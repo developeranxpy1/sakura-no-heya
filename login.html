@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sakura No Heya</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌸</text></svg>">
+    <link rel="stylesheet" href="assetts/css/style.css">
+    <style>
+        .login-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .login-card {
+            width: 90%;
+            max-width: 420px;
+            /* Liquid glass override */
+            background: rgba(255, 255, 255, 0.05); /* Clearer glass */
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1), inset 0 0 20px rgba(255,255,255,0.1);
+        }
+
+        .info-text {
+            font-size: 0.8rem;
+            margin-top: 15px;
+            opacity: 0.7;
+            text-align: center;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .skip-count {
+            font-size: 0.75rem;
+            color: var(--secondary-color);
+            margin-top: 5px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background via CSS -->
+
+    <div class="login-container">
+        <div class="glass-panel login-card anim-float">
+            <!-- Seamless Logo Area -->
+            <button id="themeToggleBtn" onclick="toggleLoginTheme()" title="Toggle Theme"
+                style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.2rem; cursor: pointer; opacity: 0.7; z-index: 10;">
+                ☀️
+            </button>
+            <div class="card-header-logo">
+                <img src="assetts/images/sakuralogo.png" alt="Sakura Logo">
+            </div>
+            
+            <div class="card-content">
+                
+                
+                <input type="text" id="username" placeholder="Username" maxlength="15">
+                <div style="position: relative; width: 100%; margin-bottom: 1.5rem;">
+                <input type="password" id="groqKey" placeholder="Enter Groq API Key (gsk_...)" style="padding-right: 50px; margin-bottom: 0;">
+                <button id="toggleKey" type="button" 
+                    style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); 
+                           background: none; border: none; cursor: pointer; color: var(--secondary-color); padding:0; display:flex; align-items:center; opacity: 0.6;">
+                    <!-- Eye Icon -->
+                    <svg id="eyeIcon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn btn-secondary" id="getKeyBtn" onclick="window.open('https://console.groq.com/keys', '_blank')">Get Key</button>
+                <button class="btn" id="startBtn">Start</button>
+            </div>
+
+            <button class="btn btn-secondary" id="skipBtn" style="margin-top: 25px; width: 100%; border:none; opacity: 0.9;">Skip Key (Trial)</button>
+            <div id="skipInfo" class="skip-count"></div>
+
+            <p class="info-text">
+                By entering, you accept cookies for credentials and persistent memory for app state.
+            </p>
+        </div>
+    </div>
+
+    <script src="assetts/js/common.js"></script>
+    <script>
+        const startBtn = document.getElementById('startBtn');
+        const skipBtn = document.getElementById('skipBtn');
+        const usernameInput = document.getElementById('username');
+        const keyInput = document.getElementById('groqKey');
+        const toggleKeyBtn = document.getElementById('toggleKey');
+        const skipInfo = document.getElementById('skipInfo');
+        const themeBtn = document.getElementById('themeToggleBtn');
+
+        // Theme Logic
+        function toggleLoginTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            // Apply
+            document.documentElement.setAttribute('data-theme', newTheme);
+            themeBtn.innerText = newTheme === 'dark' ? '🌙' : '☀️';
+
+            // Save to State (even before login)
+            let state = Common.loadState('general.json') || {};
+            state.theme = newTheme;
+            Common.saveState('general.json', state);
+        }
+
+        // Init Theme
+        (function initTheme() {
+            const state = Common.loadState('general.json') || {};
+            if (state.theme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                if(themeBtn) themeBtn.innerText = '🌙';
+            } else {
+                if(themeBtn) themeBtn.innerText = '☀️';
+            }
+        })();
+
+        // Toggle Password Logic
+        toggleKeyBtn.addEventListener('click', () => {
+            if (keyInput.type === 'password') {
+                keyInput.type = 'text';
+                // optional: change icon style
+                toggleKeyBtn.style.opacity = '1';
+            } else {
+                keyInput.type = 'password';
+                toggleKeyBtn.style.opacity = '0.6';
+            }
+        });
+
+        // Check Previous Cookies
+        const savedUser = Common.getCookie('username');
+        const savedKey = Common.getCookie('key');
+        
+        if (savedUser) usernameInput.value = savedUser;
+        if (savedKey && savedKey !== 'SKIPPED_TRIAL') keyInput.value = savedKey;
+
+        // Check general.json if cookies are missing
+        let generalState = Common.loadState('general.json') || {};
+        if (!savedUser && generalState.username) usernameInput.value = generalState.username;
+        if ((!savedKey || savedKey === 'SKIPPED_TRIAL') && generalState.key && generalState.key !== 'SKIPPED_TRIAL') {
+             keyInput.value = generalState.key;
+        }
+
+        // Check Skip Count (App State -> general.json or separate)
+        let skipCount = generalState.skip_count || 0;
+        const MAX_SKIPS = 3;
+
+        function updateSkipUI() {
+            if (skipCount >= MAX_SKIPS) {
+                // skipBtn.disabled = true; // User asked to "discard creds" - arguably if expired we might still want to disable or handle differently. 
+                // Keeping disabled logic for Expired Trial as strict requirement mentions limit.
+                skipBtn.disabled = true;
+                skipBtn.innerText = "Trial Expired";
+                skipInfo.innerText = "Please enter a valid API Key to continue.";
+            } else {
+                skipInfo.innerText = `Trial Uses: ${skipCount}/${MAX_SKIPS}`;
+            }
+        }
+        updateSkipUI();
+
+        // Strict Validation Regex
+        const keyRegex = /^gsk_[a-zA-Z0-9]{20,}$/;
+
+        // Removed auto-disable logic to keep button enabled
+        function validateInputs() {
+            const keyValid = keyRegex.test(keyInput.value.trim());
+            // Visual feedback only
+            if (keyInput.value.length > 5 && !keyValid) {
+                keyInput.style.borderColor = 'red';
+            } else {
+                keyInput.style.borderColor = '#ff9ebb'; // Reset to pink
+            }
+        }
+        usernameInput.addEventListener('input', validateInputs);
+        keyInput.addEventListener('input', validateInputs);
+
+        // Toast Logic
+        function showToast(message) {
+            let toast = document.getElementById('toast-msg');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'toast-msg';
+                toast.className = 'toast';
+                document.body.appendChild(toast);
+            }
+            toast.innerHTML = `<span>⚠️</span> ${message}`;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Actions
+        async function attemptLogin(user, key, isSkip = false) {
+             // 0. Check Cookies Enabled
+            if (!navigator.cookieEnabled) {
+                alert("Cookies are disabled! Please enable them for this app to work.");
+                return;
+            }
+
+            // 1. Request Persistent Storage (Silent)
+            if (navigator.storage && navigator.storage.persist) {
+                navigator.storage.persist().then(granted => {
+                    console.log("Storage persistence granted:", granted);
+                });
+            }
+
+            // 2. Save Session
+            let days = isSkip ? 1 : 30;
+            Common.setCookie('username', user, days);
+            Common.setCookie('key', key, days);
+
+            // 3. Sync to general.json
+            generalState.username = user;
+            generalState.key = key;
+            if (isSkip) {
+                skipCount++;
+                generalState.skip_count = skipCount;
+            }
+            Common.saveState('general.json', generalState);
+            
+            // 4. Init other files if missing
+            const initFiles = {
+                'mood.json': { current: 'neutral', createdAt: Date.now() },
+                'history.json': { logs: [], commands: [], createdAt: Date.now() },
+                'bg.json': { current: 'default', custom_url: '', createdAt: Date.now() }
+            };
+
+            for (const [file, data] of Object.entries(initFiles)) {
+                if (!localStorage.getItem('delta_os_' + file)) {
+                    Common.saveState(file, data);
+                }
+            }
+            
+            window.location.href = 'mainmenu.html';
+        }
+
+        startBtn.addEventListener('click', async () => {
+            const user = usernameInput.value.trim();
+            const key = keyInput.value.trim();
+
+            // validation check on click
+            if (!user || user === "") {
+                usernameInput.style.borderColor = 'red';
+                showToast("Please enter a Username!");
+                usernameInput.focus();
+                return;
+            }
+            
+            if (!key || !keyRegex.test(key)) {
+                keyInput.style.borderColor = 'red';
+                showToast("Please enter a valid Groq API Key!");
+                keyInput.focus();
+                return;
+            }
+
+            await attemptLogin(user, key, false);
+        });
+
+        skipBtn.addEventListener('click', async () => {
+            if (skipCount >= MAX_SKIPS) return;
+            // Discard creds: Don't use input values. Use placeholders.
+            await attemptLogin("Guest", "SKIPPED_TRIAL", true);
+        });
+
+    </script>
+</body>
+</html>

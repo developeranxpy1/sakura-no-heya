@@ -1,0 +1,92 @@
+hi 
+
+project name 'sakura-no-heya'
+
+
+
+general instruction
+
+0. dont use js alerts anywhere
+
+
+1. store everything/files inside persistant memory
+
+
+files----- in persistant memory
+history.json
+mood.json
+bg.json
+general.json
+
+
+
+and use cookies for user auth and user name and key storage
+
+2. the skip button can be used only 3 times after that user needs to use their key
+identify the that is the same user used the skip button 3 times is to checking their cookies and ip combining and checking them 
+
+3. use really basic and simple code for everything css js html pure
+
+4. this project is made for hosting in github pages with a anti server model
+
+5. use the existing files before creating new ones
+
+
+
+
+
+instruction for the login.html
+
+
+
+
+1. create a an an inputbox for username and input box for groq api key free or paid tier and add 3 buttons get key, start, skip key
+the get key will redirect to the groq api key and the start key will start the game with the users key it stays gray and disabled if the key box is empty and the skip is only usable 3 times
+
+2. add info about accepting the cookies and persistance memory in browser or else game wont run
+
+3. use stripped bg for the pages and use the logo from the assetts/images directory
+
+
+4. do research and use this ui theme for everything https://www.reddit.com/r/Unity2D/comments/1jubzzn/simple_pink_cute_ui_pack/
+dont generate ai elements use the real theme elements
+
+
+
+
+5. impliment a dark mode which is lavender+black and white mode =pink+white into everything
+
+
+
+
+
+instruction for the mainmenu.html 
+
+0. make the entire webpage responsive 
+
+1. add a main card...... inside that add a logo and buttons ...story mode (disabled),  quick start, settings, delete userdata, about, logout etc....
+
+2. inside settings add 2 ios toggles for sfx and music ...... personality prompt box for the session and a save btton for it 
+
+3. and a loading.html animation page
+
+
+
+instruction for desktopui.html
+
+1. make a windows like desktop os with mouse window manager taskbar icons searchbar time calender
+
+2. terminal, file universal manager, boot screen, etc tools
+
+
+5. extra time to make it as perfect as possible also use unix commands in the terminal
+
+also make a minimise option in the desktop 
+
+
+
+
+
+
+
+

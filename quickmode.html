@@ -1,0 +1,2067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sakura No Heya - Quick Chat</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌸</text></svg>">
+    <link rel="stylesheet" href="assetts/css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        body, html {
+            margin: 0;
+            height: 100dvh; /* Mobile Viewport Fix */
+            overflow: hidden;
+            position: fixed; /* Force Lock */
+            overscroll-behavior: none; /* No Bounce */
+            background-color: #000 !important; /* Fixed Black */
+            background-image: none !important; /* Remove dynamic images */
+            /* Global Font Change */
+            font-family: 'Comic Sans MS', 'Comic Sans', cursive, sans-serif;
+            touch-action: manipulation; /* ALLOW TOUCH */
+        }
+
+        #backBtn {
+            position: absolute;
+            top: 20px; left: 20px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 100;
+        }
+
+        /* Character Layer - Centered */
+        .character-layer {
+            position: absolute;
+            bottom: -50px;
+            left: 50%;
+            transform: translateX(-50%); /* Perfectly Centered */
+            height: 95%; 
+            max-width: 70vh;
+            object-fit: contain;
+            z-index: 1;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+            display: none;
+        }
+        
+        /* Character Slide Animation */
+        .character-layer.sliding {
+            animation: slideInRight 0.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        @keyframes slideInRight {
+            0% { transform: translateX(100%); opacity: 0; }
+            100% { transform: translateX(-50%); opacity: 1; }
+        }
+
+        /* VN Text Box Container - Floating Dark Pill */
+        .vn-box-container {
+            position: absolute;
+            bottom: 5%; 
+            /* Smart Gap for Mobile */
+            bottom: 5dvh; 
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%; /* Reduced by ~10% */
+            max-width: 810px; /* Reduced by ~10% from 900px */
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Main Dialogue Box - Layout Only */
+        .dialogue-box {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding: 25px 35px 25px 35px; /* Standard pill padding */
+            min-height: 120px; 
+            isolation: auto;
+        }
+        
+        /* The Dark Background Layer */
+        .glass-plate {
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            /* Clearer Glass - Reduced Opacity */
+            background: linear-gradient(135deg, rgba(20, 15, 30, 0.75), rgba(40, 25, 50, 0.7));
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            /* Blur Re-enabled Globally */
+            backdrop-filter: blur(10px); 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border-radius: 20px; 
+        }
+
+        /* Remove unused gloss */
+        .glass-plate::before { content: none; }
+
+        /* MC Blue Theme Update */
+        .dialogue-box.blue-theme .glass-plate {
+            border-color: rgba(100, 200, 255, 0.3);
+        }
+        .dialogue-box.blue-theme {
+            background: transparent; box-shadow: none; border: none;
+        }
+
+        /* Name Label - 2015 Era Pink Pill */
+        .char-name-label {
+            position: absolute;
+            top: -24px;
+            left: 20px;
+
+            background: #ff9ebd; /* Sakura Pink */
+            color: #ffffff; /* White Text */
+            border: 3px solid #ffffff; /* Thick White Rim */
+            -webkit-text-stroke: 0; 
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2); 
+            padding: 4px 22px;
+            border-radius: 10px; /* Boxy Shape */
+            font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+            font-weight: 900; 
+            font-size: 1.1rem; 
+            box-shadow: 0 0 15px rgba(255, 158, 189, 0.6); /* Soft Pink Glow */
+            z-index: 100;
+            overflow: hidden; /* For gloss highlight */
+        }
+        
+        /* 2015 Gloss Highlight */
+        .char-name-label::before {
+            content: '';
+            position: absolute;
+            top: 1px;
+            left: 5%;
+            width: 90%;
+            height: 40%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.5), transparent);
+            border-radius: 10px;
+            pointer-events: none;
+        }
+
+        /* Name Label Blue Theme */
+        .dialogue-box.blue-theme .char-name-label {
+            background: #a2cffe; /* Opaque Blue */
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            border-color: #ffffff; /* Opaque White */
+            box-shadow: 0 0 15px rgba(162, 207, 254, 0.6); /* Soft Blue Glow */
+        }
+
+        .dialogue-text {
+            color: #ffffff;
+            font-family: 'Comic Sans MS', 'Comic Sans', cursive; /* Requested Font */
+            font-size: 1rem; /* Smaller text as requested */
+            line-height: 1.5;
+            font-weight: normal;
+            white-space: pre-wrap;
+            flex-grow: 1; 
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.9);
+            mix-blend-mode: normal; 
+            /* Fix Overflow */
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            min-width: 0; /* Flex fix */
+        }
+        
+        /* --- IG Style History --- */
+        .history-container {
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+            flex: 1;
+            padding-right: 5px;
+            margin-bottom: 25px; /* Space for input */
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.3) transparent;
+            scroll-behavior: smooth; /* Smooth Scrolling */
+            /* Mobile scroll fix */
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-y;
+            /* justify-content: flex-end; REMOVED to fix scrolling clipping */
+        }
+        .history-container::-webkit-scrollbar { width: 6px; }
+        .history-container::-webkit-scrollbar-track { background: transparent; }
+        .history-container::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.3); border-radius: 3px; }
+        .history-container::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.5); }
+        
+        /* Expanded State */
+        .dialogue-box.expanded {
+            height: 60vh; /* Expand Verify */
+            transition: none !important; /* Instant arrival */
+        }
+        .dialogue-box.expanded .dialogue-text {
+            display: none !important; /* Hide single text forcefully */
+        }
+        .dialogue-box.expanded .history-container {
+            display: flex; /* Show list */
+        }
+        
+        /* Bubbles */
+        .msg-bubble {
+            max-width: 75%;
+            padding: 10px 15px;
+            border-radius: 18px;
+            font-size: 1rem;
+            line-height: 1.4;
+            position: relative;
+            font-family: 'Comic Sans MS', sans-serif;
+            text-shadow: none;
+        }
+        
+        .msg-user {
+            align-self: flex-end;
+            background: #3797f0; /* IG Blue */
+            color: white;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .msg-sakura {
+            align-self: flex-start;
+            background: #efefef; /* IG Gray */
+            color: black;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        }
+        
+        .msg-time {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            margin-top: 4px;
+            text-align: right;
+            display: block;
+        }
+
+        /* Typing Animation Bubble (Instagram Style) */
+        .typing-bubble {
+            background: #efefef;
+            padding: 10px 15px;
+            border-radius: 20px;
+            border-bottom-left-radius: 4px;
+            display: inline-flex;
+            gap: 4px;
+            align-items: center;
+            width: fit-content;
+            margin-bottom: 15px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            animation: fadeIn 0.3s ease-out;
+        }
+        .dot {
+            width: 6px;
+            height: 6px;
+            background: #999;
+            border-radius: 50%;
+            animation: jump 1.2s infinite ease-in-out;
+        }
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes jump {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-6px); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Input Area - Integrated */
+        .input-bar {
+            width: 100%;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-top: auto; 
+            padding-top: 0;
+            border: none;
+            margin-bottom: 30px; /* Increased gap to 10% feel (Desktop) */
+        }
+
+        /* Integrated Input Wrapper - Matching Snippet */
+        .integrated-input {
+            flex: 1; 
+            height: 30px; /* Increased by 10% (27px -> 30px) */
+            background: rgba(255,255,255,0.35); 
+            border-radius: 999px; 
+            display: flex;
+            align-items: center;
+            padding-left: 15px; 
+            box-sizing: border-box;
+            position: relative;
+            border: none; 
+            overflow: hidden; /* Prevent Button Overflow */
+        }
+        
+        .integrated-input:focus-within {
+           /* Optional: keeping focus ring or removing if pure snippet is desired. 
+              Snippet has no focus style, so I'll keep it subtle or remove border change. */
+           box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Send Button - Exact Snippet Style */
+        #sendBtn {
+            /* Always Expanded */
+            width: 80px; 
+            height: 28px;
+            margin-right: 2px;
+            border-radius: 14px; 
+            /* 3D Pink Effect */
+            background: linear-gradient(to bottom, #ff9ebd, #e91e63); 
+            color: white; 
+            border: 1px solid rgba(255,255,255,0.4);
+            box-shadow: 0 3px 0 #ad1457, 0 5px 5px rgba(0,0,0,0.2); /* 3D Depth + Shadow */
+            display: flex;
+            align-items: center;
+            justify-content: center; /* Always center */
+            cursor: pointer;
+            transition: border-radius 0.6s ease; /* No width transition needed */
+            margin-left: auto; 
+            flex-shrink: 0;
+            font-size: 0.9rem; 
+            padding: 0;
+            line-height: 1;
+            overflow: hidden; 
+            white-space: nowrap;
+        }
+
+        #sendBtn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(0.8);
+            box-shadow: none; /* Flatten disabled button */
+            transform: translateY(2px); /* Lower it slightly */
+        }
+        
+        #sendBtn:hover:not(:disabled) {
+            box-shadow: 0 4px 0 #ad1457, 0 6px 8px rgba(0,0,0,0.3); /* Slightly lifted */
+        }
+        
+        #sendBtn:active:not(:disabled) {
+            transform: translateY(3px); /* Press Down */
+            box-shadow: 0 1px 0 #ad1457, 0 2px 2px rgba(0,0,0,0.2); /* Reduced Shadow */
+        }
+        
+        .btn-text {
+            display: inline-block;
+            opacity: 1; /* Always Visible */
+            max-width: none; 
+            margin-left: 6px; /* Always Gapped */
+            font-size: 0.8rem;
+            font-weight: bold;
+            font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+            transition: all 0.6s ease; /* Match button speed */
+            color: #fff; /* White Text */
+            overflow: hidden;
+        }
+        
+
+
+        /* Input Field - Snippet Style */
+        .chat-input {
+            flex: 1;
+            height: 100%; /* Snippet input height */
+            border: none !important;
+            outline: none;
+            background: transparent !important;
+            color: #eee !important;
+            font-size: 14px; /* Smaller font for thinner box */
+            padding: 0; 
+            font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+            border-radius: 0;  
+            box-shadow: none !important; 
+            text-align: left; 
+            min-width: 0; /* Allow Flex Shrink */
+        }
+        
+        .chat-input::placeholder {
+            color: #ddd !important;
+            opacity: 0.8;
+        }
+        
+        .chat-input:focus {
+             /* Resetting focus styles to match snippet (none) */
+             background: transparent !important;
+             box-shadow: none !important;
+        }
+
+        /* --- Button Styling (Pretty & Functional) --- */
+        .vn-btn {
+            background: rgba(0, 0, 0, 0.3); /* Match Input Background */
+            border: 1px solid rgba(255, 255, 255, 0.2); /* Match Input Border */
+            color: #fff;
+            font-weight: bold;
+            color: #fff;
+            font-weight: bold;
+            padding: 0 15px; 
+            height: 30px; /* Match input height */
+            box-sizing: border-box; 
+            border-radius: 15px; /* 30px/2 */
+            font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+            font-size: 0.85rem;  
+            box-shadow: none;
+            display: inline-flex;
+            align-items: center; /* Vertical Center Text */
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .vn-btn:hover:not(:disabled) {
+            background: rgba(255,255,255,0.1);
+            border-color: #ff9ebd; /* Pink Border on Hover */
+            color: #ff9ebd; /* Pink Text on Hover */
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(255, 158, 189, 0.2);
+        }
+
+        /* Removed Hide Input in Blue Theme */
+
+        /* Blue Card Refinement - Just the written text, hide EVERYTHING else */
+        .dialogue-box.blue-theme .vn-controls,
+        .dialogue-box.blue-theme .input-bar,
+        .dialogue-box.blue-theme #continueBtn {
+            display: none !important;
+        }
+        
+        .dialogue-box.blue-theme .dialogue-text {
+            display: block !important;
+            text-align: left;
+            padding-left: 20px;
+        }
+        
+        /* Typing indicator on the left corner, after and below the text */
+        .dialogue-box.blue-theme #typing-indicator {
+            align-self: flex-start; /* Push to left */
+            margin-top: 10px;    /* Below text */
+            margin-left: 10px;  /* Corner gap */
+            margin-bottom: 0;
+            background: rgba(239, 239, 239, 0.9);
+            position: relative; /* Remove absolute to flow below text */
+        }
+
+        /* Quick Menu / Controls - Bottom Center Strip */
+        .vn-controls {
+            
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            
+            font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: rgba(255,255,255,0.5); 
+            text-transform: capitalize;
+            user-select: none;
+            transition: opacity 0.3s;
+        }
+        
+        .vn-control-btn {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .vn-control-btn:hover { 
+            color: #ff9ebd; /* Pink Hover */
+            text-shadow: 0 0 5px #ff9ebd, 0 0 10px #ff9ebd; /* Pink Glow */
+            text-decoration: none; 
+        }
+
+        /* Removed Hide Controls in Blue Theme */
+        .dialogue-box.blue-theme .vn-controls {
+             opacity: 1;
+             pointer-events: auto;
+        }
+
+        /* --- Mobile Responsiveness --- */
+        @media (max-width: 600px) {
+            .vn-box-container {
+                width: 98%; 
+                bottom: 10dvh; /* 10% Smart Gap */
+            }
+            .dialogue-box {
+                padding: 15px 15px 60px 15px; /* Extra bottom padding for controls */
+            }
+            .char-name-label {
+                left: 10px;
+                font-size: 0.9rem;
+            }
+            
+            /* Stack Input and Continue Button */
+            .input-bar {
+                flex-wrap: wrap; 
+                gap: 20px; /* Increased to 10% feel */
+                margin-bottom: 15px;
+            }
+            .integrated-input {
+                height: 42px !important; /* Thicker text box */
+                padding-left: 18px !important;
+            }
+            #sendBtn {
+                height: 38px !important; /* Scale send button */
+                width: 90px !important;
+                border-radius: 19px !important;
+            }
+            .chat-input {
+                font-size: 16px !important; /* Better for mobile zoom prevention */
+            }
+            #continueBtn {
+                width: 100%; /* Full width button on mobile */
+                height: 35px;
+            }
+            
+            /* Wrap Controls */
+            .vn-controls {
+                flex-wrap: wrap; 
+                justify-content: space-evenly;
+                gap: 10px; 
+                font-size: 0.75rem;
+                bottom: 10px;
+                width: 100%;
+                padding: 0 10px;
+                box-sizing: border-box;
+            }
+            
+            /* Fullscreen History & Settings on Mobile */
+            .vn-box-container.expanded,
+            .vn-box-container.entered-settings {
+                top: 0 !important;
+                left: 0 !important;
+                bottom: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                height: 100dvh !important;
+                transform: none !important;
+                border-radius: 0 !important;
+                display: flex !important;
+                flex-direction: column !important;
+                z-index: 999999 !important;
+                background: #000 !important; /* Pure Black as per screenshot */
+            }
+
+            .vn-box-container.expanded .dialogue-box {
+                width: 100% !important;
+                height: 100% !important;
+                border-radius: 0 !important;
+                margin: 0 !important;
+                padding: 60px 10px 15vh 10px !important; /* Reduced gap by 60% (was 35vh) */
+                background: transparent !important;
+                box-shadow: none !important;
+                display: flex !important;
+                flex-direction: column !important;
+            }
+            
+            /* Hide Label, Show Controls/Input */
+            .vn-box-container.expanded .char-name-label { display: none !important; }
+            .vn-box-container.expanded .vn-controls,
+            .vn-box-container.expanded .input-bar {
+                display: flex !important;
+            }
+
+            /* Pin Controls to Bottom - TRANSPARENT */
+            .vn-box-container.expanded .vn-controls {
+                position: fixed;
+                bottom: 5px; /* Closer to edge */
+                left: 0; 
+                width: 100%;
+                z-index: 1000;
+                background: transparent !important; /* No background stripe */
+                padding-bottom: 20px;
+            }
+            
+            /* Pin Input Above Controls */
+            .vn-box-container.expanded .input-bar {
+                position: fixed;
+                bottom: 10dvh; /* 10% gap from bottom of screen/keyboard */
+                left: 0; width: 100%;
+                z-index: 1000;
+                padding: 0 10px;
+                box-sizing: border-box;
+            }
+            
+            /* Adjust History to SCROLL */
+            .vn-box-container.expanded .history-container {
+                padding-bottom: 25dvh; /* Ensure chat ends above the 10% lifted input */
+            }
+        }
+        
+        /* Disabled Controls */
+        .disabled-btn {
+            opacity: 0.5; /* Visible but Greyed Out */
+            pointer-events: none;
+            cursor: not-allowed;
+            /* display: none; REMOVED */
+        }
+        /* --- FINAL POLISH & FIXES --- */
+        
+        /* Custom Scrollbar for History */
+        .history-container::-webkit-scrollbar {
+            width: 2px; /* Ultra thin */
+        }
+        .history-container::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+        }
+        .history-container::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+        }
+        .history-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,158,189, 0.5);
+        }
+
+        /* History Header (Instagram Style) */
+        .history-header {
+            display: none; /* Hidden by default */
+            position: absolute;
+            top: 0; left: 0; width: 100%;
+            height: 60px;
+            padding: 0 15px;
+            box-sizing: border-box;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.2);
+            z-index: 20;
+            border-radius: 20px 20px 0 0;
+        }
+        
+        .vn-box-container.expanded .history-header {
+            display: flex;
+        }
+        .vn-box-container.expanded .char-name-label {
+            display: none; /* Hide default floating label when expanded */
+        }
+
+        .hist-back-btn {
+            background: transparent; border: none; color: white;
+            font-size: 2rem; cursor: pointer; line-height: 1;
+            padding: 0; margin-right: 10px;
+        }
+        .hist-title {
+            flex: 1; text-align: center; display: flex; flex-direction: column;
+        }
+        .hist-name { font-weight: bold; font-size: 1rem; color: white; }
+        .hist-status { font-size: 0.75rem; color: rgba(255,255,255,0.6); }
+
+        /* 1. Ensure Animation Expands Upwards */
+        .vn-box-container {
+            transform-origin: bottom center;
+            transition: all 0.4s ease-in-out; 
+            /* Ensure bottom stays anchored so it grows UP */
+            bottom: 10%; 
+        }
+
+        /* 2. Text-Only Control Buttons in Expanded History (Instagram Style) */
+        .vn-box-container.expanded .vn-control-btn {
+             background: transparent !important; 
+             border: none !important;
+             color: rgba(255,255,255,0.6) !important;
+             font-weight: bold;
+             text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+             padding: 5px !important;
+             border-radius: 0 !important;
+             box-shadow: none !important;
+        }
+        .vn-box-container.expanded .vn-control-btn:hover {
+            color: #ff9ebd !important;
+            background: transparent !important;
+            text-shadow: 0 0 8px rgba(255,158,189, 0.6);
+        }
+
+        /* 3. Ensure Desktop Expansion doesn't spread out */
+        @media (min-width: 601px) {
+            .vn-box-container.expanded {
+                /* STRICTLY maintain width/position to prevent "spreading" */
+                width: 80% !important; 
+                max-width: 810px !important;
+                left: 50% !important;
+                transform: translateX(-50%) !important; 
+                bottom: 10% !important; 
+                
+                /* Only Grow Height */
+                height: 70vh !important; 
+                border-radius: 20px !important; 
+            }
+            .vn-box-container.expanded .dialogue-box {
+                 background: rgba(20, 20, 20, 0.6) !important; /* Darker & More Transparent */
+                 backdrop-filter: blur(12px) !important; /* Reduced Blur (50% reduction) */
+                 height: 100% !important;
+                 border-radius: 20px !important;
+                 padding: 60px 35px 40px 35px !important; /* Reduced bottom padding */
+                 box-shadow: 0 20px 50px rgba(0,0,0,0.6) !important;
+            }
+            
+            /* Ensure Input/Controls visible on desktop expanded too */
+            .vn-box-container.expanded .vn-controls,
+            .vn-box-container.expanded .input-bar {
+                display: flex !important;
+            }
+            
+            /* Hide Char Image on Desktop Expand too if needed, but JS handles it */
+        }
+
+
+        /* --- Settings Expansion Styles --- */
+        /* Mimic .expanded logic for .entered-settings */
+        .vn-box-container.entered-settings {
+            height: 80vh; /* Mobile default */
+            bottom: 0;
+            width: 100%;
+            border-radius: 0;
+            transition: none !important; /* Instant arrival */
+            z-index: 1500; /* High z-index */
+        }
+
+        .vn-box-container.entered-settings .dialogue-box {
+            height: 100% !important;
+            border-radius: 0;
+        }
+
+        /* Desktop Overrides for Settings Expansion */
+        @media (min-width: 601px) {
+            .vn-box-container.entered-settings {
+                width: 80% !important;
+                max-width: 810px !important;
+                left: 50% !important;
+                transform: translateX(-50%) !important;
+                bottom: 10% !important;
+                height: 70vh !important;
+                border-radius: 0 !important;
+            }
+            .vn-box-container.entered-settings .dialogue-box {
+                background: rgba(20, 20, 20, 0.6) !important;
+                backdrop-filter: blur(12px) !important;
+                height: 100% !important;
+                border-radius: 0 !important;
+                padding-bottom: 20px !important; 
+            }
+        }
+
+        /* Visibility toggles in Settings Mode */
+        .vn-box-container.entered-settings .dialogue-text,
+        .vn-box-container.entered-settings .name-box,
+        .vn-box-container.entered-settings .history-container,
+        .vn-box-container.entered-settings .char-name-label,
+        .vn-box-container.entered-settings .input-bar,
+        .vn-box-container.entered-settings .vn-controls,
+        .vn-box-container.entered-settings .history-header {
+            display: none !important; 
+        }
+
+        .vn-box-container.entered-settings #settingsPanel {
+            opacity: 1;
+            pointer-events: all;
+            position: relative; /* Fits inside the flex container */
+            width: 100%;
+            height: 100%;
+            background: transparent; /* Box has background */
+            backdrop-filter: none; /* Box has blur */
+            padding: 0;
+        }
+
+        /* --- Settings Modal Styles (From Main Menu) --- */
+        .settings-modal {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #141520; /* Deep Dark Blue */
+            border-radius: 0;
+            z-index: 200;
+            padding: 0; /* REMOVED padding for edge-to-edge header */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: none !important; /* Instant arrival */
+            overflow-y: auto;
+            color: #d1d5db; /* Gray-300 text */
+            font-family: 'Inter', sans-serif; /* Modern font fallback */
+            
+            /* Hide Scrollbar */
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none;  /* IE 10+ */
+            
+            /* Mobile scroll fix */
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-y;
+        }
+        .settings-modal::-webkit-scrollbar { 
+            display: none; /* Chrome/Safari */
+        }
+
+        .settings-modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 1rem;
+            width: 100%;
+            font-weight: bold;
+            color: white;
+        }
+
+        /* Pretty Settings Header */
+        .settings-header-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: calc(100% - 30px); /* Account for margins */
+            padding: 15px;
+            margin: 15px;
+            background: rgba(20, 21, 32, 0.8);
+            border-radius: 20px; /* Rounded */
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative; /* For absolute back button */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .settings-back-btn {
+            background: none;
+            border: none;
+            color: #c4b5fd; /* Lavender */
+            font-size: 2rem;
+            position: absolute;
+            left: 15px;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0;
+            transition: transform 0.2s;
+        }
+        .settings-back-btn:hover {
+            transform: scale(1.2);
+            color: #fff;
+        }
+
+        /* Toggles */
+        /* Toggles */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 55px; height: 30px; /* Refined size */
+        }
+        .switch input { display: none; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #374151; /* Dark Gray Unchecked */
+            border-radius: 34px;
+            transition: .3s;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 24px; width: 24px;
+            left: 3px; bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        /* Toggles Redesign */
+        input:checked + .slider { background-color: #a78bfa; } /* Match Lavender */
+        input:checked + .slider:before { transform: translateX(25px); }
+
+        /* Buttons Redesign */
+        .btn-lavender {
+            background: #c4b5fd; /* Soft Lavender */
+            color: #4c1d95; /* Deep Purple Text */
+            border: none;
+            padding: 12px 0;
+            border-radius: 15px; /* Requested 15px */
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+            /* 3D effect border */
+            border-bottom: 4px solid #a78bfa;
+            transition: all 0.1s;
+            font-family: 'Comic Sans MS', cursive;
+            flex: 1; /* Ensure Symmetry */
+        }
+        .btn-lavender:active {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+        }
+
+        .btn-salmon {
+             background: #f87171; /* Salmon/Red */
+             color: white;
+             border: none;
+             padding: 12px 0;
+             border-radius: 15px; /* Requested 15px */
+             font-weight: bold;
+             font-size: 1rem;
+             cursor: pointer;
+             width: 100%;
+             /* Darker Red 3D */
+             border-bottom: 4px solid #ef4444; 
+             transition: all 0.1s;
+             font-family: 'Comic Sans MS', cursive;
+        }
+        .btn-salmon:active {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+        }
+
+        /* Personality Textarea */
+        .settings-textarea {
+            width: 100%;
+            height: 120px;
+            background: rgba(30, 30, 46, 0.5);
+            border: 2px solid #a78bfa;
+            border-radius: 15px; /* Requested 15px */
+            color: white;
+            padding: 10px;
+            font-family: inherit;
+            resize: none;
+            margin-bottom: 20px;
+        }
+        .settings-textarea:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.5);
+        }
+
+        /* Persistence File Card */
+        .persistence-card {
+            background: #c4b5fd;
+            border-radius: 15px; /* Requested 15px */
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: #4c1d95;
+            font-weight: bold;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+        .file-icon-btn {
+            background: #a78bfa;
+            border: none;
+            border-radius: 15px; /* Requested 15px */
+            width: 30px; 
+            height: 30px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* --- New Settings Header Styles (Sticky + Minimalistic Back) --- */
+        .settings-header-wrapper {
+            width: 100%;
+            position: sticky; /* Sticky */
+            top: 0;
+            z-index: 50;
+            background: #141520; /* Match modal bg to cover content scrolling */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0; /* Reset margin, handled by padding */
+            padding: 10px 20px; /* Reduced vertical padding */
+            border-bottom: 1px solid rgba(255,255,255,0.05); /* Subtle separator */
+            box-sizing: border-box;
+        }
+
+        .settings-back-btn {
+            position: absolute;
+            left: 0;
+            background: transparent !important;
+            border: none !important;
+            color: #a78bfa !important; /* Lavender Icon */
+            font-size: 2.5rem !important; /* Bigger */
+            font-weight: bold;
+            cursor: pointer;
+            cursor: pointer;
+            padding: 0 20px; /* Adjusted for header padding */
+            line-height: 1;
+            transition: transform 0.2s;
+        }
+        .settings-back-btn:hover {
+            transform: scale(1.1);
+            color: #c4b5fd !important;
+        }
+
+        /* --- JSON Editor Modal --- */
+        #jsonEditorModal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000000; /* Always on top */
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: none !important; /* Instant arrival */
+        }
+        #jsonEditorModal.active {
+            display: flex;
+            opacity: 1;
+        }
+        .json-editor-content {
+            background: #1e1e2e;
+            padding: 20px;
+            border-radius: 15px; /* Consistent radius */
+            width: 90%;
+            max-width: 600px;
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #a78bfa;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        .json-editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            color: #c4b5fd;
+            font-family: 'Comic Sans MS', cursive;
+            font-size: 1.2rem;
+        }
+        .json-editor-textarea {
+            flex: 1;
+            background: #141520;
+            color: #a78bfa;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 10px;
+            font-family: monospace;
+            resize: none;
+            margin: 15px 0;
+            font-size: 16px; /* Mobile safe font size */
+        }
+        .json-editor-textarea:focus {
+            outline: none;
+            border-color: #a78bfa;
+        }
+
+        /* Mobile specific adjustments for Editor */
+        @media (max-width: 600px) {
+            .json-editor-content {
+                width: 100% !important;
+                height: 100dvh !important;
+                max-width: 100% !important;
+                border-radius: 0 !important;
+                padding: 15px;
+                border: none;
+            }
+            .json-editor-header {
+                font-size: 1.1rem;
+                padding-top: 10px; /* Safe area */
+            }
+            .json-editor-textarea {
+                font-size: 16px; /* Prevent zoom */
+                border-radius: 5px;
+            }
+            #jsonEditorModal button {
+                padding: 12px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <button id="backBtn" onclick="window.location.href='mainmenu.html'">Back</button>
+    <div id="debug" class="debug-info"></div>
+
+    <img id="character-layer" class="character-layer" src="" alt="Sakura">
+
+    <div class="vn-box-container">
+        <!-- Dialogue Box -->
+        <div class="dialogue-box">
+            <div class="glass-plate"></div>
+            
+            <!-- IG Style Header (Visible only when expanded) -->
+            <div class="history-header">
+                <button id="histBackBtn" class="hist-back-btn">&#8249;</button> <!-- Chevron Left -->
+                <div class="hist-title">
+                    <span class="hist-name">Sakura</span>
+                    <!-- <span class="hist-status">Active now</span> -->
+                </div>
+                <div class="hist-actions">
+                    <!-- Placeholder icons or disabled buttons -->
+                </div>
+            </div>
+
+            <div class="char-name-label">Sakura</div>
+            
+            <!-- History Container -->
+            <div id="history-container" class="history-container"></div>
+            
+            <div id="vn-text" class="dialogue-text"></div>
+            
+            <!-- Input Inside -->
+            <div class="input-bar">
+                <div class="integrated-input">
+                    <input type="email" id="user-input" class="chat-input" placeholder="Type here..." autocomplete="off">
+                    <button class="" id="sendBtn" disabled>&#10140; <span class="btn-text">Send</span></button> 
+                </div>
+                <button class="vn-btn secondary" id="continueBtn">Continue</button>
+            </div>
+
+            <!-- VN Controls -->
+            <div class="vn-controls">
+                <span class="vn-control-btn" id="btnHistory">History</span>
+                <span class="vn-control-btn disabled-btn" id="btnSkip">Skip</span>
+                <span class="vn-control-btn disabled-btn" id="btnAuto">Auto</span>
+                <span class="vn-control-btn disabled-btn" id="btnSave">Save</span>
+                <span class="vn-control-btn" id="btnSettings" onclick="toggleSettings()">Settings</span>
+            </div>
+
+            <!-- Settings Modal Overlay (Inside Box for containment) -->
+            <div class="settings-modal" id="settingsPanel">
+                <!-- Sticky Header with Back Button + Centered Title -->
+                <div class="settings-header-wrapper">
+                    <button onclick="toggleSettings()" class="settings-back-btn">&#8249;</button>
+                    <h2 style="font-family: 'Comic Sans MS', cursive; color: #e5e7eb; font-size: 1.8rem; margin: 0;">Settings</h2>
+                </div>
+                
+                <!-- Content Wrapper (Padded) -->
+                <div style="padding: 25px; width: 100%; box-sizing: border-box;">
+                    <!-- Symmetrical Toggles (Justify Between is already there, ensuring widths) -->
+                    <div class="setting-row">
+                        <span>Dark Mode</span>
+                        <label class="switch">
+                            <input type="checkbox" id="themeToggle" onchange="toggleTheme(this.checked); saveSettings(false)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-row">
+                        <span>Music</span>
+                        <label class="switch">
+                            <input type="checkbox" id="musicToggle" onchange="saveSettings(false)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-row">
+                        <span>SFX</span>
+                        <label class="switch">
+                            <input type="checkbox" id="sfxToggle" onchange="saveSettings(false)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-row">
+                        <span>Developer Mode</span>
+                        <label class="switch">
+                            <input type="checkbox" id="devToggle" onchange="saveSettings(false)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Personality Section -->
+                    <div style="width: 100%; margin-top: 10px;">
+                        <div style="margin-bottom: 5px; font-size: 0.9rem; color: #d1d5db;">Personality</div>
+                        <textarea class="settings-textarea" placeholder="5000-chars max" id="personalityInput"></textarea>
+                    </div>
+
+                    <!-- Buttons Row -->
+                    <div style="display:flex; gap:15px; width: 100%; margin-top: 10px; margin-bottom: 20px;">
+                        <button class="btn-lavender" onclick="saveSettings(true)">Save</button>
+                        <button class="btn-lavender" onclick="toggleSettings()">Back</button>
+                    </div>
+                    
+                    <!-- Divider -->
+                    <hr style="width: 100%; border: 0; border-top: 1px solid rgba(255,255,255,0.2); margin-bottom: 20px;">
+                    
+                    <!-- Delete Button -->
+                    <div style="width: 100%; margin-bottom: 20px;">
+                        <button class="btn-salmon" onclick="clearData()">Delete All Data</button>
+                    </div>
+
+                    <!-- Persistence Files Section -->
+                    <div style="width: 100%;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+                            <div style="font-weight: bold; color: #9ca3af; font-size: 0.9rem;">Persistence Files:</div>
+                            <!-- Global Export/Import Buttons inside the section header/row -->
+                            <div style="display:flex; gap:10px;">
+                                 <button class="file-icon-btn" onclick="exportData()" title="Export All" style="width:auto; padding:0 15px; font-size:0.8rem; font-weight:bold;">Export</button>
+                                 <button class="file-icon-btn" onclick="document.getElementById('fileInput').click()" title="Import All" style="width:auto; padding:0 15px; font-size:0.8rem; font-weight:bold;">Import</button>
+                                 <input type="file" id="fileInput" style="display:none" onchange="importData(this)" accept=".json">
+                            </div>
+                        </div>
+                        
+                        <!-- File List (Populated by JS) -->
+                        <div id="persistenceList"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- JSON Editor Modal -->
+    <div id="jsonEditorModal">
+        <div class="json-editor-content">
+            <div class="json-editor-header">
+                <span id="jsonEditorTitle">Editing File</span>
+                <button onclick="closeEditor()" style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer;">&times;</button>
+            </div>
+            <textarea id="jsonEditorInput" class="json-editor-textarea" spellcheck="false"></textarea>
+            <div style="display:flex; gap:10px;">
+                <button class="btn-lavender" onclick="saveEditorContent()">Save Changes</button>
+                <button class="btn-lavender" onclick="closeEditor()" style="width: auto; padding: 0 20px;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="assetts/js/common.js"></script>
+    <script>
+        // Logic moved to bottom of file
+
+
+        let chatHistory = []; 
+        const API_CONTEXT_LIMIT = 20; // Last 20 messages for AI context
+
+        // --- DOM ---
+        const vnText = document.getElementById('vn-text');
+        const userInput = document.getElementById('user-input');
+        const charImg = document.getElementById('character-layer');
+        const body = document.body;
+        const debug = document.getElementById('debug');
+        const dialogueBox = document.querySelector('.dialogue-box');
+        const boxContainer = document.querySelector('.vn-box-container');
+        const nameLabel = document.querySelector('.char-name-label');
+        const historyContainer = document.getElementById('history-container');
+
+        // Prevent Mobile Scroll (Rubber-banding) - Aggressive
+        document.addEventListener('touchmove', function(e) { 
+            // Whitelist scrollable areas
+            if(e.target.closest('.history-container') || e.target.closest('.settings-modal') || e.target.closest('.json-editor-content')) {
+                return; 
+            }
+            e.preventDefault(); 
+        }, { passive: false });
+
+        // --- ASSETS ---
+        // --- ASSETS (Hardcoded for Pure JS) ---
+        // --- ASSETS ---
+        let scannedAssets = { environments: [], characters: {} };
+
+        // Load Asset Manifest
+        fetch('assetts/manifest.json')
+            .then(res => res.json())
+            .then(data => {
+                scannedAssets = data;
+                console.log("Assets Loaded:", scannedAssets);
+                // Set initial BG if available
+                if(scannedAssets.environments && scannedAssets.environments.length > 0) {
+                     // Check history first in restoreState, else default
+                     if(chatHistory.length === 0) body.style.backgroundImage = `url('${scannedAssets.environments[0]}')`;
+                }
+            })
+            .catch(err => console.error("Asset Manifest Load Failed:", err));
+
+        // --- PERSISTENCE HELPERS ---
+        function saveChatHistory() {
+            // Load full object to avoid overwriting other fields (commands, etc.)
+            let historyData = Common.loadState('history.json') || { logs: [], commands: [], createdAt: Date.now() };
+            historyData.logs = chatHistory;
+            Common.saveState('history.json', historyData);
+        }
+
+        // Init - Load History
+        const loadedHistory = Common.loadState('history.json');
+        if (loadedHistory && loadedHistory.logs) {
+            chatHistory = loadedHistory.logs;
+        }
+
+        body.style.backgroundImage = `url('${scannedAssets.environments[0]}')`;
+        const defChar = scannedAssets.characters?.school_dress?.neutral;
+        if(defChar) { charImg.src = defChar; charImg.style.display = 'block'; }
+        
+        // Restore Visual State
+        // Restore Visual State (Always show last AI context)
+        function restoreState() {
+            if (chatHistory.length > 0) {
+                // Find last AI message for Environment/Char State
+                const lastAI = [...chatHistory].reverse().find(m => m.role === 'assistant');
+                
+                if(lastAI) {
+                    let content = lastAI.content;
+                    try {
+                        const p = JSON.parse(content);
+                        if(p.response) content = p.response;
+                        if(p.environment) body.style.backgroundImage = `url('${p.environment}')`;
+                        if(p.character_image) charImg.src = p.character_image;
+                        vnText.innerText = content;
+                    } catch(e) {
+                         vnText.innerText = content;
+                    }
+                } else {
+                     vnText.innerText = ""; // Should not happen if history exists but no AI
+                }
+                
+                // Force Sakura Theme (User request: "Always show her last message not mine")
+                dialogueBox.classList.remove('blue-theme');
+                nameLabel.innerText = "Sakura";
+            } else {
+                // Default Start - Empty
+                vnText.innerText = "";
+            }
+        }
+        
+        restoreState();
+
+
+        // --- API & ANIMATION ---
+        
+        // --- LOGIC ---
+        
+        let autoMode = false;
+        let isTyping = false;
+        
+        // Input Validation
+        // Input Validation & Auto-Send
+        userInput.addEventListener('input', () => {
+            sendBtn.disabled = userInput.value.trim() === "";
+        });
+        userInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleInput();
+                // Reset height after send
+                userInput.style.height = 'auto'; 
+            }
+        });
+
+        // Typing Override
+        let typeInterval;
+        let currentFullText = "";
+        
+        // --- LOGIC ---
+        let isAIProcessing = false;
+
+        function toggleTyping(show) {
+            isAIProcessing = show;
+            let existing = document.getElementById('typing-indicator');
+            if (show) {
+                if (existing) return;
+                const typingObj = document.createElement('div');
+                typingObj.id = 'typing-indicator';
+                typingObj.className = 'typing-bubble';
+                typingObj.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+                
+                // Add to history if expanded
+                // Whitelist only expanded history for the bubble
+                if (dialogueBox.classList.contains('expanded')) {
+                    historyContainer.appendChild(typingObj);
+                    historyContainer.scrollTop = historyContainer.scrollHeight;
+                } else {
+                    // Do not show bubble in main VN box if it looks like a "weird textarea"
+                }
+            } else {
+                if (existing) existing.remove();
+            }
+        }
+        
+        async function sendToAI(textInput, showBlueBox = true) {
+            if (!textInput && !showBlueBox) return; 
+
+            // Clear Input
+            if(showBlueBox && userInput) userInput.value = "";
+
+            // User History
+            if(showBlueBox) {
+                chatHistory.push({ role: "user", content: textInput, timestamp: Date.now() });
+            } else if (textInput === "continue") {
+                chatHistory.push({ role: "user", content: "Continue...", timestamp: Date.now() });
+            }
+            saveChatHistory(); // SAVE
+            if(dialogueBox.classList.contains('expanded')) renderHistory(); // Immediate UI update
+
+
+            // Prepare Messages (Sanitize History for API) - Sliding Window
+            const cleanHistory = chatHistory.map(({ role, content }) => ({ role, content })); // Strip timestamps
+            const contextHistory = cleanHistory.slice(-API_CONTEXT_LIMIT);
+            const messages = [
+                { role: "system", content: currentPersonality + "\n\n" + SYSTEM_INSTRUCTIONS + "\n\nAVAILABLE ASSETS: " + JSON.stringify(scannedAssets) },
+                ...contextHistory
+            ];
+
+            try {
+                if(showBlueBox) {
+                    // MC TURN - Blue Theme
+                    dialogueBox.classList.add('blue-theme');
+                    nameLabel.innerText = username || "You"; 
+                    vnText.innerText = textInput; // RESTORED: Show user text on their turn
+                } else {
+                    vnText.innerText = ""; // Thinking indicator
+                }
+
+                toggleTyping(true); // SHOW TYPING FLOW
+
+                // DEMO MODE - SKIP KEY
+                if (key === 'SKIPPED_TRIAL') {
+                    await new Promise(r => setTimeout(r, 1000));
+                    
+                    // Revert to Sakura
+                    dialogueBox.classList.remove('blue-theme');
+                    nameLabel.innerText = "Sakura";
+                    
+                    const demoJson = JSON.stringify({ 
+                        response: "I am running in demo mode because you skipped the login key! Please login with a valid Groq API key for real conversation.",
+                        environment: scannedAssets.environments ? scannedAssets.environments[0] : "",
+                        character_image: scannedAssets.characters?.school_dress?.neutral 
+                    });
+                    processResponse(demoJson);
+                    return;
+                }
+
+                // REAL API CALL (With Fallback Proxy Logic)
+                const targetUrl = "https://api.groq.com/openai/v1/chat/completions";
+                let endpoint = "https://corsproxy.io/?" + encodeURIComponent(targetUrl);
+                
+                if (!key || key === 'SKIPPED_TRIAL' || key === 'undefined') {
+                     // Safety check if demo mode logic failed to catch it
+                     throw new Error("Invalid API Key. Please log in again.");
+                }
+
+                let response;
+                try {
+                    UI.toast("Waking up Sakura...");
+                    response = await fetch(endpoint, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${key.trim()}`
+                        },
+                        body: JSON.stringify({
+                            model: MODEL,
+                            messages: messages,
+                            response_format: { type: "json_object" },
+                            temperature: 0.7,
+                            max_tokens: 1024
+                        })
+                    });
+                } catch (fetchErr) {
+                    console.error("Primary Proxy Failed, trying fallback...", fetchErr);
+                    // Fallback to Codetabs Proxy
+                    endpoint = "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(targetUrl);
+                    try {
+                        response = await fetch(endpoint, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": `Bearer ${key.trim()}`
+                            },
+                            body: JSON.stringify({
+                                model: MODEL,
+                                messages: messages,
+                                response_format: { type: "json_object" },
+                                temperature: 0.7,
+                                max_tokens: 1024
+                            })
+                        });
+                    } catch (fallbackErr) {
+                        console.error("All proxies failed.", fallbackErr);
+                        throw new Error("Connection Failed: All CORS proxies are unreachable. Please check your internet or try a different network.");
+                    }
+                }
+
+                const text = await response.text();
+
+                if (!response.ok) {
+                    let errMsg = "API Error " + response.status;
+                    try { 
+                        const err = JSON.parse(text); 
+                        errMsg = err.error?.message || errMsg; 
+                    } catch(e) {}
+                    throw new Error(errMsg);
+                }
+
+                // Process Response
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch(e) {
+                     // Check if it's the raw content or wrapped
+                     throw new Error("Invalid structure: " + text.substring(0, 50));
+                }
+                
+                const aiContent = data.choices[0].message.content;
+                
+                // Revert to Sakura
+                dialogueBox.classList.remove('blue-theme');
+                nameLabel.innerText = "Sakura";
+
+                processResponse(aiContent);
+
+            } catch(e) {
+                console.error("Groq Error:", e);
+                // Revert on error too
+                dialogueBox.classList.remove('blue-theme');
+                nameLabel.innerText = "Sakura";
+                
+                vnText.innerText = "Error: " + e.message;
+                isTyping = false;
+            }
+        }
+
+        function processResponse(jsonString) {
+            toggleTyping(false); // HIDE TYPING FLOW
+            let parsed;
+            try {
+                parsed = JSON.parse(jsonString);
+            } catch(e) {
+                parsed = { response: jsonString };
+            }
+
+            // Update History
+            chatHistory.push({ role: "assistant", content: jsonString, timestamp: Date.now() });
+            // Slicing removed to show all chants from the beginning
+            saveChatHistory(); // SAVE
+            if(dialogueBox.classList.contains('expanded')) renderHistory(); // Update bubbles
+
+
+            // Execute VN State
+            if(parsed.environment) {
+                body.style.backgroundImage = `url('${parsed.environment}')`;
+            }
+            if (parsed.character_image && parsed.character_image !== charImg.src) {
+               
+                // Fast Slide Out/In Animation
+                charImg.classList.remove('sliding');
+                void charImg.offsetWidth; // Trigger reflow
+                
+                // Add class to start animation
+                charImg.classList.add('sliding');
+                
+                // Change source mid-animation (very fast)
+                setTimeout(() => {
+                    charImg.src = parsed.character_image;
+                    charImg.style.display = 'block'; 
+                }, 100); // 100ms into slide
+            } else if (parsed.character_image) {
+                // Just ensure visible if same image
+                charImg.style.display = 'block';
+            }
+            
+            // Type Text
+            if(parsed.response) {
+                typeWriter(parsed.response, vnText);
+            } else {
+                finishTyping();
+            }
+        }
+        
+        function typeWriter(text, element) {
+            currentFullText = text;
+            clearInterval(typeInterval); 
+            element.innerText = "";
+            let i = 0;
+            isTyping = true;
+            const speed = 30; 
+            
+            typeInterval = setInterval(() => {
+                if (i < text.length) {
+                    element.innerText += text.charAt(i);
+                    i++;
+                } else {
+                    finishTyping();
+                }
+            }, speed);
+        }
+        
+        function finishTyping() {
+            clearInterval(typeInterval);
+            if(currentFullText) vnText.innerText = currentFullText;
+            isTyping = false;
+            
+            // Auto Mode Logic
+            if(autoMode) {
+                setTimeout(() => {
+                    if(autoMode) sendToAI("continue", false);
+                }, 2000); // 2s wait before auto-continuing
+            }
+        }
+        
+        // Update sendToAI to respect Auto Mode interrupt
+        const originalSendToAI = sendToAI;
+        sendToAI = async function(textInput, showBlueBox = true) {
+            if(autoMode && showBlueBox) {
+                autoMode = false;
+                document.getElementById('btnAuto').classList.remove('active');
+                UI.toast("Auto Mode Paused");
+            }
+            // Disable send button while processing
+            if(showBlueBox && sendBtn) sendBtn.disabled = true;
+            
+            try {
+                await originalSendToAI(textInput, showBlueBox);
+            } catch(e) {
+                autoMode = false;
+                document.getElementById('btnAuto').classList.remove('active');
+            }
+            
+            // Re-enable if needed (though usually input cleared)
+            if(sendBtn) sendBtn.disabled = userInput.value.trim() === ""; 
+        };
+
+        // --- CONTROL HANDLERS ---
+        const sendBtn = document.getElementById('sendBtn');
+        const histOverlay = document.getElementById('historyOverlay');
+        const histContent = document.getElementById('historyContent');
+        const btnAuto = document.getElementById('btnAuto');
+        const btnHistory = document.getElementById('btnHistory');
+        const histBackBtn = document.getElementById('histBackBtn');
+
+        function handleInput() {
+             if(!sendBtn.disabled) {
+                 sendToAI(userInput.value.trim(), true);
+                 // No height reset needed for input
+             }
+        }
+
+        sendBtn.onclick = () => {
+             handleInput();
+        };
+        
+        document.getElementById('continueBtn').onclick = () => {
+            sendToAI("continue", false);
+        };
+        
+        // Keypress removed (handled by keydown)
+
+        // History - Expand In-Place
+        // History - Toggle In-Place
+        btnHistory.onclick = () => { 
+             // Close Settings if open
+             if(boxContainer.classList.contains('entered-settings')) {
+                toggleSettings(); // This will close settings
+             }
+             
+             // Check if already expanded
+             if (dialogueBox.classList.contains('expanded')) {
+                 dialogueBox.classList.remove('expanded');
+                 boxContainer.classList.remove('expanded');
+             } else {
+                 dialogueBox.classList.add('expanded');
+                 boxContainer.classList.add('expanded'); // Toggle on parent for Mobile Fullscreen Fix
+                 renderHistory();
+             }
+        };
+
+        function renderHistory() {
+            historyContainer.innerHTML = chatHistory.map(msg => {
+                let txt = msg.content;
+                try{ const p = JSON.parse(txt); txt = p.response || txt; }catch(e){}
+                let role = msg.role;
+                if(role === "system") return "";
+                
+                // Timestamp
+                const ts = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : "";
+
+                const bubbleClass = (role === 'user') ? 'msg-user' : 'msg-sakura';
+                
+                // Avatar for Sakura
+                let avatarHtml = "";
+                if(role !== 'user') {
+                    const avatarSrc = (scannedAssets.characters && Object.keys(scannedAssets.characters).length > 0) 
+                                      ? Object.values(scannedAssets.characters)[0] 
+                                      : 'assetts/images/sakura_avatar_placeholder.png';
+                    avatarHtml = `<img src="${avatarSrc}" class="msg-avatar" onerror="this.style.display='none'">`;
+                }
+
+                return `<div style="display:flex; width:100%; margin-bottom: 12px; ${role==='user'?'justify-content:flex-end':''}">
+                           ${avatarHtml}
+                           <div class="msg-bubble ${bubbleClass}">
+                               ${txt}
+                               <span class="msg-time">${ts}</span>
+                           </div>
+                        </div>`;
+            }).join('');
+            
+            // Scroll to bottom
+            setTimeout(() => {
+               historyContainer.scrollTop = historyContainer.scrollHeight;
+            }, 50);
+        }
+
+        // Back Button in Header
+        histBackBtn.onclick = () => {
+             dialogueBox.classList.remove('expanded');
+             boxContainer.classList.remove('expanded');
+             // charImg.style.display = 'block'; // REMOVED: Managed by visibility state
+        };
+
+        // Skip
+        document.getElementById('btnSkip').onclick = () => {
+             if(isTyping) finishTyping();
+        };
+
+        // Auto
+        btnAuto.onclick = () => {
+            autoMode = !autoMode;
+            if(autoMode) {
+                btnAuto.classList.add('active');
+                UI.toast("Auto Mode On");
+                if(!isTyping) sendToAI("continue", false);
+            } else {
+                btnAuto.classList.remove('active');
+                UI.toast("Auto Mode Off");
+            }
+        };
+
+        // Save (Manual)
+        document.getElementById('btnSave').onclick = () => {
+            saveChat();
+            UI.toast("Game Saved!");
+        };
+        
+
+
+        // --- SETTINGS LOGIC ---
+        function toggleSettings() {
+            // Check if we are opening or closing
+            const isSettingsOpen = boxContainer.classList.contains('entered-settings');
+            
+            if (isSettingsOpen) {
+                // Close Settings
+                boxContainer.classList.remove('entered-settings');
+                dialogueBox.classList.remove('entered-settings');
+            } else {
+                // Open Settings
+                
+                // 1. Close History if open
+                if (boxContainer.classList.contains('expanded')) {
+                    boxContainer.classList.remove('expanded');
+                    dialogueBox.classList.remove('expanded');
+                }
+                
+                // 2. Open Settings
+                boxContainer.classList.add('entered-settings');
+                dialogueBox.classList.add('entered-settings');
+            }
+        }
+
+        function saveSettings(shouldClose = false) {
+            const isDark = document.getElementById('themeToggle').checked;
+            const music = document.getElementById('musicToggle').checked;
+            const sfx = document.getElementById('sfxToggle').checked;
+            const devMode = document.getElementById('devToggle').checked;
+            const personality = document.getElementById('personalityInput').value.trim();
+
+            // Load existing to preserve 'createdAt', 'username', 'key', etc.
+            let current = Common.loadState('general.json') || {};
+            current.theme = isDark ? 'dark' : 'light';
+            current.music = music;
+            current.sfx = sfx;
+            current.devMode = devMode;
+            current.personality = personality;
+
+            Common.saveState('general.json', current);
+            Common.initTheme(); // Apply immediately
+            
+            // Update Runtime
+            currentPersonality = personality || DEFAULT_PERSONALITY;
+            
+            if (shouldClose) {
+                toggleSettings();
+            }
+        }
+        
+        function toggleTheme(isDark) {
+            const theme = isDark ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+        }
+
+        function clearData() {
+            if(confirm("Are you sure? This will delete all your settings, history, and mood data.")) {
+                localStorage.clear();
+                Common.setCookie('delta_settings', '', -1); // Clear persistence
+                window.location.reload();
+            }
+        }
+        
+        // --- EXPORT / IMPORT (ZIP) ---
+        async function exportData() {
+            const zip = new JSZip();
+            const files = ['history.json', 'mood.json', 'bg.json', 'general.json', 'log1.json'];
+            
+            try {
+                UI.toast("Preparing Export...");
+                
+                files.forEach(file => {
+                     const content = localStorage.getItem('delta_os_' + file);
+                     if(content) zip.file(file, content);
+                });
+                
+                const blob = await zip.generateAsync({type:"blob"});
+                const url = URL.createObjectURL(blob);
+                
+                // Generate Date String in mm-dd-yy format
+                const now = new Date();
+                const day = String(now.getDate()).padStart(2, '0');
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const year = String(now.getFullYear()).slice(-2); // Last 2 digits
+                const dateStr = `${month}-${day}-${year}`;
+
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `sakurabackup-${dateStr}.zip`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                UI.toast("Export Complete!");
+            } catch(e) {
+                console.error(e);
+                UI.alert("Export Failed: " + e.message);
+            }
+        }
+        
+        function importData(input) {
+            const file = input.files[0];
+            if(!file) return;
+            
+            UI.toast("Reading File...");
+            
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const zip = await JSZip.loadAsync(e.target.result);
+                    let count = 0;
+                    
+                    // Iterate and save
+                    const filePromises = [];
+                    zip.forEach((relativePath, zipEntry) => {
+                        if(relativePath.endsWith('.json')) {
+                            filePromises.push(
+                                zipEntry.async("string").then(content => {
+                                    // Basic validation
+                                    try {
+                                        JSON.parse(content); // check validity
+                                        localStorage.setItem('delta_os_' + relativePath, content);
+                                        count++;
+                                    } catch(jsonErr) {
+                                        console.warn("Skipping invalid JSON: " + relativePath);
+                                    }
+                                })
+                            );
+                        }
+                    });
+                    
+                    await Promise.all(filePromises);
+                    
+                    if(count > 0) {
+                        // Sync general.json to cookie if present
+                        const general = localStorage.getItem('delta_os_general.json');
+                        if(general) Common.setCookie('delta_settings', general, 365);
+                        
+                        UI.toast(`Imported ${count} files. Reloading...`);
+                        setTimeout(() => window.location.reload(), 1500);
+                    } else {
+                        UI.alert("No valid JSON files found in Zip.");
+                    }
+                    
+                } catch(err) {
+                    console.error(err);
+                    UI.alert("Import Failed: " + err.message);
+                }
+            };
+            reader.readAsArrayBuffer(file); // ZIP requires ArrayBuffer
+        }
+
+
+        
+        // --- Persistence Logic ---
+
+        let currentEditingFile = null;
+
+        function openEditor(filename) {
+            currentEditingFile = filename;
+            const modal = document.getElementById('jsonEditorModal');
+            const textarea = document.getElementById('jsonEditorInput');
+            const title = document.getElementById('jsonEditorTitle');
+            
+            // Get content
+            const rawContent = localStorage.getItem('delta_os_' + filename);
+            let displayContent = "";
+            try {
+                // If it exists, pretty print. If not, empty object or null.
+                displayContent = rawContent ? JSON.stringify(JSON.parse(rawContent), null, 4) : "{}";
+            } catch(e) {
+                displayContent = rawContent || "{}"; // Fallback
+            }
+
+            textarea.value = displayContent;
+            title.innerText = "Editing: " + filename;
+            
+            modal.style.display = 'flex';
+            // Slight delay to allow display flex to apply before opacity transition
+            setTimeout(() => modal.classList.add('active'), 10);
+        }
+
+        function saveEditorContent() {
+            if(!currentEditingFile) return;
+            const textarea = document.getElementById('jsonEditorInput');
+            const content = textarea.value;
+
+            try {
+                // Validate JSON
+                const parsed = JSON.parse(content);
+                // Save to LocalStorage
+                localStorage.setItem('delta_os_' + currentEditingFile, JSON.stringify(parsed));
+                UI.toast("Saved " + currentEditingFile);
+                closeEditor();
+                renderPersistenceList(); // Refresh list to update status
+            } catch(e) {
+                UI.alert("Invalid JSON: " + e.message);
+            }
+        }
+
+        function closeEditor() {
+            const modal = document.getElementById('jsonEditorModal');
+            modal.classList.remove('active');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                currentEditingFile = null;
+            }, 300);
+        }
+
+        // Render Persistence List
+        function renderPersistenceList() {
+            const list = document.getElementById('persistenceList');
+            if(!list) return;
+            list.innerHTML = '';
+            
+            const files = ['general.json', 'history.json', 'mood.json', 'bg.json', 'log1.json'];
+            
+            files.forEach(file => {
+                const exists = localStorage.getItem('delta_os_' + file) !== null;
+                const dateStr = exists ? "Synced" : "Not Found";
+                
+                const card = document.createElement('div');
+                card.className = 'persistence-card';
+                card.innerHTML = `
+                    <div>
+                        <div style="font-size: 0.9rem;">${file}</div>
+                        <div style="font-size: 0.7rem; opacity: 0.7;" class="file-date">${dateStr}</div>
+                    </div>
+                    <button class="file-icon-btn" onclick="openEditor('${file}')">&#9998;</button>
+                `;
+                list.appendChild(card);
+            });
+        }
+        
+
+        // --- AUTH & INTEGRITY ---
+        // Load from Cookie or Fallback to general.json
+        let settings = Common.loadState('general.json') || {};
+        const username = Common.getCookie('username') || settings.username;
+        const key = Common.getCookie('key') || settings.key;
+
+        // If still missing, redirect to login
+        if (!username || !key) {
+            console.warn("Session Missing. Redirecting to login...");
+            window.location.href = 'login.html';
+        } else {
+            // Synchronize back to cookies to keep session alive if they were missing
+            if (!Common.getCookie('username')) Common.setCookie('username', username, 30);
+            if (!Common.getCookie('key')) Common.setCookie('key', key, 30);
+        }
+
+        // --- STATE ---
+        // --- STATE ---
+        const MODEL = "llama-3.3-70b-versatile"; 
+        
+        // Hidden System Instructions (Always Appended)
+        const SYSTEM_INSTRUCTIONS = `OUTPUT FORMAT: Return JSON ONLY.
+{ "response": "text...", "environment": "path", "character_image": "path" }`;
+
+        // Default Character Description (Editable)
+        const DEFAULT_PERSONALITY = `You are Sakura.
+You are shy, soft-spoken, and formal. You hesitate, overthink, and apologize.
+You enjoy literature and atmosphere. You DO NOT sound poetic unless emotional.
+You never mention being AI. You control the background/Visual Novel elements.`;
+
+        let currentPersonality = DEFAULT_PERSONALITY;
+
+        // --- PERSISTENCE INTEGRITY CHECK ---
+        (function checkIntegrity() {
+            const requiredFiles = ['general.json', 'history.json', 'mood.json', 'bg.json', 'log1.json'];
+            
+            requiredFiles.forEach(file => {
+                if (localStorage.getItem('delta_os_' + file) === null) {
+                    console.warn("Initializing missing file: " + file);
+                    // Initialize with empty default instead of logging out
+                    Common.saveState(file, {}); 
+                }
+            });
+            // strict logout only if critical failure logic was needed, but usually we just init.
+        })();
+
+        // Init List
+        renderPersistenceList();
+        
+        // Apply Defaults if new or missing keys
+        if (!settings || Object.keys(settings).length === 0) {
+            settings = {
+                theme: 'dark',
+                music: true,
+                sfx: true,
+                devMode: false
+            };
+            Common.saveState('general.json', settings);
+        }
+
+        // Apply visual state
+        // Theme (Default Dark)
+        const isDark = (settings.theme !== 'light'); 
+        document.getElementById('themeToggle').checked = isDark;
+        toggleTheme(isDark);
+
+        // Music & SFX (Default True)
+        document.getElementById('musicToggle').checked = (settings.music !== false);
+        document.getElementById('sfxToggle').checked = (settings.sfx !== false);
+        
+        // DevMode (Default False)
+        document.getElementById('devToggle').checked = (settings.devMode === true);
+
+        // Personality (Default to Default Text if empty)
+        // Check if we need to migrate old data that might contain the instructions
+        const savedPersonality = settings.personality || settings.prompt;
+        
+        // Simple heuristic: if it contains "OUTPUT FORMAT", strip it for the UI (optional polish, but good for UX)
+        let displayPersonality = savedPersonality || DEFAULT_PERSONALITY;
+        if (displayPersonality.includes("OUTPUT FORMAT: Return JSON ONLY")) {
+             displayPersonality = displayPersonality.split("OUTPUT FORMAT")[0].trim();
+        }
+
+        document.getElementById('personalityInput').value = displayPersonality;
+        currentPersonality = displayPersonality;
+
+        // --- CHARACTER ANIMATION WRAPPER ---
+        const originalProcessResponse = processResponse;
+        /* we are updating the logic inside process response directly in next steps or assuming it handles standard logic. 
+           To implement the slide animation, we need to hook into where charImg.src is set.
+           Currently processResponse is doing that. We will modify processResponse to add the animation class.
+        */
+        
+        // Re-implementing a safer restoreState that respects slide animation isn't needed for init, 
+        // but for dynamic updates in processResponse.
+        
+    </script>
+</body>
+</html>

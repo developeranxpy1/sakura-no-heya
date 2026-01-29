@@ -1,0 +1,19 @@
+{
+    "environments": [
+        "assetts/images/bg-pattern.png",
+        "assetts/images/dark-bg-pattern.png",
+        "assetts/images/olddark-bg-pattern.png",
+        "assetts/images/oldsakuralogo.png",
+        "assetts/images/sakuralogo.png"
+    ],
+    "characters": {
+        "school-dress": {
+            "angry": "assetts/images/character/school-dress/angry/angryshy.png",
+            "annoyed": "assetts/images/character/school-dress/annoyed/annoyedshy.png",
+            "glitch": "assetts/images/character/school-dress/glitch/creepyglitch.png",
+            "happy": "assetts/images/character/school-dress/happy/shy.png",
+            "neutral": "assetts/images/character/school-dress/neutral/shyneutral.png",
+            "sad": "assetts/images/character/school-dress/sad/scaredshy.png"
+        }
+    }
+}

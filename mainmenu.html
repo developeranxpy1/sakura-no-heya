@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sakura No Heya</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌸</text></svg>">
+    <link rel="stylesheet" href="assetts/css/style.css">
+    <style>
+        .menu-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-y: auto; /* Allow travel on small screens */
+            padding: 20px 0; /* buffer */
+        }
+
+        .menu-card {
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            position: relative;
+            margin: auto; /* Center in scrollable flex */
+        }
+
+        .menu-logo {
+            width: 180px;
+            margin-bottom: 30px;
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* .menu-logo:hover {
+            transform: scale(1.1) rotate(-5deg);
+        } */
+
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .menu-card { width: 95%; }
+            .menu-logo { width: 150px; margin-bottom: 20px; }
+            .btn-menu { padding: 10px 15px; font-size: 1rem; }
+            h2 { font-size: 1.5rem !important; }
+            
+            /* Override user inline style for prompt on mobile */
+            #aiPrompt { width: 100% !important; }
+            .switch { width: 60px; height: 30px; }
+            .slider:before { width: 20px; height: 20px; bottom: 3px; }
+            input:checked + .slider:before { transform: translateX(28px); }
+        }
+
+        @media (max-height: 600px) and (orientation: landscape) {
+            .menu-container { align-items: flex-start; padding-top: 20px; }
+            .menu-logo { width: 120px; margin-bottom: 10px; }
+            .menu-buttons { gap: 10px; }
+        }
+
+        .settings-modal {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--glass-bg); /* Themed */
+            border-radius: 20px;
+            z-index: 10;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
+            color: var(--text-color); /* Inherit text color */
+        }
+
+        @media (max-width: 400px) {
+            .settings-modal { padding: 10px; }
+            .btn-candy { min-width: 100px; padding: 10px; font-size: 1rem; }
+        }
+
+        .settings-modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            width: 100%; /* Ensure row fills width */
+            font-weight: bold;
+            color: var(--text-color); /* Themed */
+        }
+
+        /* Cute Toggles */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 80px; /* Wider */
+            height: 36px; /* Taller */
+        }
+
+        .switch input { display: none; }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: var(--btn-bg); /* Themed */
+            border: 2px solid var(--border-color); /* Themed */
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px; /* Bigger knob */
+            width: 26px;
+            left: 3px;
+            bottom: 3px;
+            background-color: #ffffff;
+            transition: .4s;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        input:checked + .slider {
+            background-color: var(--border-color); /* Themed Active */
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(44px); /* Adjusted for width */
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Background via CSS -->
+
+    <div class="menu-container">
+        <!-- Main Card -->
+        <div class="glass-panel menu-card" style="overflow: hidden;"> <!-- Ensure video clips to corners -->
+            <video autoplay loop muted playsinline 
+                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; filter: blur(8px); opacity: 0.8; transform: scale(1.1);"> <!-- Scale to prevent blur edges -->
+                <source src="assetts/video/bgvideo.mp4" type="video/mp4">
+            </video>
+            <div class="card-header-logo">
+                <img src="assetts/images/sakuralogo.png" class="menu-logo" alt="Sakura">
+            </div>
+            
+            <div class="menu-buttons card-content" style="display: flex; flex-direction: column; gap: 10px; padding-top:0;">
+                
+                <button class="btn-menu" onclick="window.location.href='quickmode.html'">
+                    <span>🚀</span> Quick Start
+                </button>
+                
+                <button id="storyBtn" class="btn-menu" disabled style="opacity: 0.6; cursor: not-allowed; background: #f9f9f9; border-color: #ddd; color: #aaa;">
+                    <span>📖</span> Story Mode
+                </button>
+                
+                <button class="btn-menu" onclick="toggleSettings()">
+                    <span>⚙️</span> Settings
+                </button>
+
+                <button class="btn-menu btn-danger" onclick="clearData()">
+                    <span>🗑️</span> Delete userdata
+                </button>
+
+                <button class="btn-menu" style="border-color:#ccc; color:#888;" onclick="logout()">
+                    <span>🔙</span> Logout
+                </button>
+
+                <div class="menu-separator"></div>
+
+                <button class="btn-menu" onclick="window.location.href='about.html'">
+                    <span>ℹ️</span> About
+                </button>
+            </div>
+
+            <!-- Settings Modal Overlay -->
+            <div class="settings-modal" id="settingsPanel">
+                <h2 style="font-family: 'Comic Sans MS', cursive; color: var(--text-color); font-size: 2rem; margin-bottom: 30px;">Settings</h2>
+                
+                <div class="setting-row">
+                    <span>Dark Mode</span>
+                    <label class="switch">
+                        <input type="checkbox" id="themeToggle" onchange="toggleTheme(this.checked); saveSettings(false)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-row">
+                    <span>Music</span>
+                    <label class="switch">
+                        <input type="checkbox" id="musicToggle" onchange="saveSettings(false)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <div class="setting-row">
+                    <span>SFX</span>
+                    <label class="switch">
+                        <input type="checkbox" id="sfxToggle" onchange="saveSettings(false)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-row">
+                    <span>Developer Mode</span>
+                    <label class="switch">
+                        <input type="checkbox" id="devToggle" onchange="saveSettings(false)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div style="margin-top: 20px; width: 100%;">
+                    <label style="display:block; text-align:left; font-size:0.9rem; margin-bottom:5px;">Personality</label>
+                    <textarea id="personalityInput" maxlength="5000" placeholder="5000-chars max" style="width: 100%; box-sizing: border-box; border-radius: 10px; padding: 15px; border: 2px solid var(--border-color); font-family: inherit; resize: vertical; min-height: 150px; font-size: 1rem; background: var(--glass-bg); color: var(--text-color);"></textarea>
+                </div>
+
+                <div style="margin-top: 30px; display:flex; gap:15px; flex-wrap: wrap; justify-content: center; width: 100%;">
+                    <button class="btn-candy" onclick="saveSettings(true)">Save</button>
+                    <!-- Logout Removed -->
+                    <button class="btn-candy" onclick="toggleSettings()">Back</button>
+                </div>
+                
+                <hr style="margin: 25px 0; border: 0.5px solid #eee; width: 100%;">
+                
+                <button class="btn-candy-red" onclick="clearData()">Delete All Data</button>
+                
+                <div id="fileList" style="margin-top: 15px; font-size: 0.8rem; color: #888; text-align: left; width: 100%;">
+                    <!-- Files generated will be listed here -->
+                </div>
+            </div>
+        
+        </div>
+    </div>
+
+    <!-- JSON Editor Modal -->
+    <div id="jsonEditor" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 100; display: none; align-items: center; justify-content: center;">
+        <div class="glass-panel" style="background: white; padding: 20px; width: 90%; max-width: 500px; display: flex; flex-direction: column;">
+            <h3 style="margin-top: 0; color: #594a4e; text-align: center;">Edit <span id="editFileName"></span></h3>
+            <textarea id="jsonContent" style="width: 100%; height: 300px; border: 2px solid #ff9ebb; border-radius: 10px; padding: 10px; font-family: monospace; resize: vertical;"></textarea>
+            <div style="margin-top: 15px; display: flex; gap: 10px; justify-content: center;">
+                <button class="btn-candy" onclick="saveJSON()">Save</button>
+                <button class="btn-candy" style="border-color: #ddd; background: #f0f0f0; color: #888;" onclick="closeEditor()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="assetts/js/common.js"></script>
+    <script>
+        // Check Auth using correct cookie
+        if (!Common.getCookie('username')) {
+            window.location.href = 'login.html';
+        }
+
+        let currentEditingFile = null;
+
+        function toggleSettings() {
+            const panel = document.getElementById('settingsPanel');
+            panel.classList.toggle('active');
+            
+            if (panel.classList.contains('active')) {
+                updateFileList();
+            }
+        }
+
+        function updateFileList() {
+            const list = document.getElementById('fileList');
+            let content = "<strong>Persistence Files:</strong><ul style='list-style:none; padding:0; margin-top:5px;'>";
+            const prefix = 'delta_os_';
+            let found = false;
+
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith(prefix)) {
+                    found = true;
+                    const filename = key.replace(prefix, '');
+                    let meta = "Unknown Date";
+                    try {
+                        const data = JSON.parse(localStorage.getItem(key));
+                        if (data && data.createdAt) {
+                            const date = new Date(data.createdAt);
+                            meta = date.toLocaleString();
+                        }
+                    } catch(e) {}
+                    
+                    content += `<li style="margin-bottom:10px; background: var(--btn-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <span style="color:var(--btn-text); font-weight:bold;">${filename}</span><br>
+                            <span style="font-size:0.7rem; color:var(--btn-text); opacity: 0.7;">${meta}</span>
+                        </div>
+                        <button onclick="editFile('${filename}')" style="background: var(--border-color); border: none; border-radius: 5px; cursor: pointer; padding: 5px 10px; font-size: 1rem;">✏️</button>
+                    </li>`;
+                }
+            }
+            content += "</ul>";
+            
+            if (found) {
+                list.innerHTML = content;
+            } else {
+                list.innerHTML = "No persistent files found.";
+            }
+        }
+
+        function editFile(filename) {
+            currentEditingFile = filename;
+            const data = Common.loadState(filename);
+            
+            document.getElementById('editFileName').innerText = filename;
+            document.getElementById('jsonContent').value = JSON.stringify(data, null, 2); // Pretty print
+            document.getElementById('jsonEditor').style.display = 'flex';
+        }
+
+        function closeEditor() {
+            document.getElementById('jsonEditor').style.display = 'none';
+            currentEditingFile = null;
+        }
+
+        function saveJSON() {
+            if (!currentEditingFile) return;
+            
+            try {
+                const raw = document.getElementById('jsonContent').value;
+                const parsed = JSON.parse(raw);
+                
+                // Save using Common (handles cookie sync for general.json too!)
+                Common.saveState(currentEditingFile, parsed);
+                
+                alert("Saved!");
+                closeEditor();
+                updateFileList();
+                
+                // If we edited general settings, reload them right away to verify
+                if (currentEditingFile === 'general.json') {
+                    if (parsed.personality !== undefined) document.getElementById('personalityInput').value = parsed.personality;
+                    if (parsed.music !== undefined) document.getElementById('musicToggle').checked = parsed.music;
+                    if (parsed.sfx !== undefined) document.getElementById('sfxToggle').checked = parsed.sfx;
+                    if (parsed.theme !== undefined) {
+                        const isDark = (parsed.theme === 'dark');
+                        document.getElementById('themeToggle').checked = isDark;
+                        toggleTheme(isDark);
+                    }
+                    // Apply theme globally (backup)
+                    Common.initTheme();
+                }
+
+            } catch (e) {
+                alert("Invalid JSON! Please check syntax.\n" + e.message);
+            }
+        }
+
+        function logout() {
+            Common.setCookie('username', '', -1);
+            Common.setCookie('key', '', -1);
+            window.location.href = 'login.html';
+        }
+
+        function clearData() {
+            if(confirm("Are you sure? This will delete all your settings, history, and mood data.")) {
+                localStorage.clear();
+                // Also clear the persistence cookie
+                Common.setCookie('delta_settings', '', -1);
+                logout();
+            }
+        }
+
+        function saveSettings(shouldClose = false) {
+            const isDark = document.getElementById('themeToggle').checked;
+            const music = document.getElementById('musicToggle').checked;
+            const sfx = document.getElementById('sfxToggle').checked;
+            const devMode = document.getElementById('devToggle').checked;
+            const personality = document.getElementById('personalityInput').value.trim();
+
+            // Load existing to preserve 'createdAt' or other metadata
+            let current = Common.loadState('general.json') || {};
+            current.theme = isDark ? 'dark' : 'light';
+            current.music = music;
+            current.sfx = sfx;
+            current.devMode = devMode;
+            current.personality = personality;
+
+            Common.saveState('general.json', current);
+            Common.initTheme(); // Apply immediately
+            applyDevMode(devMode); // Apply dev mode immediately
+            
+            if (shouldClose) {
+                toggleSettings();
+            }
+        }
+
+        function applyDevMode(isEnabled) {
+            const btn = document.getElementById('storyBtn');
+            if (isEnabled) {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                btn.style.cursor = 'pointer';
+                btn.style.background = ''; // Reverts to CSS default or class
+                btn.style.borderColor = '';
+                btn.style.color = '';
+                btn.innerHTML = '<span>📖</span> Story Mode';
+                btn.onclick = function() { window.location.href = 'desktopui.html'; };
+            } else {
+                btn.disabled = true;
+                btn.style.opacity = '0.6';
+                btn.style.cursor = 'not-allowed';
+                btn.style.background = '#f9f9f9';
+                btn.style.borderColor = '#ddd';
+                btn.style.color = '#aaa';
+                btn.innerHTML = '<span>📖</span> Story Mode';
+                btn.onclick = null;
+            }
+        }
+
+        function toggleTheme(isDark) {
+            const theme = isDark ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+        }
+
+        // Default Character Description (Sync with Quickmode)
+        const DEFAULT_PERSONALITY = `You are Sakura.
+You are shy, soft-spoken, and formal. You hesitate, overthink, and apologize.
+You enjoy literature and atmosphere. You DO NOT sound poetic unless emotional.
+You never mention being AI. You control the background/Visual Novel elements.`;
+
+        // Load Settings
+        let settings = Common.loadState('general.json') || {};
+        if (settings) {
+            if (settings.theme === 'dark') {
+                document.getElementById('themeToggle').checked = true;
+                toggleTheme(true);
+            }
+            document.getElementById('musicToggle').checked = (settings.music !== false);
+            document.getElementById('sfxToggle').checked = (settings.sfx !== false);
+            if (settings.devMode) {
+                document.getElementById('devToggle').checked = true;
+                applyDevMode(true);
+            }
+            
+            // Sync with Quickmode logic (handling both keys and stripping JSON)
+            let savedPersonality = settings.personality || settings.prompt; 
+            if (!savedPersonality) {
+                savedPersonality = DEFAULT_PERSONALITY;
+            } else if (savedPersonality.includes("OUTPUT FORMAT: Return JSON ONLY")) {
+                savedPersonality = savedPersonality.split("OUTPUT FORMAT")[0].trim();
+            }
+            
+            document.getElementById('personalityInput').value = savedPersonality;
+        }
+    </script>
+</body>
+</html>

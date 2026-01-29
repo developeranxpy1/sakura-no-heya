@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Desktop 💻 </title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌸</text></svg>">
+    <style>
+/* --- CORE VARIABLES --- */
+:root {
+    /* Light Mode */
+    --bg-color: #ffe6f2;
+    --glass-bg: rgba(255, 255, 255, 0.85);
+    --text-color: #594a4e;
+    --primary-color: #ffb7d5;
+    --secondary-color: #ff85b3;
+    --border-color: #ff9ebb;
+    --btn-bg: #fff9c4;
+    --btn-text: #ff85b3;
+    --shadow-color: rgba(255, 183, 213, 0.5);
+    
+    --font-main: 'Segoe UI', 'Roboto', Helvetica, Arial, sans-serif;
+}
+
+[data-theme="dark"] {
+    /* Dark Mode */
+    --bg-color: #0f0f1b;
+    --glass-bg: rgba(26, 26, 46, 0.9);
+    --text-color: #e0e0e0;
+    --primary-color: #a18cd1;
+    --secondary-color: #d1c4e9;
+    --border-color: #a18cd1;
+    --btn-bg: #2e2e4e;
+    --btn-text: #d1c4e9;
+    --shadow-color: rgba(0, 0, 0, 0.6);
+}
+
+* { box-sizing: border-box; touch-action: manipulation; }
+
+body {
+    margin: 0; padding: 0;
+    font-family: var(--font-main);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    overflow: hidden;
+    height: 100dvh; width: 100vw;
+    background-image: url('assetts/images/bg-pattern.png'); 
+    background-size: cover; background-position: center;
+    transition: background-image 0.3s;
+}
+[data-theme="dark"] body { background-image: url('assetts/images/dark-bg-pattern.png'); }
+
+/* --- UI COMPONENTS --- */
+.glass-panel {
+    background: var(--glass-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    color: var(--text-color);
+}
+
+.btn {
+    background: var(--btn-bg); color: var(--btn-text);
+    border: 2px solid var(--border-color); border-radius: 12px;
+    padding: 10px 18px; font-weight: bold; cursor: pointer;
+    box-shadow: 0 4px 0 var(--border-color);
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+.btn:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--border-color); }
+
+.switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+    position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+    background-color: var(--btn-bg); transition: .4s; border-radius: 34px; border: 2px solid var(--border-color);
+}
+.slider:before {
+    position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px;
+    background-color: white; transition: .4s; border-radius: 50%;
+}
+input:checked + .slider { background-color: var(--secondary-color); }
+input:checked + .slider:before { transform: translateX(24px); }
+
+/* --- DESKTOP --- */
+#desktop {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 1; padding: 10px;
+    overflow: hidden;
+}
+
+.icon-grid {
+    display: flex; flex-direction: column; flex-wrap: wrap;
+    height: calc(100% - 70px); align-content: flex-start; gap: 10px;
+}
+
+.desktop-icon {
+    width: 80px; padding: 10px;
+    display: flex; flex-direction: column; align-items: center;
+    border-radius: 10px; cursor: pointer;
+    text-shadow: 0 1px 2px rgba(255,255,255,0.5);
+    transition: background 0.2s;
+}
+.desktop-icon:hover { background: rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.4); }
+.desktop-icon img { width: 42px; height: 42px; margin-bottom: 5px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
+.desktop-icon span { font-size: 13px; text-align: center; line-height: 1.2; background: rgba(255,255,255,0.4); padding: 2px 6px; border-radius: 6px; }
+[data-theme="dark"] .desktop-icon span { background: rgba(0,0,0,0.4); color: white; text-shadow: none; }
+[data-theme="dark"] .desktop-icon img { filter: brightness(0.9); }
+
+/* --- TASKBAR --- */
+#taskbar {
+    position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%);
+    width: 90%; max-width: 800px; height: 55px;
+    background: var(--glass-bg);
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 28px;
+    display: flex; align-items: center; padding: 0 15px; gap: 15px;
+    z-index: 9000;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+}
+
+#start-btn {
+    width: 36px; height: 36px;
+    background: var(--text-color);
+    mask: url('https://api.iconify.design/mdi:delta.svg') no-repeat center/contain;
+    -webkit-mask: url('https://api.iconify.design/mdi:delta.svg') no-repeat center/contain;
+    cursor: pointer;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+#start-btn:hover { transform: scale(1.1); }
+#start-btn.flipped { transform: rotate(180deg) scale(1.1); } /* Logo Flip */
+
+.taskbar-apps { flex: 1; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
+.taskbar-apps::-webkit-scrollbar { display: none; }
+
+.task-item {
+    background: rgba(255,255,255,0.2); border: 1px solid var(--border-color);
+    border-radius: 12px; padding: 0 12px; height: 36px;
+    display: flex; align-items: center; cursor: pointer;
+    font-size: 13px; white-space: nowrap; max-width: 120px;
+    transition: all 0.2s;
+}
+.task-item.active {
+    background: var(--primary-color); color: white;
+    box-shadow: 0 2px 8px var(--shadow-color);
+    border-color: transparent;
+}
+
+/* --- START MENU --- */
+#start-menu {
+    position: fixed; bottom: 80px; left: 50%;
+    transform: translateX(-50%) scale(0.9); opacity: 0; pointer-events: none;
+    width: 320px; height: 400px;
+    padding: 20px;
+    z-index: 8000;
+    display: flex; flex-direction: column;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+#start-menu.open { opacity: 1; transform: translateX(-50%) scale(1); pointer-events: auto; }
+
+.menu-profile { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); }
+.menu-avatar { width: 48px; height: 48px; background: white; border-radius: 50%; padding: 2px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+.menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; overflow-y: auto; padding: 2px; }
+.menu-item {
+    background: rgba(255,255,255,0.3); border: 1px solid transparent;
+    padding: 15px; border-radius: 12px;
+    display: flex; align-items: center; gap: 10px; cursor: pointer;
+    transition: 0.2s;
+}
+.menu-item:hover { background: white; transform: translateY(-3px); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+[data-theme="dark"] .menu-item:hover { background: rgba(255,255,255,0.15); }
+
+/* --- WINDOWS --- */
+.window {
+    position: absolute; display: flex; flex-direction: column;
+    background: var(--glass-bg);
+    overflow: hidden;
+    animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+.titlebar {
+    height: 36px; background: rgba(255,255,255,0.2);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 10px; user-select: none;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+.win-controls { display: flex; gap: 6px; }
+.circle-btn {
+    width: 12px; height: 12px; border-radius: 50%; border:none; cursor: pointer;
+}
+.circle-btn.close { background: #ff5f56; }
+.circle-btn.min { background: #ffbd2e; }
+.circle-btn.max { background: #27c93f; }
+
+.content { flex: 1; overflow: auto; position: relative; }
+
+/* --- TERMINAL STYLE --- */
+.terminal-wrap { background: #1a1a2e; color: #50fa7b; font-family: monospace; padding: 10px; height: 100%; display: flex; flex-direction: column; }
+.term-out { flex: 1; overflow-y: auto; white-space: pre-wrap; font-size: 14px; }
+.term-in { background: transparent; border: none; color: inherit; font-size: 14px; outline: none; width: 100%; margin-top: 5px; }
+
+/* --- MOBILE RESPONSIVENESS --- */
+@media (max-width: 768px) {
+    #taskbar {
+        width: 100%; max-width: none; bottom: 0; border-radius: 0;
+        border-right: none; border-left: none; border-bottom: none;
+        height: 60px; padding: 0 10px;
+    }
+    
+    .icon-grid {
+        flex-direction: row; align-content: flex-start;
+        justify-content: center; width: 100%;
+    }
+    .desktop-icon { width: 70px; margin: 5px; }
+    
+    .task-item span { display: none; } /* Icon only taskbar items */
+    
+    /* Full screen windows on mobile */
+    .window.mobile-full {
+        width: 100% !important; height: calc(100% - 60px) !important;
+        top: 0 !important; left: 0 !important;
+        border-radius: 0; border: none;
+    }
+    
+    #start-menu { width: 100%; bottom: 60px; border-radius: 20px 20px 0 0; }
+}
+
+.resize-handle {
+    width: 20px; height: 20px;
+    position: absolute; bottom: 0; right: 0;
+    cursor: se-resize;
+    background: transparent;
+    transition: background 0.2s;
+    border-radius: 0 0 12px 0; /* Matches window corner if rounded */
+}
+.window:hover .resize-handle {
+    background: transparent; /* SVG handles visibility */
+}
+/* Override SVG color on hover */
+.window:hover .resize-handle svg {
+    stroke: var(--text-color);
+    opacity: 0.8 !important;
+}
+</style>
+</head>
+<body>
+
+<div id="desktop">
+    <!-- Icons populated by JS -->
+    <div class="icon-grid" id="icon-grid"></div>
+</div>
+
+<div id="start-menu" class="glass-panel">
+    <div class="menu-profile">
+        <img src="assetts/images/deltalogo.png" class="menu-avatar" alt="User" onerror="this.src='assetts/images/sakuralogo.png'">
+        <div>
+            <div style="font-weight:bold" id="user-name">Guest</div>
+            <div style="font-size:12px; opacity:0.7">Delta User</div>
+        </div>
+    </div>
+    <div class="menu-grid">
+        <div class="menu-item" onclick="appLauncher.open('terminal')">💻 Terminal</div>
+        <div class="menu-item" onclick="appLauncher.open('notepad')">📝 Notepad</div>
+        <div class="menu-item" onclick="appLauncher.open('files')">📁 Files</div>
+        <div class="menu-item" onclick="appLauncher.open('settings')">⚙️ Settings</div>
+        <div class="menu-item" onclick="appLauncher.open('browser')">🌐 Browser</div>
+        <div class="menu-item" onclick="location.href='mainmenu.html'">🏠 Home</div>
+    </div>
+</div>
+
+<div id="taskbar">
+    <div id="start-btn" onclick="toggleStartMenu()"></div>
+    <div class="taskbar-apps" id="taskbar-apps"></div>
+    <div id="clock" style="font-size:12px; font-weight:bold; margin-left:auto;">12:00</div>
+</div>
+
+<div id="toast-container" style="position:fixed; top:20px; left:50%; transform:translateX(-50%); z-index:9999;"></div>
+
+<script>
+/* --- CONFIG & ASSETS --- */
+let IS_MOBILE_CACHE = window.innerWidth <= 768;
+const IS_MOBILE = () => IS_MOBILE_CACHE; // Dynamic check via cache updated on resize
+const REAL_ASSETS = [
+    { name: 'bg-pattern.png', type: 'image' },
+    { name: 'dark-bg-pattern.png', type: 'image' },
+    { name: 'olddark-bg-pattern.png', type: 'image' },
+    { name: 'oldsakuralogo.png', type: 'image' },
+    { name: 'sakuralogo.png', type: 'image' },
+    { name: 'deltalogo.png', type: 'image' }
+];
+
+/* --- STORAGE HELPER --- */
+const Store = {
+    get: (k) => JSON.parse(localStorage.getItem('delta_' + k) || 'null'),
+    set: (k, v) => localStorage.setItem('delta_' + k, JSON.stringify(v)),
+    getCookie: (n) => {
+        const v = document.cookie.match('(^|;) ?' + n + '=([^;]*)(;|$)');
+        return v ? v[2] : null;
+    }
+};
+
+/* --- VIRTUAL FILE SYSTEM --- */
+const VFS = {
+    tree: Store.get('vfs') || {
+        '/': { type: 'dir', children: {
+            'home': { type: 'dir', children: {
+                'user': { type: 'dir', children: {
+                    'documents': { type: 'dir', children: {
+                        'welcome.txt': { type: 'file', content: 'Welcome to DeltaOS Mobile!\n\nApps open full screen on small devices.' }
+                    }},
+                    'assets': { type: 'dir', children: {} } // Will populate dynamically
+                }}
+            }}
+        }}
+    },
+    save: () => Store.set('vfs', VFS.tree),
+    resolve: (path) => {
+        const parts = path.split('/').filter(Boolean);
+        let node = VFS.tree['/'];
+        for (const part of parts) {
+            if (node.children && node.children[part]) node = node.children[part];
+            else return null;
+        }
+        return node;
+    },
+    populateAssets: () => {
+        const assetNode = VFS.resolve('/home/user/assets');
+        if (assetNode) {
+            REAL_ASSETS.forEach(a => {
+                assetNode.children[a.name] = { 
+                    type: 'file', 
+                    mime: a.type, 
+                    src: `assetts/images/${a.name}` // Real path mapping
+                };
+            });
+        }
+    }
+};
+VFS.populateAssets(); // Init
+
+/* --- WINDOW MANAGER --- */
+class WindowManager {
+    constructor() {
+        this.desktop = document.getElementById('desktop');
+        this.taskbar = document.getElementById('taskbar-apps');
+        this.windows = [];
+        this.zIndex = 100;
+    }
+
+    open(config) {
+        const id = 'win_' + Date.now();
+        const win = document.createElement('div');
+        win.id = id;
+        win.className = `window glass-panel ${IS_MOBILE ? 'mobile-full' : ''}`;
+        win.style.zIndex = ++this.zIndex;
+        
+        // Calculate Center
+        const width = config.width || 600;
+        const height = config.height || 400;
+        const left = (window.innerWidth - width) / 2;
+        const top = (window.innerHeight - height) / 2;
+
+        // Mobile Fullscreen vs Desktop Position
+        // Mobile Fullscreen vs Desktop Position
+        if (!IS_MOBILE()) {
+            win.style.width = width + 'px';
+            win.style.height = height + 'px';
+            // Always Center - Removed offset logic
+            win.style.left = (Math.max(0, left)) + 'px';
+            win.style.top = (Math.max(0, top)) + 'px';
+        }
+
+        win.innerHTML = `
+            <div class="titlebar">
+                <div style="font-weight:bold; display:flex; align-items:center; gap:5px;">
+                    ${config.icon || '📄'} ${config.title}
+                </div>
+                <div class="win-controls">
+                    <button class="circle-btn min" onclick="WM.minimize('${id}')"></button>
+                    <button class="circle-btn max" onclick="WM.maximize('${id}')"></button>
+                    <button class="circle-btn close" onclick="WM.close('${id}')"></button>
+                </div>
+            </div>
+            <div class="content" id="content_${id}"></div>
+            ${!IS_MOBILE() ? '<div class="resize-handle" style="display:flex; justify-content:flex-end; align-items:flex-end; padding:2px;"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1" style="opacity:0.5;"><path d="M10 0 L10 10 L0 10 M10 4 L10 10 L4 10 M10 8 L10 10 L8 10" stroke-linecap="square"/></svg></div>' : ''}
+        `;
+
+        this.desktop.appendChild(win);
+        const contentContainer = document.getElementById(`content_${id}`);
+        contentContainer.appendChild(config.content);
+
+        this.windows.push({ id, title: config.title, el: win });
+        this.addTaskbarItem(id, config.title, config.icon);
+        this.focus(id);
+        
+        // Drag & Resize logic (Desktop only)
+        if (!IS_MOBILE()) {
+            this.makeDraggable(win, win.querySelector('.titlebar'));
+            this.makeResizable(win, win.querySelector('.resize-handle'));
+        }
+    }
+
+    close(id) {
+        document.getElementById(id)?.remove();
+        this.windows = this.windows.filter(w => w.id !== id);
+        document.getElementById(`tb_${id}`)?.remove();
+    }
+    
+    closeAll() {
+        [...this.windows].forEach(w => this.close(w.id));
+    }
+
+    minimize(id) {
+        const win = document.getElementById(id);
+        win.style.display = 'none';
+        document.getElementById(`tb_${id}`).classList.remove('active');
+    }
+
+    focus(id) {
+        const win = document.getElementById(id);
+        if (win) {
+            win.style.display = 'flex';
+            win.style.zIndex = ++this.zIndex;
+            this.windows.forEach(w => document.getElementById(`tb_${w.id}`).classList.toggle('active', w.id === id));
+        }
+    }
+
+    maximize(id) {
+        const win = document.getElementById(id);
+        if(IS_MOBILE()) return; 
+        
+        if (win.style.width === '100%') {
+            // Restore (using stored pre-state if available, else center)
+            if(win.dataset.pre) {
+                const pre = JSON.parse(win.dataset.pre);
+                win.style.width = pre.w; win.style.height = pre.h;
+                win.style.left = pre.l; win.style.top = pre.t;
+            } else {
+                 win.style.width = '600px'; win.style.height = '400px';
+                 win.style.top = '10%'; win.style.left = '20%';
+            }
+        } else {
+            // Save state
+            win.dataset.pre = JSON.stringify({ w: win.style.width, h: win.style.height, l: win.style.left, t: win.style.top });
+            win.style.width = '100%'; win.style.height = 'calc(100% - 70px)';
+            win.style.top = '0'; win.style.left = '0';
+        }
+    }
+
+    addTaskbarItem(id, title, icon) {
+        const btn = document.createElement('div');
+        btn.id = `tb_${id}`;
+        btn.className = 'task-item';
+        btn.innerHTML = `${icon || '📄'} <span>${title}</span>`;
+        btn.onclick = () => {
+            const win = document.getElementById(id);
+            if (win.style.display === 'none' || parseInt(win.style.zIndex) !== this.zIndex) this.focus(id);
+            else this.minimize(id);
+        };
+        this.taskbar.appendChild(btn);
+    }
+
+    makeDraggable(el, handle) {
+        let isDown = false, offX, offY;
+        handle.addEventListener('mousedown', e => {
+            if(e.target.tagName==='BUTTON' || IS_MOBILE()) return;
+            isDown = true;
+            offX = e.clientX - el.offsetLeft;
+            offY = e.clientY - el.offsetTop;
+            this.focus(el.id);
+        });
+        document.addEventListener('mouseup', () => isDown = false);
+        document.addEventListener('mousemove', e => {
+            if (!isDown || IS_MOBILE()) return;
+            if (el.style.width === '100%') return; // Don't drag if maximized
+            el.style.left = (e.clientX - offX) + 'px';
+            el.style.top = (e.clientY - offY) + 'px';
+        });
+    }
+
+    makeResizable(el, handle) {
+        let isResizing = false;
+        handle.addEventListener('mousedown', e => {
+            if(IS_MOBILE()) return;
+            isResizing = true;
+            e.stopPropagation(); // Prevent drag
+            this.focus(el.id);
+        });
+        document.addEventListener('mouseup', () => isResizing = false);
+        document.addEventListener('mousemove', e => {
+            if (!isResizing || IS_MOBILE()) return;
+            el.style.width = (e.clientX - el.offsetLeft) + 'px';
+            el.style.height = (e.clientY - el.offsetTop) + 'px';
+        });
+    }
+    
+    // Called on resize
+    handleResize() {
+        const mobile = IS_MOBILE();
+        this.windows.forEach(w => {
+            const win = w.el;
+            if (mobile) {
+                // Save state if wasn't mobile before?
+                if (!win.classList.contains('mobile-full')) {
+                     win.dataset.desktopState = JSON.stringify({ w: win.style.width, h: win.style.height, l: win.style.left, t: win.style.top });
+                     win.classList.add('mobile-full');
+                     win.style.width = ''; win.style.height = ''; win.style.top = ''; win.style.left = ''; // Reset inline to allow CSS override? Or CSS !important handles it.
+                     // The CSS uses !important, so just adding class is enough, but cleaning up inline styles helps.
+                }
+            } else {
+                if (win.classList.contains('mobile-full')) {
+                    win.classList.remove('mobile-full');
+                    // Restore
+                    if (win.dataset.desktopState) {
+                        const s = JSON.parse(win.dataset.desktopState);
+                        win.style.width = s.w; win.style.height = s.h; win.style.left = s.l; win.style.top = s.t;
+                    }
+                }
+            }
+        });
+    }
+}
+const WM = new WindowManager();
+window.addEventListener('resize', () => {
+    IS_MOBILE_CACHE = window.innerWidth <= 768; // Update cache
+    WM.handleResize();
+});
+
+/* --- APPS --- */
+const appLauncher = {
+    terminal: () => {
+        const div = document.createElement('div');
+        div.className = 'terminal-wrap';
+        div.innerHTML = `<div class="term-out">DeltaOS v2.0 [unix]\nType 'help' to see available commands.</div><div style="display:flex; align-items:center;"><span id="prompt" style="color:#bd93f9; margin-right:5px;">/home/user $</span><input class="term-in" autofocus></div>`;
+        const inp = div.querySelector('input');
+        const out = div.querySelector('.term-out');
+        const promptSpan = div.querySelector('#prompt');
+        let cwd = '/home/user';
+
+        // --- SHELL UTILS ---
+        const resolve = (path) => {
+            if (!path) return cwd;
+            if (path.startsWith('/')) return path; // Absolute (simplified)
+            // Relative
+            const parts = cwd.split('/').concat(path.split('/'));
+            const res = [];
+            for (const p of parts) {
+                if (!p || p === '.') continue;
+                if (p === '..') res.pop();
+                else res.push(p);
+            }
+            return '/' + res.join('/');
+        };
+        const getVal = (path) => {
+            const p = resolve(path);
+            const n = VFS.resolve(p);
+            return n ? n : null;
+        };
+        const print = (text) => out.innerText += '\n' + text;
+        
+        // --- COMMAND REGISTRY ---
+        const commands = {
+            // File Ops
+            ls: (args) => {
+                const target = getVal(args[0]);
+                if (!target) return print(`ls: ${args[0] || ''}: No such file or directory`);
+                if (target.type !== 'dir') return print(`ls: ${args[0]}: Not a directory`);
+                const items = Object.entries(target.children || {}).map(([k, v]) => 
+                    v.type === 'dir' ? `\x1b[1;34m${k}/\x1b[0m` : k
+                );
+                print(items.join('  ') || '(empty)');
+            },
+            cd: (args) => {
+                const p = resolve(args[0] || '/home/user');
+                const n = VFS.resolve(p);
+                if (n && n.type === 'dir') {
+                    cwd = p;
+                    promptSpan.innerText = `${cwd} $`;
+                } else print(`cd: ${args[0] || ''}: No such file or directory`);
+            },
+            pwd: () => print(cwd),
+            cat: (args) => {
+                if(!args[0]) return print("cat: missing operand");
+                const n = getVal(args[0]);
+                if (!n || n.type !== 'file') print(`cat: ${args[0]}: No such file`);
+                else print(n.content || '');
+            },
+            mkdir: (args) => {
+                if(!args[0]) return print("mkdir: missing operand");
+                const p = resolve(args[0]);
+                const parts = p.split('/');
+                const name = parts.pop();
+                const parent = VFS.resolve('/' + parts.join('/'));
+                if(parent && parent.type==='dir') {
+                    if(parent.children[name]) print(`mkdir: cannot create '${name}': Exists`);
+                    else { parent.children[name] = {type:'dir', children:{}}; VFS.save(); }
+                } else print(`mkdir: cannot create '${args[0]}': No such dir`);
+            },
+            touch: (args) => {
+                if(!args[0]) return print("touch: missing operand");
+                const p = resolve(args[0]);
+                const parts = p.split('/');
+                const name = parts.pop();
+                const parent = VFS.resolve('/' + parts.join('/'));
+                if(parent && parent.type==='dir') {
+                    if(!parent.children[name]) { parent.children[name]={type:'file', content:''}; VFS.save(); }
+                } else print(`touch: cannot touch '${args[0]}': No such dir`);
+            },
+            rm: (args) => {
+                if(!args[0]) return print("rm: missing operand");
+                const p = resolve(args[0]);
+                const parts = p.split('/');
+                const name = parts.pop();
+                const parent = VFS.resolve('/' + parts.join('/'));
+                if(parent && parent.children[name]) {
+                    if(parent.children[name].type === 'dir' && !args.includes('-r')) print(`rm: cannot remove '${name}': Is a directory`);
+                    else { delete parent.children[name]; VFS.save(); }
+                } else print(`rm: cannot remove '${args[0]}': No such file`);
+            },
+            rmdir: (args) => {
+                if(!args[0]) return print("rmdir: missing operand");
+                const n = getVal(args[0]);
+                if(n && n.type === 'dir') {
+                   // Simplified: just delete logic reused or custom
+                   const p = resolve(args[0]);
+                   const parts = p.split('/');
+                   const name = parts.pop();
+                   const parent = VFS.resolve('/' + parts.join('/'));
+                   delete parent.children[name]; VFS.save();
+                } else print(`rmdir: failed to remove '${args[0]}': Not a directory or empty`);
+            },
+            cp: (args) => {
+                if(args.length < 2) return print("cp: missing file operand");
+                const src = getVal(args[0]);
+                if(!src || src.type !== 'file') return print(`cp: cannot stat '${args[0]}': No such file`);
+                // Dest logic simplified
+                const destPath = resolve(args[1]);
+                const parts = destPath.split('/');
+                const name = parts.pop();
+                const parent = VFS.resolve('/' + parts.join('/'));
+                if(parent && parent.type === 'dir') {
+                    parent.children[name] = JSON.parse(JSON.stringify(src)); // Deep copy
+                    VFS.save();
+                } else print(`cp: cannot create regular file '${args[1]}': No such dir`);
+            },
+            mv: (args) => {
+                if(args.length < 2) return print("mv: missing operand");
+                const srcPath = resolve(args[0]);
+                const srcParts = srcPath.split('/');
+                const srcName = srcParts.pop();
+                const srcParent = VFS.resolve('/' + srcParts.join('/'));
+                
+                if(!srcParent || !srcParent.children[srcName]) return print(`mv: cannot stat '${args[0]}': No such file`);
+                
+                const destPath = resolve(args[1]);
+                const destParts = destPath.split('/');
+                const destName = destParts.pop();
+                const destParent = VFS.resolve('/' + destParts.join('/'));
+                
+                if(destParent && destParent.type === 'dir') {
+                    destParent.children[destName] = srcParent.children[srcName];
+                    delete srcParent.children[srcName];
+                    VFS.save();
+                } else print(`mv: cannot move '${args[0]}' to '${args[1]}': No such dir`);
+            },
+            
+            // Text Ops
+            echo: (args) => print(args.join(' ')),
+            grep: (args) => {
+                 if(args.length < 2) return print("grep: usage: grep PATTERN FILE");
+                 const pattern = args[0];
+                 const file = getVal(args[1]);
+                 if(!file || file.type!=='file') return print(`grep: ${args[1]}: No such file`);
+                 const lines = (file.content||'').split('\n');
+                 lines.forEach(l => { if(l.includes(pattern)) print(`(standard input): ${l}`); });
+            },
+            head: (args) => {
+                 const file = getVal(args[0]);
+                 if(!file || file.type!=='file') return print(`head: ${args[0]}: No such file`);
+                 print((file.content||'').split('\n').slice(0, 10).join('\n'));
+            },
+            tail: (args) => {
+                 const file = getVal(args[0]);
+                 if(!file || file.type!=='file') return print(`tail: ${args[0]}: No such file`);
+                 const lines = (file.content||'').split('\n');
+                 print(lines.slice(Math.max(0, lines.length - 10)).join('\n'));
+            },
+            wc: (args) => {
+                 const file = getVal(args[0]);
+                 if(!file || file.type!=='file') return print(`wc: ${args[0]}: No such file`);
+                 const c = file.content||'';
+                 print(`${c.split('\n').length} ${c.split(' ').length} ${c.length} ${args[0]}`);
+            },
+            date: () => print(new Date().toString()),
+            uptime: () => print(" 21:00:00 up 10 min,  1 user,  load average: 0.00, 0.01, 0.05"),
+            whoami: () => print(Store.getCookie('username') || 'guest'),
+            uname: () => print("Linux DeltaOS 5.10.0-generic #1 SMP x86_64 GNU/Linux"),
+            clear: () => out.innerText = 'DeltaOS v2.0',
+            history: () => print("1  ls\n2  help\n3  ..."),
+            exit: () => WM.close(div.parentElement.parentElement.id.replace('content_', '')), 
+
+            // Simulation Stubs
+            install: () => print("E: Could not open lock file /var/lib/dpkg/lock"),
+            sudo: () => print("User is not in the sudoers file. This incident will be reported."),
+            su: () => print("Password: \nsu: Authentication failure"),
+            mount: () => print("sysfs on /sys type sysfs (rw,nosuid,nodev,noexec,relatime)\nproc on /proc type proc (rw,nosuid,nodev,noexec,relatime)"),
+            ps: () => print("  PID TTY          TIME CMD\n 1234 pts/0    00:00:00 bash\n 5678 pts/0    00:00:00 ps"),
+            kill: () => print("kill: usage: kill [-s sigspec | -n signum | -sigspec] pid | jobspec ... or kill -l [sigspec]"),
+            man: (args) => print(`No manual entry for ${args[0] || 'help'}`),
+            
+            // Extras from user list
+            chmod: () => print("chmod: changing permissions of '...': Operation not permitted (Virtual FS)"),
+            chown: () => print("chown: changing ownership of '...': Operation not permitted"),
+            bg: () => print("-bash: bg: current: no such job"),
+            fg: () => print("-bash: fg: current: no such job"),
+            
+            help: () => {
+                print("DeltaOS Shell - Built-in Commands:");
+                print("----------------------------------");
+                print("File Ops: ls, cd, pwd, mkdir, touch, cp, mv, rm, rmdir");
+                print("Text Ops: cat, echo, grep, head, tail, wc, sort, uniq");
+                print("System  : date, whoami, uptime, uname, clear, exit, history");
+                print("Simulated: mount, su, sudo, ps, kill, chmod, chown, man, etc.");
+                print("\nType 'command --help' for pseudo-usage.");
+            }
+        };
+
+        // --- INPUT HANDLER ---
+        inp.onkeydown = (e) => {
+            if (e.key === 'Enter') {
+                const rawLine = inp.value.trim();
+                out.innerText += `\n${promptSpan.innerText} ${rawLine}`;
+                inp.value = '';
+                
+                if (rawLine) {
+                    // Simple parser handling quotes
+                    const args = rawLine.match(/(?:[^\s"]+|"[^"]*")+/g).map(s => s.replace(/"/g, ''));
+                    const cmd = args.shift();
+                    
+                    if (commands[cmd]) {
+                        try { commands[cmd](args); } catch(e) { print(`Error: ${e.message}`); }
+                    } else if (['alias','bg','break','case','continue','do','done','elif','else','esac','exec','export','fc','fg','for','getopts','hash','if','in','jobs','newgrp','read','readonly','return','select','set','shift','then','times','trap','type','ulimit','umask','unalias','until','wait','while'].includes(cmd)) {
+                         print(`${cmd}: shell keyword/builtin (simulated)`);
+                    } else {
+                        print(`${cmd}: command not found`);
+                    }
+                }
+                div.scrollTop = div.scrollHeight;
+            }
+        };
+        
+        div.onclick = () => { if(window.getSelection().toString().length === 0) inp.focus(); };
+        return div;
+    },
+    notepad: () => {
+        const div = document.createElement('div');
+        div.style = "display:flex; flex-direction:column; height:100%;";
+        
+        // Toolbar
+        const toolbar = document.createElement('div');
+        toolbar.style = "padding:5px; background:rgba(255,255,255,0.4); border-bottom:1px solid rgba(0,0,0,0.1); display:flex; gap:10px;";
+        
+        const saveBtn = document.createElement('button');
+        saveBtn.className = 'btn-secondary';
+        saveBtn.style = "padding:2px 10px; border:1px solid var(--border-color); border-radius:5px; cursor:pointer;";
+        saveBtn.innerHTML = "💾 Save";
+        
+        toolbar.appendChild(saveBtn);
+        
+        // Content
+        const ta = document.createElement('textarea');
+        ta.style = "flex:1; width:100%; border:none; padding:10px; background:transparent; font-family:inherit; resize:none; outline:none; color:var(--text-color);";
+        ta.placeholder = "Type here...";
+        
+        div.appendChild(toolbar);
+        div.appendChild(ta);
+        
+        // Logic
+        saveBtn.onclick = () => {
+            const filename = prompt("Enter filename (e.g., note.txt):", "note.txt");
+            if (filename) {
+                // Parse path: default to /home/user/documents if no path provided
+                let path = filename.startsWith('/') ? filename : '/home/user/documents/' + filename;
+                
+                // Helper to resolve parent dir
+                const parts = path.split('/').filter(Boolean);
+                const name = parts.pop();
+                const dirPath = '/' + parts.join('/');
+                const dirNode = VFS.resolve(dirPath);
+                
+                if (dirNode && dirNode.type === 'dir') {
+                    dirNode.children[name] = { type: 'file', content: ta.value };
+                    VFS.save();
+                    UI.toast(`Saved to ${dirPath}/${name}`);
+                } else {
+                    alert("Directory not found: " + dirPath);
+                }
+            }
+        };
+        
+        return div;
+    },
+    files: () => {
+        const container = document.createElement('div');
+        let path = '/home/user';
+        let history = ['/home/user']; // History stack for Back button
+        
+        function render() {
+            // Header with Nav Buttons
+            container.innerHTML = `
+                <div style="padding:10px; border-bottom:1px solid rgba(0,0,0,0.1); display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.4);">
+                    <button id="fm-back" class="btn-secondary" style="padding:5px 10px; font-size:1rem;" title="Back">⬅️</button>
+                    <button id="fm-up" class="btn-secondary" style="padding:5px 10px; font-size:1rem;" title="Up Level">⬆️</button>
+                    <button id="fm-home" class="btn-secondary" style="padding:5px 10px; font-size:1rem;" title="Home">🏠</button>
+                    <input type="text" value="${path}" readonly style="flex:1; margin:0; padding:5px; height:30px; border-radius:5px; font-size:0.9rem;">
+                </div>
+            `;
+            
+            const grid = document.createElement('div');
+            grid.className = 'icon-grid';
+            grid.style.padding = '10px';
+            grid.style.height = 'calc(100% - 55px)';
+            grid.style.overflowY = 'auto';
+            grid.style.justifyContent = 'flex-start';
+            grid.style.alignContent = 'flex-start'; // Fix for wrapping
+            
+            const node = VFS.resolve(path);
+            if(node && node.children) {
+                const sorted = Object.entries(node.children).sort((a,b) => (b[1].type === 'dir') - (a[1].type === 'dir')); // Dirs first
+                
+                if (sorted.length === 0) {
+                    grid.innerHTML = `<div style="width:100%; text-align:center; opacity:0.6; margin-top:20px;">Empty Directory</div>`;
+                }
+
+                sorted.forEach(([name, file]) => {
+                    const item = document.createElement('div');
+                    item.className = 'desktop-icon';
+                    let icon = '📄';
+                    if (file.type === 'dir') icon = '📁';
+                    else if (['png','jpg','jpeg','gif'].some(x => name.toLowerCase().includes(x))) icon = '🖼️';
+                    else if (name.endsWith('.txt')) icon = '📝';
+                    
+                    item.innerHTML = `<div style="font-size:24px">${icon}</div><span>${name}</span>`;
+                    item.onclick = () => {
+                        if(file.type === 'dir') { 
+                            if(path === '/') path = '/' + name;
+                            else path += '/' + name;
+                            history.push(path);
+                            render(); 
+                        }
+                        else if(file.src) {
+                            // Open Real Asset
+                            const img = document.createElement('img');
+                            img.src = file.src;
+                            img.style.maxWidth = '100%'; img.style.maxHeight = '100%'; img.style.objectFit='contain';
+                            img.style.display='block'; img.style.margin='auto';
+                            WM.open({ title: name, content: img, width:500, height:500, icon:'🖼️' });
+                        } else {
+                            // Create text view for non-image files if content exists
+                             if(file.content) {
+                                const ta = document.createElement('textarea');
+                                ta.style.width='100%'; ta.style.height='100%'; ta.value = file.content;
+                                WM.open({ title: name, content: ta, width:400, height:300, icon:'📝' });
+                            }
+                        }
+                    };
+                    grid.appendChild(item);
+                });
+            } else {
+                 grid.innerHTML = `<div style="color:red; padding:20px;">Error: Path not found</div>`;
+            }
+            container.appendChild(grid);
+            
+            // Bind Buttons
+            container.querySelector('#fm-back').onclick = () => {
+                if (history.length > 1) {
+                    history.pop();
+                    path = history[history.length - 1];
+                    render();
+                }
+            };
+            // Disable back if at root of history
+            container.querySelector('#fm-back').disabled = history.length <= 1;
+            container.querySelector('#fm-back').style.opacity = history.length <= 1 ? '0.5' : '1';
+
+            container.querySelector('#fm-up').onclick = () => {
+                const parts = path.split('/').filter(Boolean);
+                if (parts.length > 0) {
+                    parts.pop();
+                    path = '/' + parts.join('/');
+                    if (path !== history[history.length-1]) history.push(path); // Add to history so we can go 'back' to the deeper folder? Or distinct? Browsers usually treat 'Up' as a navigation event.
+                    render();
+                }
+            };
+            container.querySelector('#fm-home').onclick = () => {
+                path = '/home/user';
+                if (path !== history[history.length-1]) history.push(path);
+                render();
+            };
+        }
+        render();
+        return container;
+    },
+    // Persistent File Settings Logic
+    settings: (() => {
+        function renderFiles(container) {
+            const list = document.createElement('div');
+            list.innerHTML = "<strong>Persistence Files:</strong><ul style='list-style:none; padding:0; margin-top:5px; font-size:0.9rem;'></ul>";
+            const ul = list.querySelector('ul');
+            const prefix = 'delta_os_';
+            let found = false;
+
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith(prefix)) {
+                    found = true;
+                    const filename = key.replace(prefix, '');
+                    const li = document.createElement('li');
+                    li.style = "margin-bottom:5px; background:rgba(255,255,255,0.3); padding:5px; border-radius:5px; display:flex; justify-content:space-between;";
+                    li.innerHTML = `<span>${filename}</span> <button style="cursor:pointer; border:none; background:none;">✏️</button>`;
+                    li.querySelector('button').onclick = () => editFile(filename);
+                    ul.appendChild(li);
+                }
+            }
+            if (!found) ul.innerHTML = "<li>No files found.</li>";
+            container.appendChild(list);
+        }
+
+        function editFile(filename) {
+            // Note: Directly accessing localStorage to ensure we get the raw string content for editing
+            const raw = localStorage.getItem('delta_os_' + filename);
+            
+            const div = document.createElement('div');
+            div.style = "display:flex; flex-direction:column; height:100%; gap:10px;";
+            div.innerHTML = `
+                <textarea style="flex:1; font-family:monospace;">${raw}</textarea>
+                <button class="btn">Save</button>
+            `;
+            div.querySelector('button').onclick = () => {
+                try {
+                    const val = div.querySelector('textarea').value;
+                    JSON.parse(val); // Validate JSON
+                    localStorage.setItem('delta_os_' + filename, val);
+                    WM.close(editingWinId);
+                    // Refresh theme if general
+                    if(filename === 'general.json') {
+                         try { 
+                            const parsed = JSON.parse(val);
+                            if(parsed.theme) setTheme(parsed.theme);
+                         } catch(e){}
+                    }
+                } catch(e) { alert("Invalid JSON"); }
+            };
+            
+            const editingWinId = 'edit_' + Date.now();
+            // Using WM.top level method, but we are inside an object. Need 'WM' global.
+            WM.open({ title: 'Edit ' + filename, content: div, width: 400, height: 500 });
+        }
+
+        return () => {
+            const d = document.createElement('div'); d.style.padding='20px';
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            d.innerHTML = `
+                <h3>System</h3>
+                <div style="margin-bottom:15px;">
+                    <label class="switch">
+                        <input type="checkbox" ${isDark ? 'checked' : ''} onchange="setTheme(this.checked ? 'dark':'light')">
+                        <span class="slider"></span>
+                    </label> Dark Mode
+                </div>
+                <button class="btn" style="background:#ff5f56; color:white; width:100%; margin-bottom:20px;" onclick="localStorage.clear(); location.reload()">Reset All Data</button>
+                <hr style="opacity:0.5; margin-bottom:20px;">
+            `;
+            renderFiles(d);
+            return d;
+        };
+    })(),
+    
+    open: (app) => {
+        if (app === 'close_all') {
+            WM.closeAll();
+            return;
+        }
+        
+        const map = {
+            terminal: { title: 'Terminal', icon: '💻', content: appLauncher.terminal() },
+            notepad: { title: 'Notepad', icon: '📝', content: appLauncher.notepad() },
+            files: { title: 'Files', icon: '📁', content: appLauncher.files() },
+            browser: { title: 'Browser', icon: '🌐', content: (() => { 
+                const root = document.createElement('div');
+                root.style = "display:flex; flex-direction:column; height:100%;";
+                
+                // Toolbar
+                const toolbar = document.createElement('div');
+                toolbar.style = "display:flex; gap:5px; padding:8px; background:rgba(255,255,255,0.4); border-bottom:1px solid rgba(0,0,0,0.1); align-items:center;";
+                
+                const btnStyle = "padding:5px 10px; border:1px solid var(--border-color); background:var(--btn-bg); border-radius:5px; cursor:pointer;";
+                
+                toolbar.innerHTML = `
+                    <button id="br-back" style="${btnStyle}" title="Back">⬅️</button>
+                    <button id="br-fwd" style="${btnStyle}" title="Forward">➡️</button>
+                    <button id="br-reload" style="${btnStyle}" title="Reload">🔄</button>
+                    <input id="br-url" type="text" value="https://www.wikipedia.org" style="flex:1; padding:6px; border-radius:5px; border:1px solid var(--border-color); font-family:inherit;">
+                    <button id="br-go" style="${btnStyle} background:var(--primary-color); color:white;">Go</button>
+                `;
+                
+                // Iframe
+                const frame = document.createElement('iframe');
+                frame.src = 'https://www.wikipedia.org';
+                frame.style = "flex:1; border:none; background:white;";
+                // Sandbox: Block popups (new tabs), allow scripts/forms/same-origin
+                frame.setAttribute('sandbox', 'allow-forms allow-scripts allow-same-origin allow-modals allow-presentation');
+                
+                root.appendChild(toolbar);
+                root.appendChild(frame);
+                
+                // History Logic
+                const historyStack = ['https://www.wikipedia.org'];
+                let historyIndex = 0;
+                let isNavigating = false;
+
+                const updateButtons = () => {
+                    toolbar.querySelector('#br-back').disabled = historyIndex <= 0;
+                    toolbar.querySelector('#br-back').style.opacity = historyIndex <= 0 ? 0.5 : 1;
+                    
+                    toolbar.querySelector('#br-fwd').disabled = historyIndex >= historyStack.length - 1;
+                    toolbar.querySelector('#br-fwd').style.opacity = historyIndex >= historyStack.length - 1 ? 0.5 : 1;
+                };
+
+                const loadUrl = (url) => {
+                    frame.src = url;
+                    toolbar.querySelector('#br-url').value = url;
+                };
+
+                const go = (url) => {
+                    if(!url.startsWith('http')) {
+                         if(!url.includes('.')) url = 'https://www.bing.com/search?q=' + encodeURIComponent(url);
+                         else url = 'https://' + url;
+                    }
+                    
+                    if (url !== historyStack[historyIndex]) {
+                        historyStack.splice(historyIndex + 1); // Truncate forward history
+                        historyStack.push(url);
+                        historyIndex++;
+                    }
+                    loadUrl(url);
+                    updateButtons();
+                };
+                
+                // Event Listeners
+                const urlInput = toolbar.querySelector('#br-url');
+                toolbar.querySelector('#br-go').onclick = () => go(urlInput.value);
+                urlInput.onkeydown = (e) => { if(e.key === 'Enter') go(urlInput.value); };
+                
+                toolbar.querySelector('#br-reload').onclick = () => { 
+                    try { frame.contentWindow.location.reload(); } catch(e){ frame.src = frame.src; } 
+                };
+                
+                toolbar.querySelector('#br-back').onclick = () => {
+                    if (historyIndex > 0) {
+                        historyIndex--;
+                        loadUrl(historyStack[historyIndex]);
+                        updateButtons();
+                    }
+                };
+                
+                toolbar.querySelector('#br-fwd').onclick = () => {
+                    if (historyIndex < historyStack.length - 1) {
+                        historyIndex++;
+                        loadUrl(historyStack[historyIndex]);
+                        updateButtons();
+                    }
+                };
+                
+                updateButtons(); // Init state
+                
+                return root;
+            })() },
+            settings: { title: 'Settings', icon: '⚙️', content: appLauncher.settings() }
+        };
+        if(map[app]) {
+            WM.open(map[app]);
+            toggleStartMenu(false);
+        }
+    }
+};
+
+/* --- SYSTEM UI --- */
+function toggleStartMenu(force) {
+    const menu = document.getElementById('start-menu');
+    const btn = document.getElementById('start-btn');
+    const newState = force !== undefined ? force : !menu.classList.contains('open');
+    
+    if (newState) {
+        menu.classList.add('open');
+        btn.classList.add('flipped');
+    } else {
+        menu.classList.remove('open');
+        btn.classList.remove('flipped');
+    }
+}
+
+// Close Start Menu when clicking outside
+document.addEventListener('click', (e) => {
+    const menu = document.getElementById('start-menu');
+    const btn = document.getElementById('start-btn');
+    if (menu.classList.contains('open') && !menu.contains(e.target) && !btn.contains(e.target)) {
+        toggleStartMenu(false);
+    }
+});
+
+// Global Theme Setter
+window.setTheme = (theme) => {
+    document.documentElement.setAttribute('data-theme', theme);
+    document.cookie = `delta_theme=${theme}; path=/; max-age=31536000`;
+    // Update general.json if exists
+    try {
+        const g = JSON.parse(localStorage.getItem('delta_os_general.json') || '{}');
+        g.theme = theme;
+        localStorage.setItem('delta_os_general.json', JSON.stringify(g));
+    } catch(e){}
+};
+// Init Theme
+const initialTheme = Store.getCookie('delta_theme');
+if(initialTheme) setTheme(initialTheme);
+
+// Desktop Shortcuts
+const desktopIcons = [
+    { title: 'Computer', icon: 'https://api.iconify.design/heroicons:computer-desktop.svg?color=%23594a4e', action: 'files' },
+    { title: 'Terminal', icon: 'https://api.iconify.design/heroicons:command-line.svg?color=%23594a4e', action: 'terminal' },
+    { title: 'Browser', icon: 'https://api.iconify.design/heroicons:globe-alt.svg?color=%23594a4e', action: 'browser' },
+    { title: 'Settings', icon: 'https://api.iconify.design/heroicons:cog-6-tooth.svg?color=%23594a4e', action: 'settings' },
+    { title: 'Close All', icon: 'https://api.iconify.design/heroicons:x-circle.svg?color=%23ff5f56', action: 'close_all' },
+    { title: 'Home', icon: 'https://api.iconify.design/heroicons:home.svg?color=%23594a4e', action: 'home' }
+];
+
+const grid = document.getElementById('icon-grid');
+desktopIcons.forEach(app => {
+    const el = document.createElement('div');
+    el.className = 'desktop-icon';
+    el.innerHTML = `<img src="${app.icon}"><span>${app.title}</span>`;
+    
+    if (app.action === 'home') {
+        el.onclick = () => location.href = 'mainmenu.html';
+    } else {
+        el.onclick = () => appLauncher.open(app.action);
+    }
+    
+    grid.appendChild(el);
+});
+
+// Clock
+setInterval(() => document.getElementById('clock').innerText = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}), 1000);
+
+// Init User from Cookie
+const username = Store.getCookie('username');
+if(username) document.getElementById('user-name').innerText = username;
+
+</script>
+</body>
+</html>
