@@ -1783,7 +1783,15 @@
                     }
                     charImg.style.display = 'block';
                 };
+                newImg.onerror = () => {
+                    console.warn("Character image failed to load:", parsed.character_image);
+                    // Fallback: Ensure previous image is visible if available
+                    if(charImg.src) charImg.style.display = 'block';
+                };
                 newImg.src = parsed.character_image;
+            } else {
+                // If no image sent, ensure current is visible (if set)
+                if(charImg.src) charImg.style.display = 'block';
             }
             
             // Auto-Focus Input for next turn
