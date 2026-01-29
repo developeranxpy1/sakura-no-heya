@@ -1991,8 +1991,12 @@
         const MODEL = "llama-3.3-70b-versatile"; 
         
         // Hidden System Instructions (Always Appended)
-        const SYSTEM_INSTRUCTIONS = `OUTPUT FORMAT: Return JSON ONLY.
-{ "response": "text...", "environment": "path", "character_image": "path" }`;
+        const SYSTEM_INSTRUCTIONS = `CORE DIRECTIVES:
+1. OUTPUT: Return JSON ONLY. Format: { "response": "text", "environment": "path", "character_image": "path" }
+2. ASSETS: Choose paths from AVAILABLE ASSETS. 
+   - Change 'environment' based on the CURRENT TIME or your mood.
+   - Change 'character_image' from the emotion categories to match your response.
+3. CONTEXT: You are fully aware of the real-time date and time provided.`;
 
         // Default Character Description (Editable)
         const DEFAULT_PERSONALITY = `You are Sakura.
