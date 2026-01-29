@@ -10,3 +10,5 @@ AI character prototype
 ## About
 
 A visual novel style AI character interface with chat functionality.
+
+project created with google antigravity
