@@ -14,11 +14,32 @@
             overflow: hidden;
             position: fixed; /* Force Lock */
             overscroll-behavior: none; /* No Bounce */
-            background-color: #000 !important; /* Fixed Black */
-            background-image: none !important; /* Remove dynamic images */
+            background-color: #000; 
+            background-size: cover;
+            background-position: center;
             /* Global Font Change */
             font-family: 'Comic Sans MS', 'Comic Sans', cursive, sans-serif;
             touch-action: manipulation; /* ALLOW TOUCH */
+        }
+
+        /* Particles Overlay */
+        .particles-overlay {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 2;
+            opacity: 0.4;
+            background: url('https://www.transparenttextures.com/patterns/dust.png'); /* Subtle dust texture */
+        }
+
+        /* Breathing Animation */
+        @keyframes breathe {
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.01); }
+        }
+
+        .character-layer.breathing {
+            animation: breathe 3s ease-in-out infinite;
         }
 
         #backBtn {
