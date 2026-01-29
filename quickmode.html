@@ -1348,11 +1348,35 @@
                 scannedAssets = data;
                 console.log("Assets Loaded:", scannedAssets);
                 restoreState(); // Restore state ONLY after assets are known
+                preloadAllAssets(scannedAssets); // Background Preload
             })
             .catch(err => {
                 console.error("Asset Manifest Load Failed:", err);
                 restoreState(); // Fallback restore even if assets fail
             });
+
+        // --- PRELOADER ---
+        function preloadAllAssets(assets) {
+            const urls = new Set();
+            // Recursive extractor
+            function traverse(obj) {
+                if (!obj) return;
+                if (typeof obj === 'string') {
+                    if (obj.match(/\.(png|jpe?g|webp|gif)$/i)) urls.add(obj);
+                } else if (typeof obj === 'object') {
+                    for (const key in obj) traverse(obj[key]);
+                }
+            }
+            traverse(assets);
+            
+            console.log(`Background Preloading ${urls.size} assets...`);
+            let loaded = 0;
+            urls.forEach(url => {
+                const img = new Image();
+                img.src = url;
+                img.onload = () => { loaded++; if(loaded === urls.size) console.log("All Assets Preloaded!"); };
+            });
+        }
 
         // --- PERSISTENCE HELPERS ---
         function saveChatHistory() {
