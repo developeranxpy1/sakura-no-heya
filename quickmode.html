@@ -1384,8 +1384,24 @@
         // Restore Visual State
         // Restore Visual State (Always show last AI context)
         function restoreState() {
+            // 1. Try Logged Visual State (Best Persistence)
+            const logState = Common.loadState('log1.json');
+            let visualRestored = false;
+            
+            if (logState) {
+                if (logState.last_bg) {
+                    body.style.backgroundImage = `url('${logState.last_bg}')`;
+                    visualRestored = true;
+                }
+                if (logState.last_char) {
+                    charImg.src = logState.last_char;
+                    charImg.style.display = 'block';
+                    visualRestored = true;
+                }
+            }
+
             if (chatHistory.length > 0) {
-                // Find last AI message for Environment/Char State
+                // Find last AI message for Text & Fallback Visuals
                 const lastAI = [...chatHistory].reverse().find(m => m.role === 'assistant');
                 
                 if(lastAI) {
@@ -1393,14 +1409,19 @@
                     try {
                         const p = JSON.parse(content);
                         if(p.response) content = p.response;
-                        if(p.environment) body.style.backgroundImage = `url('${p.environment}')`;
-                        if(p.character_image) charImg.src = p.character_image;
+                        
+                        // Only use history visuals if log1.json failed/missing
+                        if(!visualRestored) {
+                            if(p.environment) body.style.backgroundImage = `url('${p.environment}')`;
+                            if(p.character_image) charImg.src = p.character_image;
+                        }
+                        
                         vnText.innerText = content;
                     } catch(e) {
                          vnText.innerText = content;
                     }
                 } else {
-                     vnText.innerText = ""; // Should not happen if history exists but no AI
+                     vnText.innerText = ""; 
                 }
                 
                 // Force Sakura Theme (User request: "Always show her last message not mine")
