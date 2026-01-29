@@ -2513,6 +2513,44 @@ Dynamic: You rarely change locations. You focus on the conversation.`;
 
         /* Fix Ghost Text */
         .character-layer { color: transparent !important; }
+
+        /* --- Final Polish (Back Button & Gap) --- */
+        
+        /* Back Button Style */
+        .hist-back-btn {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.7);
+            font-size: 1.5rem; /* Small but touchable */
+            cursor: pointer;
+            padding: 5px 10px;
+            margin-right: auto; /* Push to left */
+            line-height: 1;
+        }
+        .hist-back-btn:hover { color: white; }
+
+        /* Mobile Fixes */
+        @media (max-width: 600px) {
+            /* Remove Bottom Gap */
+            .vn-controls {
+                bottom: 0px !important; /* Touch bottom */
+                padding-bottom: 15px !important; /* Safe area */
+                background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); /* Readability */
+            }
+            
+            /* Ensure Header is Visible in Expanded */
+            .dialogue-box.expanded .history-header {
+                display: flex;
+                align-items: center;
+                padding: 10px;
+                width: 100%;
+                box-sizing: border-box;
+                position: absolute;
+                top: 0;
+                left: 0;
+                z-index: 101;
+            }
+        }
     </style>
 </body>
 </html>
