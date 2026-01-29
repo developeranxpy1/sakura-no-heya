@@ -46,14 +46,22 @@
                 "assetts/images/character/school-dress/glitch/neutralglitch.png",
                 "assetts/images/character/school-dress/glitch/scaredglitch.png"
             ]
-        }
+        },
+        "sakura_sprite_pack_body": [
+            "assetts/sakura_ready_sprite_pack/body/A_collection_of_digital_2D_sprite_assets_features_.png",
+            "assetts/sakura_ready_sprite_pack/body/A_collection_of_digital_anime-style_sprites_of_Sak.png",
+            "assetts/sakura_ready_sprite_pack/body/A_collection_of_transparent_PNG_sprite_assets_feat.png",
+            "assetts/sakura_ready_sprite_pack/body/A_digital_anime-style_illustration_features_a_full.png",
+            "assetts/sakura_ready_sprite_pack/body/A_digital_anime-style_illustration_features_a_youn.png",
+            "assetts/sakura_ready_sprite_pack/body/A_digital_anime-style_illustration_of_Sakura,_a_yo.png",
+            "assetts/sakura_ready_sprite_pack/body/A_digital_illustration_in_anime-style_features_a_y.png",
+            "assetts/sakura_ready_sprite_pack/body/A_pair_of_anime-style_digital_illustrations_displa.png",
+            "assetts/sakura_ready_sprite_pack/body/A_set_of_two_anime-style_digital_illustrations_fea.png"
+        ]
     },
-    "audio": {
-        "bgm": [],
-        "sfx": []
-    },
-    "video": {
-        "bgvideo": "assetts/video/bgvideo.mp4"
-    },
-    "usage_instructions": "Sakura can set 'environment' to any path from environments (e.g. environments.room.day or environments.park.night). For character_image, use any path from characters based on current emotion (e.g. characters['school-dress'].happy[0] for happy expression)."
+    "misc_assets": [
+        "assetts/video/bgvideo.mp4",
+        "assetts/images/sakuralogo.png"
+    ],
+    "usage_instructions": "Choose 'environment' from environments. Choose 'character_image' from characters. You can also pick from the 'sakura_sprite_pack_body' if you want to change pose/outfit. Use ONLY paths provided here."
 }
