@@ -2360,6 +2360,34 @@ Dynamic: You rarely change locations. You focus on the conversation.`;
                 sendToAI(startPrompt, false, true);
             }
         }, 1500); // Delay to ensure assets loaded
+        // --- VISUAL VIEWPORT FIX (Mobile Keyboard) ---
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', () => {
+                const navHeight = 0; // Usually 0 in standalone, but maybe address bar
+                const viewportHeight = window.visualViewport.height;
+                const windowHeight = window.innerHeight;
+                
+                // Check if keyboard is likely open (viewport significantly smaller)
+                if (viewportHeight < windowHeight - 100) {
+                    // Keyboard Open: Shift UI
+                    // document.body.style.height = viewportHeight + 'px'; // Optional: Resize body
+                    // Or just ensure input is visible
+                    setTimeout(() => {
+                        const inputGroup = document.querySelector('.vn-controls');
+                        if(inputGroup) inputGroup.scrollIntoView({block: 'end', behavior: 'smooth'});
+                    }, 100);
+                } else {
+                    // Keyboard Closed
+                    document.body.style.height = '100dvh';
+                }
+            });
+            
+            // Also handle scroll (updates offset)
+             window.visualViewport.addEventListener('scroll', () => {
+                 // dynamic adjustment if needed
+             });
+        }
+        
     </script>
     <!-- Mobile & Fixes -->
     <style>
