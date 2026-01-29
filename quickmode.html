@@ -1126,6 +1126,22 @@
                 font-size: 1rem;
             }
         }
+        /* Name Label Restoration */
+        .char-name-label {
+            position: absolute;
+            top: -18px; 
+            left: 20px;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+            color: #fff;
+            padding: 5px 18px;
+            border-radius: 15px;
+            font-size: 1rem;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 10;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -1146,6 +1162,8 @@
     <img id="character-layer" class="character-layer" src="" alt="Sakura">
 
     <div class="vn-box-container">
+        <!-- Name Label -->
+        <div class="char-name-label" id="char-name-label">Sakura</div>
         <!-- Dialogue Box -->
         <div class="dialogue-box">
             <div class="glass-plate"></div>
