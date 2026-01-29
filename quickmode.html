@@ -1392,8 +1392,13 @@
             // Prepare Messages (Sanitize History for API) - Sliding Window
             const cleanHistory = chatHistory.map(({ role, content }) => ({ role, content })); // Strip timestamps
             const contextHistory = cleanHistory.slice(-API_CONTEXT_LIMIT);
+            
+            // Real-time Clock for Sakura
+            const now = new Date();
+            const timeStr = now.toLocaleString([], { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
             const messages = [
-                { role: "system", content: currentPersonality + "\n\n" + SYSTEM_INSTRUCTIONS + "\n\nAVAILABLE ASSETS: " + JSON.stringify(scannedAssets) },
+                { role: "system", content: currentPersonality + "\n\n" + SYSTEM_INSTRUCTIONS + "\n\nCURRENT TIME: " + timeStr + "\n\nAVAILABLE ASSETS: " + JSON.stringify(scannedAssets) },
                 ...contextHistory
             ];
 
