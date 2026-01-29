@@ -10,7 +10,19 @@
         },
         "school": {
             "day": "assetts/images/envbg/schooldayandnightbg/day.png",
-            "night": null
+            "night": "assetts/images/envbg/roomdayandnightbg/night.png"
+        },
+        "kitchen": {
+            "day": "assetts/images/envbg/kitchen/day.png",
+            "night": "assetts/images/envbg/kitchen/day.png"
+        },
+        "kidsroom": {
+            "day": "assetts/images/envbg/kidsroom/day.png",
+            "night": "assetts/images/envbg/kidsroom/day.png"
+        },
+        "hallway": {
+            "day": "assetts/images/envbg/hallway/day.png",
+            "night": "assetts/images/envbg/hallway/day.png"
         },
         "streets": {
             "day": null,
