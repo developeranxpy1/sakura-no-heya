@@ -1341,29 +1341,18 @@
         // --- ASSETS ---
         let scannedAssets = { environments: {}, characters: {} };
 
-        // Load Asset Manifest
+        // Initialize State after Assets Load
         fetch('assetts/manifest.json')
             .then(res => res.json())
             .then(data => {
                 scannedAssets = data;
                 console.log("Assets Loaded:", scannedAssets);
-                // Set initial BG - Time Aware Default
-                if(chatHistory.length === 0) {
-                    const hour = new Date().getHours();
-                    const isNight = hour >= 18 || hour < 6;
-                    let defaultBg;
-                    if (isNight && scannedAssets.environments?.room?.night) {
-                        defaultBg = scannedAssets.environments.room.night;
-                    } else {
-                        defaultBg = scannedAssets.environments?.school?.day || scannedAssets.environments?.room?.day;
-                    }
-                    if(defaultBg) body.style.backgroundImage = `url('${defaultBg}')`;
-                }
-                // Set default character
-                const defaultChar = scannedAssets.characters?.['school-dress']?.neutral?.[0];
-                if(defaultChar) { charImg.src = defaultChar; charImg.style.display = 'block'; }
+                restoreState(); // Restore state ONLY after assets are known
             })
-            .catch(err => console.error("Asset Manifest Load Failed:", err));
+            .catch(err => {
+                console.error("Asset Manifest Load Failed:", err);
+                restoreState(); // Fallback restore even if assets fail
+            });
 
         // --- PERSISTENCE HELPERS ---
         function saveChatHistory() {
@@ -1379,20 +1368,66 @@
             chatHistory = loadedHistory.logs;
         }
 
-        // Default BG and character set in manifest load callback above
-        
-        // Restore Visual State
-        // Restore Visual State (Always show last AI context)
+        // Restore Visual State (Smart Time/Date Logic)
         function restoreState() {
-            // 1. Try Logged Visual State (Best Persistence)
+            const now = new Date();
+            const hour = now.getHours();
+            const day = now.getDay(); // 0 = Sunday
+            const isNight = hour >= 18 || hour < 6;
+            const isSunday = day === 0;
+
+            // 1. Try Logged Visual State
             const logState = Common.loadState('log1.json');
             let visualRestored = false;
             
             if (logState) {
+                // Background Logic
                 if (logState.last_bg) {
-                    body.style.backgroundImage = `url('${logState.last_bg}')`;
+                    let bgUrl = logState.last_bg;
+                    
+                    // SMART CONTEXT SWAP
+                    // Attempt to identify current location from URL
+                    let location = "unknown";
+                    if (scannedAssets.environments) {
+                        for (const [locKey, variants] of Object.entries(scannedAssets.environments)) {
+                            if (Object.values(variants).includes(bgUrl)) {
+                                location = locKey;
+                                break;
+                            }
+                        }
+                    }
+
+                    // Apply Rules: Sunday = No School -> Move to Room
+                    if (isSunday && location === 'school') {
+                        location = 'room'; 
+                    }
+
+                    // Apply Rules: Night = Night Variant (or Room if no night school)
+                    if (location !== "unknown" && scannedAssets.environments && scannedAssets.environments[location]) {
+                        if (isNight) {
+                            // Try Night variant
+                            if (scannedAssets.environments[location].night) {
+                                bgUrl = scannedAssets.environments[location].night;
+                            } else {
+                                // If no night variant, maybe fallback to Room Night?
+                                // User said "night = no school", implies Go Home
+                                if(location === 'school') {
+                                     bgUrl = scannedAssets.environments.room?.night || bgUrl;
+                                }
+                            }
+                        } else {
+                            // Ensure Day variant
+                            if (scannedAssets.environments[location].day) {
+                                bgUrl = scannedAssets.environments[location].day;
+                            }
+                        }
+                    }
+
+                    body.style.backgroundImage = `url('${bgUrl}')`;
                     visualRestored = true;
                 }
+
+                // Character Logic
                 if (logState.last_char) {
                     charImg.src = logState.last_char;
                     charImg.style.display = 'block';
@@ -1400,40 +1435,48 @@
                 }
             }
 
+            // Fallback Init if no log (First Run)
+            if (!visualRestored && chatHistory.length === 0) {
+                 // Check Time for Default
+                 let defaultBg;
+                 if (isNight) {
+                     defaultBg = scannedAssets.environments?.room?.night;
+                 } else {
+                     defaultBg = scannedAssets.environments?.school?.day;
+                 }
+                 // Sunday Check
+                 if (isSunday && !isNight) defaultBg = scannedAssets.environments?.room?.day;
+
+                 if(defaultBg) body.style.backgroundImage = `url('${defaultBg}')`;
+                 
+                 const defaultChar = scannedAssets.characters?.['school-dress']?.neutral?.[0];
+                 if(defaultChar) { charImg.src = defaultChar; charImg.style.display = 'block'; }
+            }
+
             if (chatHistory.length > 0) {
-                // Find last AI message for Text & Fallback Visuals
+                 // Text Restoration Logic...
                 const lastAI = [...chatHistory].reverse().find(m => m.role === 'assistant');
-                
                 if(lastAI) {
                     let content = lastAI.content;
                     try {
-                        const p = JSON.parse(content);
-                        if(p.response) content = p.response;
-                        
-                        // Only use history visuals if log1.json failed/missing
-                        if(!visualRestored) {
-                            if(p.environment) body.style.backgroundImage = `url('${p.environment}')`;
-                            if(p.character_image) charImg.src = p.character_image;
-                        }
-                        
-                        vnText.innerText = content;
-                    } catch(e) {
-                         vnText.innerText = content;
-                    }
-                } else {
-                     vnText.innerText = ""; 
+                         const p = JSON.parse(content);
+                         content = p.response || content; 
+                         // Note: We intentionally IGNORE history BG if log1.json handled it smartly above
+                         if(!visualRestored) {
+                             // Fallback only
+                             if(p.environment) body.style.backgroundImage = `url('${p.environment}')`;
+                             if(p.character_image) charImg.src = p.character_image;
+                         }
+                    } catch(e){}
+                    vnText.innerText = content;
                 }
-                
-                // Force Sakura Theme (User request: "Always show her last message not mine")
                 dialogueBox.classList.remove('blue-theme');
                 nameLabel.innerText = "Sakura";
-            } else {
-                // Default Start - Empty
-                vnText.innerText = "";
             }
+            
+            // Auto-Focus Input
+            userInput.focus();
         }
-        
-        restoreState();
         // Auto-Focus Input
         userInput.focus();
 
