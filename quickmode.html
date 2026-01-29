@@ -2361,5 +2361,16 @@ Dynamic: You rarely change locations. You focus on the conversation.`;
             }
         }, 1500); // Delay to ensure assets loaded
     </script>
+    <!-- Mobile & Fixes -->
+    <style>
+        @media (max-width: 600px) {
+            .dialogue-box { width: 95% !important; bottom: 70px !important; padding: 15px !important; }
+            .character-layer { max-height: 85vh !important; bottom: -5vh !important; }
+            #userInput { font-size: 16px !important; } /* Stop iOS Zoom */
+            .vn-controls { bottom: 10px !important; }
+        }
+        /* Fix Ghost Text */
+        .character-layer { color: transparent !important; }
+    </style>
 </body>
 </html>
