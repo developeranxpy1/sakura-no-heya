@@ -1176,21 +1176,15 @@
             <div class="glass-plate"></div>
             
             <!-- IG Style Header (Visible only when expanded) -->
-            <!-- WA Style Header (Mobile Only) -->
+            <!-- IG Style Header (Visible only when expanded) -->
             <div class="history-header">
-                 <div class="profile" style="width:100%; display:flex; align-items:center;">
-                     <span class="arrow" onclick="toggleHistory()" style="font-size:24px; color:white; margin-right:5px; cursor:pointer;">&#8592;</span>
-                     <img class="pp" src="assetts/sakura_ready_sprite_pack/school/school_day.png" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
-                     <div style="flex:1; margin-left:10px; display:flex; flex-direction:column; justify-content:center;">
-                         <h2 style="margin:0; font-size:18px; color:white;">Sakura</h2>
-                         <span style="font-size:13px; color:#ddd;">Online</span>
-                     </div>
-                     <div class="right" style="color:white; display:flex; gap:15px;">
-                        <span class="icon">📹</span>
-                        <span class="icon">📞</span>
-                        <span class="icon">⋮</span>
-                     </div>
-                 </div>
+                <button id="histBackBtn" class="hist-back-btn" onclick="toggleHistory()">&#8249;</button> <!-- Chevron Left -->
+                <div class="hist-title">
+                    <span class="hist-name">Sakura</span>
+                </div>
+                <div class="hist-actions">
+                    <!-- Placeholder icons or disabled buttons -->
+                </div>
             </div>
 
 
@@ -2519,65 +2513,6 @@ Dynamic: You rarely change locations. You focus on the conversation.`;
 
         /* Fix Ghost Text */
         .character-layer { color: transparent !important; }
-
-        /* --- WHATSAPP MOBILE UI (User Request) --- */
-        .history-header { display: none; }
-
-        @media (max-width: 600px) {
-            .dialogue-box.expanded .history-header {
-                display: flex;
-                background: #036055;
-                height: 60px;
-                padding: 0 10px;
-                align-items: center;
-                position: sticky; top: 0; z-index: 100;
-            }
-            .dialogue-box.expanded #history-container {
-                background: #e5ddd5 !important; /* WA BG Color */
-                padding: 10px !important;
-            }
-            .dialogue-box.expanded .msg-bubble {
-                max-width: 80% !important;
-                padding: 8px 12px !important;
-                margin: 5px 0 !important;
-                font-size: 16px !important;
-                border-radius: 10px !important;
-                box-shadow: 0 1px 1px rgba(0,0,0,0.1);
-                font-family: sans-serif !important;
-                color: #000 !important;
-            }
-            .dialogue-box.expanded .msg-sakura {
-                background: #FFFFFF !important;
-                align-self: flex-start !important;
-                border-top-left-radius: 0 !important;
-            }
-            .dialogue-box.expanded .msg-user {
-                background: #E2FFC7 !important;
-                align-self: flex-end !important;
-                border-top-right-radius: 0 !important;
-            }
-            
-            /* Footer / Input */
-            .dialogue-box.expanded .input-bar {
-                background: transparent !important; /* Let container show? or white? WA footer is separate */
-                padding: 5px !important;
-                margin-bottom: 5px !important;
-            }
-            .dialogue-box.expanded .integrated-input {
-                background: white !important;
-                border-radius: 30px !important;
-                height: 45px !important;
-                padding: 0 15px !important;
-                box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-                border: none !important;
-            }
-            
-             /* Hide Default VN Controls */
-            .dialogue-box.expanded ~ .vn-controls, 
-            .dialogue-box.expanded .vn-controls {
-                display: none !important;
-            }
-        }
     </style>
 </body>
 </html>
