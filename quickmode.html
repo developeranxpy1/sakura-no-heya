@@ -2460,7 +2460,14 @@ Dynamic: You rarely change locations. You focus on the conversation.`;
     <style>
         /* Mobile Updates */
         @media (max-width: 600px) {
-            .dialogue-box { width: 95% !important; bottom: 70px !important; padding: 15px !important; }
+            .dialogue-box { 
+                width: 95% !important; 
+                bottom: 70px !important; 
+                padding: 15px !important; 
+                left: 50% !important; 
+                transform: translateX(-50%) !important;
+                margin-left: 0 !important;
+            }
             .character-layer { max-height: 85vh !important; bottom: -5vh !important; }
             #userInput { font-size: 16px !important; } 
             .vn-controls { bottom: 10px !important; }
