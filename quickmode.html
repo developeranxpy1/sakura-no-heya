@@ -79,6 +79,52 @@
             100% { transform: translateX(-50%); opacity: 1; }
         }
 
+        /* --- LOADING OVERLAY CSS --- */
+        #loading-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; 
+            z-index: 9999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        #loading-overlay.active { display: flex; }
+
+        .loader-container {
+            text-align: center;
+            animation: fadeIn 0.8s ease-out;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .spinner {
+            width: 80px; height: auto; margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite, spin 10s linear infinite;
+            filter: drop-shadow(0 0 15px rgba(255, 183, 213, 0.6));
+        }
+        .loading-text {
+            font-family: 'Comic Sans MS', cursive;
+            color: var(--text-color);
+            font-size: 1.2rem;
+            margin-top: 10px;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        .progress-bar {
+            width: 200px; height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px; margin-top: 20px;
+            overflow: hidden; border: 1px solid var(--border-color);
+        }
+        .progress-fill {
+            height: 100%; background: var(--secondary-color);
+            width: 0%; transition: width 0.2s linear;
+            box-shadow: 0 0 10px var(--secondary-color);
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes float { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-10px) rotate(5deg); } }
+
         /* VN Text Box Container - Floating Dark Pill */
         .vn-box-container {
             position: absolute;
