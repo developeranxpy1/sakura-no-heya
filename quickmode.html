@@ -1413,6 +1413,8 @@
         }
         
         restoreState();
+        // Auto-Focus Input
+        userInput.focus();
 
 
         // --- API & ANIMATION ---
@@ -1667,6 +1669,9 @@
                 
                 const aiContent = data.choices[0].message.content;
                 
+                // Enforce Minimum Blue Card Duration (1.2s)
+                await new Promise(r => setTimeout(r, 1200));
+
                 // Revert to Sakura
                 dialogueBox.classList.remove('blue-theme');
                 nameLabel.innerText = "Sakura";
@@ -1716,6 +1721,9 @@
                 };
                 newImg.src = parsed.character_image;
             }
+            
+            // Auto-Focus Input for next turn
+            userInput.focus();
             
             // Type Text
             if(parsed.response) {
