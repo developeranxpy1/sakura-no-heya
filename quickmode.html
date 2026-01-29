@@ -1253,9 +1253,7 @@
         }, { passive: false });
 
         // --- ASSETS ---
-        // --- ASSETS (Hardcoded for Pure JS) ---
-        // --- ASSETS ---
-        let scannedAssets = { environments: [], characters: {} };
+        let scannedAssets = { environments: {}, characters: {} };
 
         // Load Asset Manifest
         fetch('assetts/manifest.json')
@@ -1263,11 +1261,14 @@
             .then(data => {
                 scannedAssets = data;
                 console.log("Assets Loaded:", scannedAssets);
-                // Set initial BG if available
-                if(scannedAssets.environments && scannedAssets.environments.length > 0) {
-                     // Check history first in restoreState, else default
-                     if(chatHistory.length === 0) body.style.backgroundImage = `url('${scannedAssets.environments[0]}')`;
+                // Set initial BG - use room.day as default
+                if(chatHistory.length === 0) {
+                    const defaultBg = scannedAssets.environments?.room?.day || scannedAssets.environments?.patterns?.[0];
+                    if(defaultBg) body.style.backgroundImage = `url('${defaultBg}')`;
                 }
+                // Set default character
+                const defaultChar = scannedAssets.characters?.['school-dress']?.neutral?.[0];
+                if(defaultChar) { charImg.src = defaultChar; charImg.style.display = 'block'; }
             })
             .catch(err => console.error("Asset Manifest Load Failed:", err));
 
@@ -1285,9 +1286,7 @@
             chatHistory = loadedHistory.logs;
         }
 
-        body.style.backgroundImage = `url('${scannedAssets.environments[0]}')`;
-        const defChar = scannedAssets.characters?.school_dress?.neutral;
-        if(defChar) { charImg.src = defChar; charImg.style.display = 'block'; }
+        // Default BG and character set in manifest load callback above
         
         // Restore Visual State
         // Restore Visual State (Always show last AI context)
