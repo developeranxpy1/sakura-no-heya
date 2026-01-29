@@ -163,7 +163,7 @@
             
             <div class="menu-buttons card-content" style="display: flex; flex-direction: column; gap: 10px; padding-top:0;">
                 
-                <button class="btn-menu" onclick="window.location.href='quickmode.html'">
+                <button class="btn-menu" onclick="startQuickMode()">
                     <span>🚀</span> Quick Start
                 </button>
                 
@@ -459,8 +459,27 @@ You never mention being AI. You control the background/Visual Novel elements.`;
                 savedPersonality = savedPersonality.split("OUTPUT FORMAT")[0].trim();
             }
             
+            
             document.getElementById('personalityInput').value = savedPersonality;
         }
+
+        function startQuickMode() {
+            // Show Loading Overlay
+            const overlay = document.getElementById('loadingOverlay');
+            if(overlay) overlay.style.display = 'flex';
+            
+            // Navigate
+            setTimeout(() => {
+                window.location.href = 'quickmode.html';
+            }, 300); // 300ms visual feedback
+        }
     </script>
+    
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 10000; display: none; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
+        <img src="assetts/images/sakuralogo.png" style="width: 150px; margin-bottom: 20px; animation: bounce 2s infinite;">
+        <div style="font-size: 1.5rem; font-weight: bold; color: var(--text-color);">Loading...</div>
+        <style>@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }</style>
+    </div>
 </body>
 </html>
