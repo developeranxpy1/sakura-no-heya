@@ -1529,6 +1529,7 @@
         userInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
+                window.aiRetryCount = 0; // Reset Retry limit for new turn
                 handleInput();
                 // Reset height after send
                 userInput.style.height = 'auto'; 
