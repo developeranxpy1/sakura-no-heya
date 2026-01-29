@@ -1584,6 +1584,29 @@
                     }
                 }
 
+                // SIMULATE LOADING
+                const overlay = document.getElementById('loading-overlay');
+                const overlayText = document.getElementById('overlay-text');
+                const overlayProgress = document.getElementById('overlay-progress');
+                let simProgress = 0;
+                let simInterval;
+
+                if(overlay) {
+                    overlay.classList.add('active');
+                    overlayText.innerText = "Syncing Neural Pathways...";
+                    overlayProgress.style.width = '0%';
+                    
+                    // Simulated progress (goes up to 90% then waits)
+                    simInterval = setInterval(() => {
+                        simProgress += (Math.random() * 8); // Fast burst
+                        if(simProgress > 90) simProgress = 90;
+                        if(overlayProgress) overlayProgress.style.width = simProgress + '%';
+                        
+                        if(simProgress > 30 && simProgress < 50) overlayText.innerText = "Transferring Context...";
+                        if(simProgress > 70) overlayText.innerText = "Waiting for Sakura...";
+                    }, 200);
+                }
+
                 // Check final result
                 if (!response) {
                     throw new Error("Connection Failed: All connection methods (Direct & Proxies) failed. Please check your internet.");
@@ -1611,6 +1634,16 @@
                 
                 const aiContent = data.choices[0].message.content;
                 
+                // Finish Loading
+                if(overlay) {
+                    clearInterval(simInterval);
+                    overlayProgress.style.width = '100%';
+                    overlayText.innerText = "Data Received!";
+                    setTimeout(() => {
+                        overlay.classList.remove('active');
+                    }, 300); // Short delay to see 100%
+                }
+
                 // Revert to Sakura
                 dialogueBox.classList.remove('blue-theme');
                 nameLabel.innerText = "Sakura";
@@ -1619,6 +1652,11 @@
 
             } catch(e) {
                 console.error("Groq Error:", e);
+                
+                // Hide Loading on Error
+                const overlay = document.getElementById('loading-overlay');
+                if(overlay) overlay.classList.remove('active');
+                
                 // Revert on error too
                 dialogueBox.classList.remove('blue-theme');
                 nameLabel.innerText = "Sakura";
