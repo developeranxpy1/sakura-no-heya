@@ -265,7 +265,7 @@
     <script>
         // Check Auth using correct cookie
         if (!Common.getCookie('username')) {
-            window.location.href = 'login.html';
+            window.location.href = 'index.html';
         }
 
         let currentEditingFile = null;
@@ -367,7 +367,7 @@
         function logout() {
             Common.setCookie('username', '', -1);
             Common.setCookie('key', '', -1);
-            window.location.href = 'login.html';
+            window.location.href = 'index.html';
         }
 
         function clearData() {
