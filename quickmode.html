@@ -1833,7 +1833,7 @@
                     if (window.aiRetryCount < 1) {
                         window.aiRetryCount++;
                         console.log("Requesting AI to fix background...");
-                        sendToAI(`[SYSTEM ALERT: The background image '${parsed.environment}' failed to load (404). Please switch to a valid standard background like 'School Classroom (Day)' or 'Your Room (Night)'.]`, true, true);
+                        sendToAI(`[SYSTEM ALERT: The background image '${parsed.environment}' failed to load (404). Please switch to a valid standard background like 'School Classroom (Day)' or 'Your Room (Night)'.]`, false, true);
                     } else {
                         // Final Fallback
                         document.body.style.backgroundImage = "url('assetts/images/envbg/roomdayandnightbg/night.png')";
@@ -1864,7 +1864,7 @@
                     if (window.aiRetryCount < 1) {
                          window.aiRetryCount++;
                          console.log("Requesting AI to fix character...");
-                         sendToAI(`[SYSTEM ALERT: The character image '${parsed.character_image}' failed to load. Please use a standard expression like 'neutral' or 'happy' for the current outfit.]`, true, true);
+                         sendToAI(`[SYSTEM ALERT: The character image '${parsed.character_image}' failed to load. Please use a standard expression like 'neutral' or 'happy' for the current outfit.]`, false, true);
                     } else {
                         const defaultChar = scannedAssets.characters?.['school-dress']?.neutral?.[0];
                         if(defaultChar) { charImg.src = defaultChar; charImg.style.display = 'block'; }
