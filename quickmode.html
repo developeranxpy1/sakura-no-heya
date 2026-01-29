@@ -1130,7 +1130,7 @@
         /* Name Label Restoration */
         .char-name-label {
             position: absolute;
-            top: -18px; 
+            top: -22px; 
             left: 20px;
             background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
             color: #fff;
@@ -1142,6 +1142,12 @@
             z-index: 10;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
             pointer-events: none;
+            transition: all 0.3s ease; /* Smooth transition for color change */
+        }
+        /* Blue Theme Override */
+        .dialogue-box.blue-theme .char-name-label {
+            background: linear-gradient(135deg, #a2cffe 0%, #c2e9fb 100%);
+            box-shadow: 0 0 15px rgba(162, 207, 254, 0.6);
         }
     </style>
 </head>
@@ -1160,13 +1166,11 @@
     <button id="backBtn" onclick="window.location.href='mainmenu.html'">Back</button>
     <div id="debug" class="debug-info"></div>
 
-    <img id="character-layer" class="character-layer" src="" alt="Sakura">
-
     <div class="vn-box-container">
-        <!-- Name Label -->
-        <div class="char-name-label" id="char-name-label">Sakura</div>
         <!-- Dialogue Box -->
         <div class="dialogue-box">
+             <!-- Name Label moved inside for CSS scoping -->
+            <div class="char-name-label" id="char-name-label">Sakura</div>
             <div class="glass-plate"></div>
             
             <!-- IG Style Header (Visible only when expanded) -->
@@ -1700,11 +1704,15 @@
                 body.style.backgroundImage = `url('${parsed.environment}')`;
             }
             if (parsed.character_image) {
-                // Direct update - no animation to prevent glitches
-                if(charImg.src !== parsed.character_image) {
-                    charImg.src = parsed.character_image;
-                }
-                charImg.style.display = 'block';
+                // Preload Image to prevent "Invisible Alt Text" glitch
+                const newImg = new Image();
+                newImg.onload = () => {
+                    if(charImg.src !== parsed.character_image) {
+                        charImg.src = parsed.character_image;
+                    }
+                    charImg.style.display = 'block';
+                };
+                newImg.src = parsed.character_image;
             }
             
             // Type Text
