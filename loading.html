@@ -1,1 +1,124 @@
-make a cute loading menu
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading...</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌸</text></svg>">
+    <link rel="stylesheet" href="assetts/css/style.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            overflow: hidden;
+            height: 100vh;
+            margin: 0;
+            cursor: wait;
+        }
+        .loader-container {
+            text-align: center;
+            animation: fadeIn 0.8s ease-out;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .spinner {
+            width: 80px;
+            height: auto;
+            margin-bottom: 20px;
+            /* Gentle float + Spin */
+            animation: float 3s ease-in-out infinite, spin 10s linear infinite;
+            filter: drop-shadow(0 0 15px rgba(255, 183, 213, 0.6));
+        }
+        .loading-text {
+            font-family: 'Comic Sans MS', 'Comic Sans', cursive, sans-serif;
+            color: var(--text-color);
+            font-size: 1.2rem;
+            margin-top: 10px;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        .progress-bar {
+            width: 200px;
+            height: 6px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 10px;
+            margin-top: 20px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--secondary-color);
+            width: 0%;
+            transition: width 0.1s linear;
+            box-shadow: 0 0 10px var(--secondary-color);
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes float { 
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); } 
+        }
+        @keyframes pulse { 50% { opacity: 0.6; } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="loader-container">
+        <img src="assetts/images/sakuralogo.png" class="spinner" alt="Loading...">
+        <div class="loading-text" id="statusText">Connecting...</div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress"></div>
+        </div>
+    </div>
+
+    <script src="assetts/js/common.js"></script>
+    <script>
+        // Use Common.js to load theme
+        (function initTheme() {
+            const state = Common.loadState('general.json') || {};
+            if (state.theme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+
+        const msgs = [
+            "Syncing neural pathways...",
+            "Loading assets...",
+            "Waking up Sakura...",
+            "Checking local storage...",
+            "Establishing secure connection..."
+        ];
+        
+        const statusEl = document.getElementById('statusText');
+        const progressEl = document.getElementById('progress');
+        
+        // Random Start Message
+        statusEl.innerText = msgs[Math.floor(Math.random() * msgs.length)];
+
+        // Fake Progress Simulation
+        let progress = 0;
+        const interval = setInterval(() => {
+            // Non-linear progress
+            progress += Math.random() * 5;
+            if (progress > 100) progress = 100;
+            
+            progressEl.style.width = progress + '%';
+            
+            if (progress > 40 && progress < 60) statusEl.innerText = "transferring data...";
+            if (progress > 80) statusEl.innerText = "Almost there...";
+
+            if (progress === 100) {
+                clearInterval(interval);
+                setTimeout(() => {
+                    window.location.href = 'mainmenu.html';
+                }, 200);
+            }
+        }, 50); // Completes in ~1-1.5 seconds
+
+    </script>
+</body>
+</html>
