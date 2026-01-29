@@ -1454,18 +1454,15 @@
                 }
 
                 // REAL API CALL (With Fallback Proxy Logic)
+                // REAL API CALL (Multi-Stage Fallback)
                 const targetUrl = "https://api.groq.com/openai/v1/chat/completions";
-                let endpoint = "https://corsproxy.io/?" + encodeURIComponent(targetUrl);
-                
-                if (!key || key === 'SKIPPED_TRIAL' || key === 'undefined') {
-                     // Safety check if demo mode logic failed to catch it
-                     throw new Error("Invalid API Key. Please log in again.");
-                }
-
                 let response;
+                let lastError;
+
+                // 1. Try DIRECT (Best speed, works if supported or extension enabled)
                 try {
-                    UI.toast("Waking up Sakura...");
-                    response = await fetch(endpoint, {
+                    UI.toast("Connecting (Direct)...");
+                    response = await fetch(targetUrl, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
@@ -1479,12 +1476,16 @@
                             max_tokens: 1024
                         })
                     });
-                } catch (fetchErr) {
-                    console.error("Primary Proxy Failed, trying fallback...", fetchErr);
-                    // Fallback to Codetabs Proxy
-                    endpoint = "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(targetUrl);
+                } catch (e) {
+                    console.warn("Direct connection failed, trying proxy 1...", e);
+                    lastError = e;
+                }
+
+                // 2. Try Proxy 1 (corsproxy.io)
+                if (!response || !response.ok) {
                     try {
-                        response = await fetch(endpoint, {
+                        UI.toast("Connecting (Proxy 1)...");
+                        response = await fetch("https://corsproxy.io/?" + encodeURIComponent(targetUrl), {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json",
@@ -1498,10 +1499,39 @@
                                 max_tokens: 1024
                             })
                         });
-                    } catch (fallbackErr) {
-                        console.error("All proxies failed.", fallbackErr);
-                        throw new Error("Connection Failed: All CORS proxies are unreachable. Please check your internet or try a different network.");
+                    } catch (e) {
+                        console.warn("Proxy 1 failed, trying proxy 2...", e);
+                        lastError = e;
                     }
+                }
+
+                // 3. Try Proxy 2 (CodeTabs - explicit fallback)
+                if (!response || !response.ok) {
+                    try {
+                         UI.toast("Connecting (Proxy 2)...");
+                         response = await fetch("https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(targetUrl), {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": `Bearer ${key.trim()}`
+                            },
+                            body: JSON.stringify({
+                                model: MODEL,
+                                messages: messages,
+                                response_format: { type: "json_object" },
+                                temperature: 0.7,
+                                max_tokens: 1024
+                            })
+                        });
+                    } catch (e) {
+                        console.warn("Proxy 2 failed.", e);
+                        lastError = e;
+                    }
+                }
+
+                // Check final result
+                if (!response) {
+                    throw new Error("Connection Failed: All connection methods (Direct & Proxies) failed. Please check your internet.");
                 }
 
                 const text = await response.text();
