@@ -2516,6 +2516,64 @@ Dynamic: You rarely change locations. You focus on the conversation.`;
 
         /* Fix Ghost Text */
         .character-layer { color: transparent !important; }
+
+        /* --- Messenger UI Styles (Expanded Only) --- */
+        .dialogue-box.expanded .history-header {
+            display: flex;
+            justify-content: space-between;
+            background: black;
+            padding: 15px 10px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .hist-profile-pic {
+            position: relative;
+            width: 40px; height: 40px;
+        }
+        .hist-title {
+            display: flex;
+            flex-direction: column;
+        }
+        .hist-name { font-size: 1rem; color: white; font-weight: bold; }
+        .hist-status { font-size: 0.75rem; color: #b0b3b8; }
+        
+        .hist-actions {
+            display: flex; gap: 20px;
+        }
+        .hist-icon {
+            font-size: 1.2rem; filter: grayscale(1) brightness(2); /* Blue-ish */
+            color: #0084ff;
+        }
+
+        /* Message Bubbles - Messenger Style */
+        .msg-bubble {
+            border-radius: 18px !important;
+            padding: 8px 12px !important;
+            font-family: sans-serif !important; /* Match Messenger font */
+            margin-bottom: 2px !important;
+            max-width: 70% !important;
+        }
+        .msg-user {
+            background-color: #0084ff !important; /* Messenger Blue */
+            color: white !important;
+            align-self: flex-end !important;
+        }
+        .msg-sakura {
+            background-color: #3e4042 !important; /* Dark Grey */
+            color: white !important; /* White text on dark grey */
+            align-self: flex-start !important;
+        }
+        
+        /* Reset Input Bar for Expanded Mode if needed */
+        .dialogue-box.expanded .input-bar {
+            background: black !important;
+        }
+        .dialogue-box.expanded .integrated-input {
+            background: #3e4042 !important;
+            border-radius: 20px !important;
+            border: none !important;
+        }
     </style>
 </body>
 </html>
