@@ -1322,9 +1322,16 @@
             .then(data => {
                 scannedAssets = data;
                 console.log("Assets Loaded:", scannedAssets);
-                // Set initial BG - Default to School Day as requested
+                // Set initial BG - Time Aware Default
                 if(chatHistory.length === 0) {
-                    const defaultBg = scannedAssets.environments?.school?.day || scannedAssets.environments?.room?.day;
+                    const hour = new Date().getHours();
+                    const isNight = hour >= 18 || hour < 6;
+                    let defaultBg;
+                    if (isNight && scannedAssets.environments?.room?.night) {
+                        defaultBg = scannedAssets.environments.room.night;
+                    } else {
+                        defaultBg = scannedAssets.environments?.school?.day || scannedAssets.environments?.room?.day;
+                    }
                     if(defaultBg) body.style.backgroundImage = `url('${defaultBg}')`;
                 }
                 // Set default character
@@ -2207,31 +2214,31 @@ Dynamic: You rarely change locations. You focus on the conversation.`;
         
         // --- INITIAL CONTINUITY ---
         setTimeout(() => {
-            const timeOfDay = new Date().getHours() < 12 ? "morning" : (new Date().getHours() < 18 ? "afternoon" : "evening");
+            const hour = new Date().getHours();
+            const timeOfDay = hour < 12 ? "morning" : (hour < 18 ? "afternoon" : "evening");
+            const isNight = hour >= 18 || hour < 6;
+            const location = isNight ? "Your Room (Night)" : "School Classroom (Day)";
     
             if (chatHistory.length > 0) {
                  // CONTINUATION GREETING
                  const lastMsg = chatHistory[chatHistory.length - 1];
                  const minutesSince = (Date.now() - (lastMsg.timestamp || 0)) / 1000 / 60;
                  
-                 // Only if it's been at least 5 minutes, otherwise silence (prevent refresh spam)
+                 // Only if it's been at least 5 minutes
                  if(minutesSince > 5) {
                      if (lastMsg.role === 'assistant') {
-                          // She spoke last. Maybe just say "I'm still here" or "Did you need something?" logic
-                          // Or assume user left and came back.
-                          const continuityPrompt = `[SYSTEM EVENT: The user has returned after a break. It is ${timeOfDay}. Recap: "${lastMsg.content.substring(0, 50)}...". Greet them back warmly.]`;
+                          // She spoke last
+                          const continuityPrompt = `[SYSTEM EVENT: The user has returned. It is ${timeOfDay} (${location}). Recap of last topic: "${lastMsg.content.substring(0, 100)}...". Welcome them back based on this.]`;
                           sendToAI(continuityPrompt, false, true); 
                      } else {
-                          // User spoke last and maybe closed app?
-                          // Sakura should reply to that last message but with a "Sorry if I drifted off..." tone?
-                          // Or just treat it as a new greeting.
-                          const continuityPrompt = `[SYSTEM EVENT: The user has returned. It is ${timeOfDay}. Greet them.]`;
+                          // User spoke last
+                          const continuityPrompt = `[SYSTEM EVENT: The user has returned. It is ${timeOfDay} (${location}). They last said: "${lastMsg.content.substring(0, 100)}". Reply to this and welcome them back.]`;
                           sendToAI(continuityPrompt, false, true);
                      }
                  }
             } else {
                 // FRESH START
-                const startPrompt = `[SYSTEM EVENT: The user has just arrived. It is ${timeOfDay}. You are in the School Classroom. Notice the user and greet them based on this context.]`;
+                const startPrompt = `[SYSTEM EVENT: The user has just arrived. It is ${timeOfDay}. You are in: ${location}. Notice the user and greet them based on the time and location.]`;
                 sendToAI(startPrompt, false, true);
             }
         }, 1500); // Delay to ensure assets loaded
