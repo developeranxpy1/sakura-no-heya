@@ -1,19 +1,59 @@
 {
-    "environments": [
-        "assetts/images/bg-pattern.png",
-        "assetts/images/dark-bg-pattern.png",
-        "assetts/images/olddark-bg-pattern.png",
-        "assetts/images/oldsakuralogo.png",
-        "assetts/images/sakuralogo.png"
-    ],
+    "environments": {
+        "room": {
+            "day": "assetts/images/envbg/roomdayandnightbg/day.png",
+            "night": "assetts/images/envbg/roomdayandnightbg/night.png"
+        },
+        "park": {
+            "day": "assetts/images/envbg/parkdayandnightbg/day.png",
+            "night": "assetts/images/envbg/parkdayandnightbg/night.png"
+        },
+        "school": {
+            "day": "assetts/images/envbg/schooldayandnightbg/day.png",
+            "night": null
+        },
+        "streets": {
+            "day": null,
+            "night": null
+        },
+        "patterns": [
+            "assetts/images/bg-pattern.png",
+            "assetts/images/dark-bg-pattern.png"
+        ]
+    },
     "characters": {
         "school-dress": {
-            "angry": "assetts/images/character/school-dress/angry/angryshy.png",
-            "annoyed": "assetts/images/character/school-dress/annoyed/annoyedshy.png",
-            "glitch": "assetts/images/character/school-dress/glitch/creepyglitch.png",
-            "happy": "assetts/images/character/school-dress/happy/shy.png",
-            "neutral": "assetts/images/character/school-dress/neutral/shyneutral.png",
-            "sad": "assetts/images/character/school-dress/sad/scaredshy.png"
+            "happy": [
+                "assetts/images/character/school-dress/happy/shy.png"
+            ],
+            "neutral": [
+                "assetts/images/character/school-dress/neutral/shyneutral.png"
+            ],
+            "sad": [
+                "assetts/images/character/school-dress/sad/scaredshy.png",
+                "assetts/images/character/school-dress/sad/shy2.png"
+            ],
+            "angry": [
+                "assetts/images/character/school-dress/angry/angryshy.png"
+            ],
+            "annoyed": [
+                "assetts/images/character/school-dress/annoyed/annoyedshy.png",
+                "assetts/images/character/school-dress/annoyed/annoyedshy1.png",
+                "assetts/images/character/school-dress/annoyed/annoyedshy2.png"
+            ],
+            "glitch": [
+                "assetts/images/character/school-dress/glitch/creepyglitch.png",
+                "assetts/images/character/school-dress/glitch/neutralglitch.png",
+                "assetts/images/character/school-dress/glitch/scaredglitch.png"
+            ]
         }
-    }
+    },
+    "audio": {
+        "bgm": [],
+        "sfx": []
+    },
+    "video": {
+        "bgvideo": "assetts/video/bgvideo.mp4"
+    },
+    "usage_instructions": "Sakura can set 'environment' to any path from environments (e.g. environments.room.day or environments.park.night). For character_image, use any path from characters based on current emotion (e.g. characters['school-dress'].happy[0] for happy expression)."
 }
