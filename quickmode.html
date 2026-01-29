@@ -2568,11 +2568,18 @@ Dynamic: You rarely change locations. You focus on the conversation.`;
         /* Reset Input Bar for Expanded Mode if needed */
         .dialogue-box.expanded .input-bar {
             background: black !important;
+            padding-bottom: 20px; /* Safe area for bottom */
         }
         .dialogue-box.expanded .integrated-input {
             background: #3e4042 !important;
             border-radius: 20px !important;
             border: none !important;
+        }
+
+        /* HIDE VN CONTROLS IN MESSENGER MODE */
+        .dialogue-box.expanded ~ .vn-controls, 
+        .dialogue-box.expanded .vn-controls {
+            display: none !important;
         }
     </style>
 </body>
