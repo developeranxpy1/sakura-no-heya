@@ -825,7 +825,7 @@
             width: 100%;
             height: 100%;
             background: #141520; /* Deep Dark Blue */
-            border-radius: 0;
+            border-radius: 20px; /* Rounded corners */
             z-index: 200;
             padding: 0; /* REMOVED padding for edge-to-edge header */
             display: flex;
@@ -1680,22 +1680,11 @@
             if(parsed.environment) {
                 body.style.backgroundImage = `url('${parsed.environment}')`;
             }
-            if (parsed.character_image && parsed.character_image !== charImg.src) {
-               
-                // Fast Slide Out/In Animation
-                charImg.classList.remove('sliding');
-                void charImg.offsetWidth; // Trigger reflow
-                
-                // Add class to start animation
-                charImg.classList.add('sliding');
-                
-                // Change source mid-animation (very fast)
-                setTimeout(() => {
+            if (parsed.character_image) {
+                // Direct update - no animation to prevent glitches
+                if(charImg.src !== parsed.character_image) {
                     charImg.src = parsed.character_image;
-                    charImg.style.display = 'block'; 
-                }, 100); // 100ms into slide
-            } else if (parsed.character_image) {
-                // Just ensure visible if same image
+                }
                 charImg.style.display = 'block';
             }
             
