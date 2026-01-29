@@ -1798,16 +1798,23 @@
             dialogueBox.classList.remove('blue-theme');
             nameLabel.innerText = "Sakura";
 
-            // Execute VN State
+            // Execute VN State with Validation
             if(parsed.environment) {
-                body.style.backgroundImage = `url('${parsed.environment}')`;
-            }
-            
-            // CRITICAL FALLBACK: If BG is empty/black, force default
-            if (!document.body.style.backgroundImage || document.body.style.backgroundImage === 'none' || document.body.style.backgroundImage === '""') {
-                 console.warn("Background missing! Forcing default.");
-                 // Use known good path found in file system
-                 document.body.style.backgroundImage = "url('assetts/images/envbg/roomdayandnightbg/night.png')";
+                const bgImg = new Image();
+                bgImg.onload = () => {
+                    document.body.style.backgroundImage = `url('${parsed.environment}')`;
+                };
+                bgImg.onerror = () => {
+                    console.warn("Background failed to load:", parsed.environment);
+                    // Fallback to hardcoded safe path
+                    document.body.style.backgroundImage = "url('assetts/images/envbg/roomdayandnightbg/night.png')";
+                };
+                bgImg.src = parsed.environment;
+            } else {
+                 // No env sent, check if current is valid. If black/empty, set default.
+                 if (!document.body.style.backgroundImage || document.body.style.backgroundImage === 'none' || document.body.style.backgroundImage === '""') {
+                     document.body.style.backgroundImage = "url('assetts/images/envbg/roomdayandnightbg/night.png')";
+                 }
             }
             if (parsed.character_image) {
                 // Preload Image to prevent "Invisible Alt Text" glitch
