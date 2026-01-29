@@ -1613,6 +1613,15 @@
             if(isSystemTrigger) {
                 // Add the system prompt as a temporary hidden instruction
                 messages.push({ role: "system", content: textInput });
+                
+                // LOG TO BG.JSON (Hidden Logger)
+                try {
+                    let bgLogs = Common.loadState('bg.json') || [];
+                    if (!Array.isArray(bgLogs)) bgLogs = [];
+                    bgLogs.push({ timestamp: Date.now(), msg: textInput });
+                    if(bgLogs.length > 50) bgLogs.shift(); // Limit to last 50
+                    Common.saveState('bg.json', bgLogs);
+                } catch(e) { console.warn("BG Log Error", e); }
             }
 
             try {
