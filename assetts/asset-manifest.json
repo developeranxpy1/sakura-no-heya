@@ -1,0 +1,46 @@
+{
+  "version": "1.0",
+  "lastUpdated": "2026-01-29",
+  "characters": {
+    "sakura": {
+      "outfits": {
+        "school-dress": {
+          "emotions": {
+            "happy": ["shy.png"],
+            "neutral": ["shyneutral.png"],
+            "sad": ["scaredshy.png", "shy2.png"],
+            "angry": ["angryshy.png"],
+            "annoyed": ["annoyedshy.png", "annoyedshy1.png", "annoyedshy2.png"],
+            "glitch": ["creepyglitch.png", "neutralglitch.png", "scaredglitch.png"]
+          },
+          "basePath": "assetts/images/character/school-dress/"
+        }
+      }
+    }
+  },
+  "backgrounds": {
+    "room": {
+      "day": "assetts/images/envbg/roomdayandnightbg/day.png",
+      "night": "assetts/images/envbg/roomdayandnightbg/night.png"
+    },
+    "park": {
+      "day": "assetts/images/envbg/parkdayandnightbg/day.png",
+      "night": "assetts/images/envbg/parkdayandnightbg/night.png"
+    },
+    "school": {
+      "day": "assetts/images/envbg/schooldayandnightbg/day.png",
+      "night": null
+    },
+    "streets": {
+      "day": null,
+      "night": null
+    }
+  },
+  "audio": {
+    "bgm": [],
+    "sfx": []
+  },
+  "video": {
+    "bgvideo": "assetts/video/bgvideo.mp4"
+  }
+}
