@@ -1807,40 +1807,55 @@
             dialogueBox.classList.remove('blue-theme');
             nameLabel.innerText = "Sakura";
 
-            // Execute VN State with Validation
+            // Execute VN State with Validation & AI Retry
             if(parsed.environment) {
                 const bgImg = new Image();
                 bgImg.onload = () => {
                     document.body.style.backgroundImage = `url('${parsed.environment}')`;
                 };
                 bgImg.onerror = () => {
-                    console.warn("Background failed to load:", parsed.environment);
-                    // Fallback to hardcoded safe path
-                    document.body.style.backgroundImage = "url('assetts/images/envbg/roomdayandnightbg/night.png')";
+                    console.warn("Background failed:", parsed.environment);
+                    // AI Retry Logic
+                    if (!window.aiRetryCount) window.aiRetryCount = 0;
+                    if (window.aiRetryCount < 1) {
+                        window.aiRetryCount++;
+                        console.log("Requesting AI to fix background...");
+                        sendToAI(`[SYSTEM ALERT: The background image '${parsed.environment}' failed to load (404). Please switch to a valid standard background like 'School Classroom (Day)' or 'Your Room (Night)'.]`, true, true);
+                    } else {
+                        // Final Fallback
+                        document.body.style.backgroundImage = "url('assetts/images/envbg/roomdayandnightbg/night.png')";
+                        window.aiRetryCount = 0; // Reset for next valid turn
+                    }
                 };
                 bgImg.src = parsed.environment;
             } else {
-                 // No env sent, check if current is valid. If black/empty, set default.
                  if (!document.body.style.backgroundImage || document.body.style.backgroundImage === 'none' || document.body.style.backgroundImage === '""') {
                      document.body.style.backgroundImage = "url('assetts/images/envbg/roomdayandnightbg/night.png')";
                  }
             }
+            
+            // Reset Retry Count on Success (Implicitly if we get here and next turn starts)
+            // But we reset inside sendToAI success usually. 
+            // Better: Reset when user messages.
+            
             if (parsed.character_image) {
-                // Preload Image to prevent "Invisible Alt Text" glitch
                 const newImg = new Image();
                 newImg.onload = () => {
-                    if(charImg.src !== parsed.character_image) {
-                        charImg.src = parsed.character_image;
-                    }
+                    if(charImg.src !== parsed.character_image) charImg.src = parsed.character_image;
                     charImg.style.display = 'block';
                 };
                 newImg.onerror = () => {
-                    console.warn("Character image failed to load:", parsed.character_image);
-                    // Fallback to Default Character (Safe)
-                    const defaultChar = scannedAssets.characters?.['school-dress']?.neutral?.[0];
-                    if(defaultChar) {
-                        charImg.src = defaultChar;
-                        charImg.style.display = 'block';
+                    console.warn("Character failed:", parsed.character_image);
+                     // AI Retry Logic (Character)
+                    if (!window.aiRetryCount) window.aiRetryCount = 0;
+                    if (window.aiRetryCount < 1) {
+                         window.aiRetryCount++;
+                         console.log("Requesting AI to fix character...");
+                         sendToAI(`[SYSTEM ALERT: The character image '${parsed.character_image}' failed to load. Please use a standard expression like 'neutral' or 'happy' for the current outfit.]`, true, true);
+                    } else {
+                        const defaultChar = scannedAssets.characters?.['school-dress']?.neutral?.[0];
+                        if(defaultChar) { charImg.src = defaultChar; charImg.style.display = 'block'; }
+                        window.aiRetryCount = 0;
                     }
                 };
                 newImg.src = parsed.character_image;
