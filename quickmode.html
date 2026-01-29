@@ -1731,6 +1731,17 @@
             } else {
                 finishTyping();
             }
+
+            // Log State to log1.json (User Request)
+            try {
+                const logData = Common.loadState('log1.json') || {};
+                if(parsed.environment) logData.last_bg = parsed.environment;
+                if(parsed.character_image) logData.last_char = parsed.character_image;
+                logData.last_updated = Date.now();
+                Common.saveState('log1.json', logData);
+            } catch(e) { 
+                console.warn("Failed to log state", e); 
+            }
         }
         
         function typeWriter(text, element) {
