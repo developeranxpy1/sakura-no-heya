@@ -1447,7 +1447,16 @@
                         }
                     }
 
-                    body.style.backgroundImage = `url('${bgUrl}')`;
+                    // VALIDATE BEFORE APPLYING
+                    const bgImg = new Image();
+                    bgImg.onload = () => { body.style.backgroundImage = `url('${bgUrl}')`; };
+                    bgImg.onerror = () => {
+                         console.warn("Restored background failed:", bgUrl);
+                         // Safe Fallback
+                         body.style.backgroundImage = "url('assetts/images/envbg/roomdayandnightbg/night.png')";
+                    };
+                    bgImg.src = bgUrl;
+                    
                     visualRestored = true;
                 }
 
