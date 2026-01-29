@@ -1785,13 +1785,22 @@
                 };
                 newImg.onerror = () => {
                     console.warn("Character image failed to load:", parsed.character_image);
-                    // Fallback: Ensure previous image is visible if available
-                    if(charImg.src) charImg.style.display = 'block';
+                    // Fallback to Default Character (Safe)
+                    const defaultChar = scannedAssets.characters?.['school-dress']?.neutral?.[0];
+                    if(defaultChar) {
+                        charImg.src = defaultChar;
+                        charImg.style.display = 'block';
+                    }
                 };
                 newImg.src = parsed.character_image;
             } else {
                 // If no image sent, ensure current is visible (if set)
-                if(charImg.src) charImg.style.display = 'block';
+                // If current is empty/broken, try default
+                if(!charImg.src || charImg.src.endsWith(window.location.href)) { // Empty src check
+                     const defaultChar = scannedAssets.characters?.['school-dress']?.neutral?.[0];
+                     if(defaultChar) charImg.src = defaultChar;
+                }
+                charImg.style.display = 'block';
             }
             
             // Auto-Focus Input for next turn
