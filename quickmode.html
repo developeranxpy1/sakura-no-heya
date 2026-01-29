@@ -534,11 +534,17 @@
         /* --- Mobile Responsiveness --- */
         @media (max-width: 600px) {
             .vn-box-container {
-                width: 98%; 
-                bottom: 10dvh; /* 10% Smart Gap */
+                width: 100%; 
+                bottom: 0px !important; /* Remove bottom gap */
+                left: 0;
+                transform: none;
             }
             .dialogue-box {
-                padding: 15px 15px 60px 15px; /* Extra bottom padding for controls */
+                padding: 15px 15px 60px 15px; 
+                border-radius: 20px 20px 0 0; /* Rounded top, flat bottom to meet screen edge */
+            }
+            .glass-plate {
+                border-radius: 20px 20px 0 0 !important;
             }
             .char-name-label {
                 left: 10px;
@@ -574,7 +580,7 @@
                 justify-content: space-evenly;
                 gap: 10px; 
                 font-size: 0.75rem;
-                bottom: 10px;
+                bottom: 5px; /* Adjust to stay within safe area */
                 width: 100%;
                 padding: 0 10px;
                 box-sizing: border-box;
