@@ -1301,7 +1301,8 @@
         const debug = document.getElementById('debug');
         const dialogueBox = document.querySelector('.dialogue-box');
         const boxContainer = document.querySelector('.vn-box-container');
-        const nameLabel = document.querySelector('.char-name-label');
+        const boxContainer = document.querySelector('.vn-box-container');
+        const nameLabel = document.querySelector('.char-name-label') || { innerText: "" }; // Null safety proxy
         const historyContainer = document.getElementById('history-container');
 
         // Prevent Mobile Scroll (Rubber-banding) - Aggressive
@@ -1322,9 +1323,9 @@
             .then(data => {
                 scannedAssets = data;
                 console.log("Assets Loaded:", scannedAssets);
-                // Set initial BG - use room.day as default
+                // Set initial BG - Default to School Day as requested
                 if(chatHistory.length === 0) {
-                    const defaultBg = scannedAssets.environments?.room?.day || scannedAssets.environments?.patterns?.[0];
+                    const defaultBg = scannedAssets.environments?.school?.day || scannedAssets.environments?.room?.day;
                     if(defaultBg) body.style.backgroundImage = `url('${defaultBg}')`;
                 }
                 // Set default character
