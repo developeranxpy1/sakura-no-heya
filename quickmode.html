@@ -1498,29 +1498,61 @@
                 let response;
                 let lastError;
 
-                // 1. Try DIRECT (Best speed, works if supported or extension enabled)
+                // 1. Try Vercel/Server Proxy (Safest for Deployments)
                 try {
-                    UI.toast("Connecting (Direct)...");
-                    response = await fetch(targetUrl, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "Authorization": `Bearer ${key.trim()}`
-                        },
-                        body: JSON.stringify({
-                            model: MODEL,
-                            messages: messages,
-                            response_format: { type: "json_object" },
-                            temperature: 0.7,
-                            max_tokens: 1024
-                        })
-                    });
-                } catch (e) {
-                    console.warn("Direct connection failed, trying proxy 1...", e);
-                    lastError = e;
+                    // Only try if we are on a server (http/https), not file://
+                    if (window.location.protocol.startsWith('http')) {
+                        // UI.toast("Connecting (Secure)..."); // Optional feedback
+                        response = await fetch("/api/proxy", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": `Bearer ${key.trim()}`
+                            },
+                            body: JSON.stringify({
+                                model: MODEL,
+                                messages: messages,
+                                response_format: { type: "json_object" },
+                                temperature: 0.7,
+                                max_tokens: 1024
+                            })
+                        });
+                        
+                        // If it returns 404 (not on vercel) or 405, throw to fallback
+                        if(response.status === 404 || response.status === 405) {
+                            throw new Error("Proxy not found");
+                        }
+                    } else {
+                         throw new Error("Skipping proxy on local file");
+                    }
+                } catch(e) {
+                    // Silent fail to next method
                 }
 
-                // 2. Try Proxy 1 (corsproxy.io)
+                // 2. Try DIRECT (Best speed if Proxy unavailable/Localhost)
+                if (!response || !response.ok) {
+                    try {
+                        UI.toast("Connecting (Direct)...");
+                        response = await fetch(targetUrl, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": `Bearer ${key.trim()}`
+                            },
+                            body: JSON.stringify({
+                                model: MODEL,
+                                messages: messages,
+                                response_format: { type: "json_object" },
+                                temperature: 0.7,
+                                max_tokens: 1024
+                            })
+                        });
+                    } catch (e) {
+                         console.warn("Direct failed, trying external proxy...", e);
+                    }
+                }
+
+                // 3. Try Proxy 1 (corsproxy.io)
                 if (!response || !response.ok) {
                     try {
                         UI.toast("Connecting (Proxy 1)...");
