@@ -2233,37 +2233,34 @@
 
         async function importData(input) {
             const file = input.files[0];
-                                    try {
-                                        JSON.parse(content); // check validity
-                                        localStorage.setItem('delta_os_' + relativePath, content);
-                                        count++;
-                                    } catch(jsonErr) {
-                                        console.warn("Skipping invalid JSON: " + relativePath);
-                                    }
-                                })
-                            );
-                        }
-                    });
+            if (!file) return;
+
+            try {
+                const zip = await JSZip.loadAsync(file);
+                let imported = 0;
+
+                for (const filename of Object.keys(zip.files)) {
+                    const content = await zip.file(filename).async("string");
                     
-                    await Promise.all(filePromises);
-                    
-                    if(count > 0) {
-                        // Sync general.json to cookie if present
-                        const general = localStorage.getItem('delta_os_general.json');
-                        if(general) Common.setCookie('delta_settings', general, 365);
-                        
-                        UI.toast(`Imported ${count} files. Reloading...`);
-                        setTimeout(() => window.location.reload(), 1500);
-                    } else {
-                        UI.alert("No valid JSON files found in Zip.");
+                    if (filename === 'credentials.json') {
+                         try {
+                             const creds = JSON.parse(content);
+                             // Set cookies if present
+                             if(creds.username) Common.setCookie('username', creds.username, 30);
+                             if(creds.key) Common.setCookie('key', creds.key, 30);
+                         } catch(e) { console.warn("Failed to parse credentials import", e); }
+                    } else if (filename.startsWith('delta_os_')) {
+                        localStorage.setItem(filename, content);
+                        imported++;
                     }
-                    
-                } catch(err) {
-                    console.error(err);
-                    UI.alert("Import Failed: " + err.message);
                 }
-            };
-            reader.readAsArrayBuffer(file); // ZIP requires ArrayBuffer
+                
+                alert(`Imported ${imported} files successfully! Reloading...`);
+                window.location.reload(); 
+
+            } catch (e) {
+                alert("Import failed! Invalid zip." + e);
+            }
         }
 
 
