@@ -40,12 +40,16 @@ function scanAssets() {
                         const emotionPath = path.join(outfitPath, emotion);
                          if (fs.statSync(emotionPath).isDirectory()) {
                             const files = fs.readdirSync(emotionPath);
+                            assets.characters[outfit][emotion] = [];
                             for (const f of files) {
                                  if(/\.(png|jpg|jpeg|webp)$/i.test(f)) {
-                                     assets.characters[outfit][emotion] = `assetts/images/character/${outfit}/${emotion}/${f}`;
-                                     break; 
+                                     assets.characters[outfit][emotion].push(`assetts/images/character/${outfit}/${emotion}/${f}`);
                                  }
                             }
+                            // If only one, keep as string to minimize breaking changes? 
+                            // No, requested "all", array is safer for random selection.
+                            // BUT: quickmode.html expects a string for src. We must handle this consumption side too.
+                            // Let's assume consumption will pick random if array.
                          }
                     });
                 }
