@@ -687,9 +687,11 @@
             /* Settings Modal Styling - Moved Here */
             .settings-modal {
                  border-radius: 25px !important;
-                 overflow: hidden !important;
+                 overflow-y: auto !important; /* Allow scroll */
+                 overflow-x: hidden !important; 
                  background: rgba(20, 15, 30, 0.95) !important; 
                  border: 1px solid rgba(255,255,255,0.1);
+                 -webkit-overflow-scrolling: touch; /* Smooth iOS scroll */
             }
             
             /* Adjust History to SCROLL */
