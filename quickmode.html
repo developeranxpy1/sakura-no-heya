@@ -534,17 +534,32 @@
         /* --- Mobile Responsiveness --- */
         @media (max-width: 600px) {
             .vn-box-container {
-                width: 100%; 
-                bottom: 0px !important; /* Remove bottom gap */
-                left: 0;
+                width: 92%; /* Floating Box width */
+                bottom: 15px !important; /* Floating Box bottom */
+                left: 4%; /* Center it */
                 transform: none;
+                border-radius: 25px; /* Round container */
             }
             .dialogue-box {
                 padding: 15px 15px 60px 15px; 
-                border-radius: 20px 20px 0 0; /* Rounded top, flat bottom to meet screen edge */
+                border-radius: 25px !important; /* Fully Rounded */
             }
             .glass-plate {
-                border-radius: 20px 20px 0 0 !important;
+                border-radius: 25px !important; /* Fully Rounded */
+            }
+
+            /* Center Text Vertically & Normal Fonts (Mobile Only) */
+            .dialogue-text {
+                font-family: sans-serif !important;
+                display: flex;
+                flex-direction: column;
+                justify-content: center; /* Vertical Center */
+                height: 100%;
+            }
+
+            /* Normal Fonts for other elements */
+            .char-name-label, .vn-controls, .input-bar, input, button, .vn-btn, .vn-control-btn, .btn-text {
+                font-family: sans-serif !important;
             }
             .char-name-label {
                 left: 10px;
