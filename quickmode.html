@@ -423,7 +423,8 @@
             border: none !important;
             outline: none;
             background: transparent !important;
-            color: #eee !important;
+            color: #333 !important; /* Dark Text for Light Glass */
+            caret-color: #ff9ebd !important; /* Pink Cursor */
             font-size: 14px; /* Smaller font for thinner box */
             padding: 0; 
             font-family: 'Comic Sans MS', 'Comic Sans', cursive;
@@ -1468,7 +1469,13 @@
                         }
                     }
 
-                    // Apply Rules: Sunday = No School -> Move to Room
+        /* Settings Modal Styling */
+        .settings-modal {
+            border-radius: 25px !important;
+            overflow: hidden !important;
+            background: rgba(20, 15, 30, 0.95) !important; /* Darker BG for contrast */
+            border: 1px solid rgba(255,255,255,0.1);
+        }
                     if (isSunday && location === 'school') {
                         location = 'room'; 
                     }
