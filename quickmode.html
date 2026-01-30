@@ -416,8 +416,8 @@
         /* Input Field - Snippet Style */
         .chat-input {
             flex: 1;
-            height: 20px !important; /* Shorter than container */
-            line-height: normal !important; 
+            height: 24px !important; /* Taller for better cursor visibility */
+            line-height: 24px !important; 
             padding: 0 !important;
             margin: 0 !important;
             border: none !important;
@@ -425,8 +425,7 @@
             background: transparent !important;
             color: #333 !important; /* Dark Text for Light Glass */
             caret-color: #ff9ebd !important; /* Pink Cursor */
-            font-size: 14px; /* Smaller font for thinner box */
-            padding: 0; 
+            font-size: 16px !important; /* Larger font for readability */
             font-family: 'Comic Sans MS', 'Comic Sans', cursive;
             border-radius: 0;  
             box-shadow: none !important; 
@@ -2193,58 +2192,47 @@
             const zip = new JSZip();
             const files = ['history.json', 'mood.json', 'bg.json', 'general.json', 'log1.json'];
             
-            try {
-                UI.toast("Preparing Export...");
-                
-                files.forEach(file => {
-                     const content = localStorage.getItem('delta_os_' + file);
-                     if(content) zip.file(file, content);
-                });
-                
-                const blob = await zip.generateAsync({type:"blob"});
-                const url = URL.createObjectURL(blob);
-                
-                // Generate Date String in mm-dd-yy format
-                const now = new Date();
-                const day = String(now.getDate()).padStart(2, '0');
-                const month = String(now.getMonth() + 1).padStart(2, '0');
-                const year = String(now.getFullYear()).slice(-2); // Last 2 digits
-                const dateStr = `${month}-${day}-${year}`;
-
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `sakurabackup-${dateStr}.zip`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-
-                UI.toast("Export Complete!");
-            } catch(e) {
-                console.error(e);
-                UI.alert("Export Failed: " + e.message);
+            let count = 0;
+            
+            // 1. Gather all branded localstorage items
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('delta_os_')) {
+                    zip.file(key, localStorage.getItem(key));
+                    count++;
+                }
             }
+            
+            // 2. Export cookies as credentials.json
+            const creds = {
+                username: Common.getCookie('username'),
+                key: Common.getCookie('key')
+            };
+            zip.file('credentials.json', JSON.stringify(creds));
+
+            if (count === 0) {
+                alert("No data to export!");
+                return;
+            }
+
+            // Timestamp Format: sakuranh-YYYY-MM-DD-HH-MM
+            const now = new Date();
+            const dateStr = now.toISOString().slice(0,10); // YYYY-MM-DD
+            const timeStr = now.toTimeString().slice(0,5).replace(':', '-'); // HH-MM
+            const filename = `sakuranh-${dateStr}-${timeStr}.zip`;
+
+            const blob = await zip.generateAsync({type:"blob"});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         }
-        
-        function importData(input) {
+
+        async function importData(input) {
             const file = input.files[0];
-            if(!file) return;
-            
-            UI.toast("Reading File...");
-            
-            const reader = new FileReader();
-            reader.onload = async function(e) {
-                try {
-                    const zip = await JSZip.loadAsync(e.target.result);
-                    let count = 0;
-                    
-                    // Iterate and save
-                    const filePromises = [];
-                    zip.forEach((relativePath, zipEntry) => {
-                        if(relativePath.endsWith('.json')) {
-                            filePromises.push(
-                                zipEntry.async("string").then(content => {
-                                    // Basic validation
                                     try {
                                         JSON.parse(content); // check validity
                                         localStorage.setItem('delta_os_' + relativePath, content);
