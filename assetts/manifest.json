@@ -1,50 +1,13 @@
 {
-    "environments": {
-        "room": {
-            "day": "assetts/images/envbg/roomdayandnightbg/day.png",
-            "night": "assetts/images/envbg/roomdayandnightbg/night.png"
-        },
-        "park": {
-            "day": "assetts/images/envbg/parkdayandnightbg/day.png",
-            "night": "assetts/images/envbg/parkdayandnightbg/night.png"
-        },
-        "school": {
-            "day": "assetts/images/envbg/schooldayandnightbg/day.png",
-            "night": "assetts/images/envbg/roomdayandnightbg/night.png"
-        },
-        "kitchen": {
-            "day": "assetts/images/envbg/kitchen/day.png",
-            "night": "assetts/images/envbg/kitchen/day.png"
-        },
-        "kidsroom": {
-            "day": "assetts/images/envbg/kidsroom/day.png",
-            "night": "assetts/images/envbg/kidsroom/day.png"
-        },
-        "hallway": {
-            "day": "assetts/images/envbg/hallway/day.png",
-            "night": "assetts/images/envbg/hallway/day.png"
-        },
-        "streets": {
-            "day": null,
-            "night": null
-        },
-        "patterns": [
-            "assetts/images/bg-pattern.png",
-            "assetts/images/dark-bg-pattern.png"
-        ]
-    },
+    "environments": [
+        "assetts/images/bg-pattern.png",
+        "assetts/images/dark-bg-pattern.png",
+        "assetts/images/olddark-bg-pattern.png",
+        "assetts/images/oldsakuralogo.png",
+        "assetts/images/sakuralogo.png"
+    ],
     "characters": {
         "school-dress": {
-            "happy": [
-                "assetts/images/character/school-dress/happy/shy.png"
-            ],
-            "neutral": [
-                "assetts/images/character/school-dress/neutral/shyneutral.png"
-            ],
-            "sad": [
-                "assetts/images/character/school-dress/sad/scaredshy.png",
-                "assetts/images/character/school-dress/sad/shy2.png"
-            ],
             "angry": [
                 "assetts/images/character/school-dress/angry/angryshy.png"
             ],
@@ -57,23 +20,17 @@
                 "assetts/images/character/school-dress/glitch/creepyglitch.png",
                 "assetts/images/character/school-dress/glitch/neutralglitch.png",
                 "assetts/images/character/school-dress/glitch/scaredglitch.png"
+            ],
+            "happy": [
+                "assetts/images/character/school-dress/happy/shy.png"
+            ],
+            "neutral": [
+                "assetts/images/character/school-dress/neutral/shyneutral.png"
+            ],
+            "sad": [
+                "assetts/images/character/school-dress/sad/scaredshy.png",
+                "assetts/images/character/school-dress/sad/shy2.png"
             ]
-        },
-        "sakura_sprite_pack_body": [
-            "assetts/sakura_ready_sprite_pack/body/A_collection_of_digital_2D_sprite_assets_features_.png",
-            "assetts/sakura_ready_sprite_pack/body/A_collection_of_digital_anime-style_sprites_of_Sak.png",
-            "assetts/sakura_ready_sprite_pack/body/A_collection_of_transparent_PNG_sprite_assets_feat.png",
-            "assetts/sakura_ready_sprite_pack/body/A_digital_anime-style_illustration_features_a_full.png",
-            "assetts/sakura_ready_sprite_pack/body/A_digital_anime-style_illustration_features_a_youn.png",
-            "assetts/sakura_ready_sprite_pack/body/A_digital_anime-style_illustration_of_Sakura,_a_yo.png",
-            "assetts/sakura_ready_sprite_pack/body/A_digital_illustration_in_anime-style_features_a_y.png",
-            "assetts/sakura_ready_sprite_pack/body/A_pair_of_anime-style_digital_illustrations_displa.png",
-            "assetts/sakura_ready_sprite_pack/body/A_set_of_two_anime-style_digital_illustrations_fea.png"
-        ]
-    },
-    "misc_assets": [
-        "assetts/video/bgvideo.mp4",
-        "assetts/images/sakuralogo.png"
-    ],
-    "usage_instructions": "Choose 'environment' from environments. Choose 'character_image' from characters. You can also pick from the 'sakura_sprite_pack_body' if you want to change pose/outfit. Use ONLY paths provided here."
+        }
+    }
 }
