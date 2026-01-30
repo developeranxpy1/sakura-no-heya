@@ -416,8 +416,9 @@
         /* Input Field - Snippet Style */
         .chat-input {
             flex: 1;
-            height: 100% !important; /* Fill container */
-            line-height: 30px !important; /* Force Baseline Center */
+            height: 24px !important; /* Smaller than container */
+            line-height: 24px !important; /* Match height */
+            align-self: center !important; /* Flex center */
             border: none !important;
             outline: none;
             background: transparent !important;
@@ -659,7 +660,7 @@
             /* Pin Controls to Bottom - TRANSPARENT */
             .vn-box-container.expanded .vn-controls {
                 position: fixed;
-                bottom: 5px; /* Closer to edge */
+                bottom: 0% !important; /* Shifted down to edge */
                 left: 0; 
                 width: 100%;
                 z-index: 1000;
