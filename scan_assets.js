@@ -16,14 +16,27 @@ function scanAssets() {
     }
 
     // 1. Scan Environments (Root Images)
+    // 1. Scan Environments (Recursive - Excluding 'character')
     try {
-        const rootFiles = fs.readdirSync(ASSET_DIR);
-        rootFiles.forEach(file => {
-            if (/\.(png|jpg|jpeg|webp)$/i.test(file)) {
-                 assets.environments.push(`assetts/images/${file}`);
-            }
-        });
-    } catch (e) { console.error("Error scanning root:", e); }
+        function scanDir(dir, relativePath) {
+            const files = fs.readdirSync(dir);
+            files.forEach(file => {
+                const fullPath = path.join(dir, file);
+                const stat = fs.statSync(fullPath);
+                
+                if (stat.isDirectory()) {
+                    if (file !== 'character') { // Skip character folder (handled separately)
+                        scanDir(fullPath, path.join(relativePath, file));
+                    }
+                } else if (/\.(png|jpg|jpeg|webp)$/i.test(file)) {
+                     // Normalize path separators to forward slashes for web usage
+                     const webPath = path.join('assetts/images', relativePath, file).replace(/\\/g, '/');
+                     assets.environments.push(webPath);
+                }
+            });
+        }
+        scanDir(ASSET_DIR, '');
+    } catch (e) { console.error("Error scanning environments:", e); }
 
     // 2. Scan Characters
     const charDir = path.join(ASSET_DIR, 'character');
