@@ -337,17 +337,17 @@
         /* Integrated Input Wrapper - Matching Snippet */
         .integrated-input {
             flex: 1; 
-            min-height: 52px; /* Taller Box */
-            background: #2f2f2f; /* Dark Grey Token BG */
-            border-radius: 26px; /* Superellipse-ish */
+            min-height: 52px !important; /* Taller Box */
+            background: #2f2f2f !important; /* Dark Grey Token BG */
+            border-radius: 26px !important; /* Superellipse-ish */
             display: flex;
             align-items: center;
             padding-left: 15px; 
             box-sizing: border-box;
             position: relative;
-            border: 1px solid rgba(255,255,255,0.1); 
+            border: 1px solid rgba(255,255,255,0.1) !important; 
             overflow: hidden; 
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: 0 0 10px rgba(0,0,0,0.1) !important;
         }
         
         .integrated-input:focus-within {
@@ -579,12 +579,15 @@
                 margin-bottom: 15px;
             }
             .integrated-input {
-                 /* Inherit Global Height (52px) */
+                 min-height: 52px !important; 
+                 background: #2f2f2f !important;
+                 border-radius: 26px !important;
                  padding-left: 18px !important;
             }
             #sendBtn {
-                 /* Inherit Global Height (42px) */
+                 height: 42px !important;
                  width: 90px !important;
+                 border-radius: 20px !important;
             }
             .chat-input {
                 font-size: 16px !important; /* Better for mobile zoom prevention */
