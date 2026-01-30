@@ -1399,18 +1399,33 @@
         let scannedAssets = { environments: {}, characters: {} };
 
         // Initialize State after Assets Load
-        fetch('assetts/manifest.json')
-            .then(res => res.json())
-            .then(data => {
-                scannedAssets = data;
-                console.log("Assets Loaded:", scannedAssets);
-                restoreState(); // Restore state ONLY after assets are known
-                preloadAllAssets(scannedAssets); // Background Preload
-            })
-            .catch(err => {
-                console.error("Asset Manifest Load Failed:", err);
-                restoreState(); // Fallback restore even if assets fail
-            });
+        // Fail-Safe: Retry logic for manifest
+        async function loadManifestWithRetry(retries = 3) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const res = await fetch('assetts/manifest.json');
+                    if (!res.ok) throw new Error("Manifest 404");
+                    const data = await res.json();
+                    
+                    // Validation
+                    if (!data.environments || !data.characters) throw new Error("Invalid Manifest Structure");
+                    
+                    scannedAssets = data;
+                    console.log("Assets Loaded Successfully:", scannedAssets);
+                    restoreState(); 
+                    preloadAllAssets(scannedAssets);
+                    return;
+                } catch (err) {
+                    console.warn(`Manifest Load Attempt ${i+1} Failed:`, err);
+                    await new Promise(r => setTimeout(r, 1000)); // Wait 1s
+                }
+            }
+            console.error("All Manifest attempts failed. Using fallback.");
+            UI.alert("Warning: Asset Manifest failed to load. Using visual fallbacks.");
+            restoreState(); // Run anyway with defaults
+        }
+        
+        loadManifestWithRetry();
 
         // --- PRELOADER ---
         function preloadAllAssets(assets) {
@@ -1524,8 +1539,14 @@
                 }
             }
 
-            // Fallback Init if no log (First Run)
+            // Fallback Init if no log (First Run / New User)
             if (!visualRestored && chatHistory.length === 0) {
+                 const generalData = Common.loadState('general.json');
+                 const createdAt = generalData?.createdAt || 0;
+                 const isNewUser = (Date.now() - createdAt) < 8000; // Increased to 8s for safety
+
+                 console.log("New User Check:", isNewUser, "Created:", new Date(createdAt).toLocaleTimeString());
+
                  // Check Time for Default
                  let defaultBg;
                  if (isNight) {
@@ -1533,12 +1554,38 @@
                  } else {
                      defaultBg = scannedAssets.environments?.school?.day;
                  }
+                 
+                 // New User Override
+                 if (isNewUser) {
+                     // Try to find a sunset or specific bg
+                     // Fallback to day if specific not found
+                     defaultBg = scannedAssets.environments?.['classroom']?.sunset || defaultBg;
+                     
+                     // Greeting
+                     // Inject a "fake" history item so it renders immediately? 
+                     // Or just set the text? Setting text is safer for "first render"
+                     vnText.innerText = "Hi... I was getting quite bored here...";
+                     nameLabel.innerText = "Sakura";
+                     
+                     // Play Music (if available) - requires user interaction often, but we can try setup
+                     // (Music implementation is separate, but placeholder here)
+                 }
+
                  // Sunday Check
-                 if (isSunday && !isNight) defaultBg = scannedAssets.environments?.room?.day;
+                 if (isSunday && !isNight && !isNewUser) defaultBg = scannedAssets.environments?.room?.day;
 
                  if(defaultBg) body.style.backgroundImage = `url('${defaultBg}')`;
                  
-                 const defaultChar = scannedAssets.characters?.['school-dress']?.neutral?.[0];
+                 // Character logic
+                 let defaultChar = scannedAssets.characters?.['school-dress']?.neutral?.[0];
+                 
+                 if (isNewUser) {
+                     // Try "bored" or "waiting"
+                     const waiting = scannedAssets.characters?.['school-dress']?.['waiting']?.[0];
+                     const bored = scannedAssets.characters?.['school-dress']?.['bored']?.[0];
+                     defaultChar = waiting || bored || defaultChar;
+                 }
+
                  if(defaultChar) { charImg.src = defaultChar; charImg.style.display = 'block'; }
             }
 
@@ -1807,7 +1854,13 @@
 
                 // Check final result
                 if (!response) {
-                    throw new Error("Connection Failed: All connection methods (Direct & Proxies) failed. Please check your internet.");
+                    // Fail-Safe: Offline fallback
+                     vnText.innerText = "I seem to be offline... Please check your connection.";
+                     dialogueBox.classList.remove('blue-theme');
+                     nameLabel.innerText = "Sakura";
+                     isTyping = false;
+                     toggleTyping(false);
+                     throw new Error("Connection Failed: All connection methods (Direct & Proxies) failed. Please check your internet.");
                 }
 
                 const text = await response.text();
