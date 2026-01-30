@@ -416,9 +416,10 @@
         /* Input Field - Snippet Style */
         .chat-input {
             flex: 1;
-            height: 24px !important; /* Smaller than container */
-            line-height: 24px !important; /* Match height */
-            align-self: center !important; /* Flex center */
+            height: 100% !important; 
+            line-height: normal !important; /* Reset */
+            padding-top: 5px !important; /* Manual Push Down */
+            box-sizing: border-box !important;
             border: none !important;
             outline: none;
             background: transparent !important;
