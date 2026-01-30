@@ -337,16 +337,17 @@
         /* Integrated Input Wrapper - Matching Snippet */
         .integrated-input {
             flex: 1; 
-            height: 30px; /* Increased by 10% (27px -> 30px) */
-            background: rgba(255,255,255,0.35); 
-            border-radius: 999px; 
+            min-height: 52px; /* Taller Box */
+            background: #2f2f2f; /* Dark Grey Token BG */
+            border-radius: 26px; /* Superellipse-ish */
             display: flex;
             align-items: center;
             padding-left: 15px; 
             box-sizing: border-box;
             position: relative;
-            border: none; 
-            overflow: hidden; /* Prevent Button Overflow */
+            border: 1px solid rgba(255,255,255,0.1); 
+            overflow: hidden; 
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
         
         .integrated-input:focus-within {
@@ -359,9 +360,9 @@
         #sendBtn {
             /* Always Expanded */
             width: 80px; 
-            height: 28px;
-            margin-right: 2px;
-            border-radius: 14px; 
+            height: 42px; /* Match new input height */
+            margin-right: 4px;
+            border-radius: 20px;  
             /* 3D Pink Effect */
             background: linear-gradient(to bottom, #ff9ebd, #e91e63); 
             color: white; 
@@ -578,13 +579,12 @@
                 margin-bottom: 15px;
             }
             .integrated-input {
-                height: 42px !important; /* Thicker text box */
-                padding-left: 18px !important;
+                 /* Inherit Global Height (52px) */
+                 padding-left: 18px !important;
             }
             #sendBtn {
-                height: 38px !important; /* Scale send button */
-                width: 90px !important;
-                border-radius: 19px !important;
+                 /* Inherit Global Height (42px) */
+                 width: 90px !important;
             }
             .chat-input {
                 font-size: 16px !important; /* Better for mobile zoom prevention */
