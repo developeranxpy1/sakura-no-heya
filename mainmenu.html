@@ -541,11 +541,17 @@ You never mention being AI. You control the background/Visual Novel elements.`;
                 return;
             }
 
+            // Timestamp Format: sakuranh-YYYY-MM-DD-HH-MM
+            const now = new Date();
+            const dateStr = now.toISOString().slice(0,10); // YYYY-MM-DD
+            const timeStr = now.toTimeString().slice(0,5).replace(':', '-'); // HH-MM
+            const filename = `sakuranh-${dateStr}-${timeStr}.zip`;
+
             const blob = await zip.generateAsync({type:"blob"});
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `sakura_backup_${Date.now()}.zip`;
+            a.download = filename;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
