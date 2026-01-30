@@ -1921,8 +1921,9 @@
                     if (!window.aiRetryCount) window.aiRetryCount = 0;
                     if (window.aiRetryCount < 1) {
                          window.aiRetryCount++;
-                         console.log("Requesting AI to fix character...");
-                         sendToAI(`[SYSTEM ALERT: The character image '${targetSrc}' failed to load. Please use a standard expression like 'neutral'.]`, true, true);
+                         console.warn(`[SYSTEM SILENT] Character load failed: ${targetSrc}. Requesting retry silently...`);
+                         // Using a hidden system trigger to ask AI to fix it without showing user
+                         sendToAI(`[SYSTEM: The previous character image failed to load. Please switch to a standard 'neutral' expression.]`, false, true);
                     } else {
                         const defaultChar = scannedAssets.characters?.['school-dress']?.neutral?.[0];
                         if(defaultChar) { charImg.src = defaultChar; charImg.style.display = 'block'; }
