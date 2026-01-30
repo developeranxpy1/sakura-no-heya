@@ -6,6 +6,7 @@
     <title>Sakura No Heya</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌸</text></svg>">
     <link rel="stylesheet" href="assetts/css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
         .menu-container {
             width: 100vw;
@@ -239,6 +240,14 @@
                 
                 <hr style="margin: 25px 0; border: 0.5px solid #eee; width: 100%;">
                 
+                <hr style="margin: 25px 0; border: 0.5px solid #eee; width: 100%;">
+                
+                <div style="display:flex; gap:10px; flex-wrap: wrap; justify-content: center; width: 100%; margin-bottom: 20px;">
+                    <button class="btn-candy" onclick="exportData()">Export Data</button>
+                    <button class="btn-candy" onclick="triggerImport()">Import Data</button>
+                </div>
+                <input type="file" id="importFile" style="display: none;" accept=".zip" onchange="importData(this)">
+
                 <button class="btn-candy-red" onclick="clearData()">Delete All Data</button>
                 
                 <div id="fileList" style="margin-top: 15px; font-size: 0.8rem; color: #888; text-align: left; width: 100%;">
@@ -504,6 +513,77 @@ You never mention being AI. You control the background/Visual Novel elements.`;
 
             // Navigate
             window.location.href = 'quickmode.html';
+        }
+
+        /* --- IMPORT / EXPORT LOGIC --- */
+        async function exportData() {
+            const zip = new JSZip();
+            let count = 0;
+            
+            // 1. Gather all branded localstorage items
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('delta_os_')) {
+                    zip.file(key, localStorage.getItem(key));
+                    count++;
+                }
+            }
+            
+            // 2. Also export cookies (username/key) as a JSON
+            const creds = {
+                username: Common.getCookie('username'),
+                key: Common.getCookie('key')
+            };
+            zip.file('credentials.json', JSON.stringify(creds));
+
+            if (count === 0) {
+                alert("No data to export!");
+                return;
+            }
+
+            const blob = await zip.generateAsync({type:"blob"});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `sakura_backup_${Date.now()}.zip`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function triggerImport() {
+            document.getElementById('importFile').click();
+        }
+
+        async function importData(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            try {
+                const zip = await JSZip.loadAsync(file);
+                let imported = 0;
+
+                for (const filename of Object.keys(zip.files)) {
+                    const content = await zip.file(filename).async("string");
+                    
+                    if (filename === 'credentials.json') {
+                         try {
+                             const creds = JSON.parse(content);
+                             if(creds.username) Common.setCookie('username', creds.username, 30);
+                             if(creds.key) Common.setCookie('key', creds.key, 30);
+                         } catch(e) {}
+                    } else if (filename.startsWith('delta_os_')) {
+                        localStorage.setItem(filename, content);
+                        imported++;
+                    }
+                }
+                
+                alert(`Imported ${imported} files successfully! Reloading...`);
+                window.location.reload(); 
+
+            } catch (e) {
+                alert("Import failed! Invalid zip." + e);
+            }
         }
     </script>
     
