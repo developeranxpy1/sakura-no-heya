@@ -1661,7 +1661,7 @@
                     const demoJson = JSON.stringify({ 
                         response: "I am running in demo mode because you skipped the login key! Please login with a valid Groq API key for real conversation.",
                         environment: scannedAssets.environments ? scannedAssets.environments[0] : "",
-                        character_image: scannedAssets.characters?.school_dress?.neutral 
+                        character_image: scannedAssets.characters?.['school-dress']?.neutral?.[0] 
                     });
                     processResponse(demoJson);
                     return;
@@ -1875,26 +1875,32 @@
             // Better: Reset when user messages.
             
             if (parsed.character_image) {
+                // Handle Array Input (Random Pick)
+                let targetSrc = parsed.character_image;
+                if(Array.isArray(targetSrc)) {
+                    targetSrc = targetSrc[Math.floor(Math.random() * targetSrc.length)];
+                }
+
                 const newImg = new Image();
                 newImg.onload = () => {
-                    if(charImg.src !== parsed.character_image) charImg.src = parsed.character_image;
+                    if(charImg.src !== targetSrc) charImg.src = targetSrc;
                     charImg.style.display = 'block';
                 };
                 newImg.onerror = () => {
-                    console.warn("Character failed:", parsed.character_image);
+                    console.warn("Character failed:", targetSrc);
                      // AI Retry Logic (Character)
                     if (!window.aiRetryCount) window.aiRetryCount = 0;
                     if (window.aiRetryCount < 1) {
                          window.aiRetryCount++;
                          console.log("Requesting AI to fix character...");
-                         sendToAI(`[SYSTEM ALERT: The character image '${parsed.character_image}' failed to load. Please use a standard expression like 'neutral' or 'happy' for the current outfit.]`, true, true);
+                         sendToAI(`[SYSTEM ALERT: The character image '${targetSrc}' failed to load. Please use a standard expression like 'neutral'.]`, true, true);
                     } else {
                         const defaultChar = scannedAssets.characters?.['school-dress']?.neutral?.[0];
                         if(defaultChar) { charImg.src = defaultChar; charImg.style.display = 'block'; }
                         window.aiRetryCount = 0;
                     }
                 };
-                newImg.src = parsed.character_image;
+                newImg.src = targetSrc;
             } else {
                 // If no image sent, ensure current is visible (if set)
                 // If current is empty/broken, try default
@@ -2039,9 +2045,10 @@
                 // Avatar for Sakura
                 let avatarHtml = "";
                 if(role !== 'user') {
-                    const avatarSrc = (scannedAssets.characters && Object.keys(scannedAssets.characters).length > 0) 
-                                      ? Object.values(scannedAssets.characters)[0] 
-                                      : 'assetts/images/sakura_avatar_placeholder.png';
+                    // Safe Access: First Character -> Neutral -> First Image
+                    const firstCharKey = (scannedAssets.characters && Object.keys(scannedAssets.characters).length > 0) ? Object.keys(scannedAssets.characters)[0] : null;
+                    const avatarSrc = firstCharKey ? scannedAssets.characters[firstCharKey]?.neutral?.[0] : 'assetts/images/sakura_avatar_placeholder.png';
+                    
                     avatarHtml = `<img src="${avatarSrc}" class="msg-avatar" onerror="this.style.display='none'">`;
                 }
 
