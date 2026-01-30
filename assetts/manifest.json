@@ -2,20 +2,6 @@
     "environments": [
         "assetts/images/bg-pattern.png",
         "assetts/images/dark-bg-pattern.png",
-        "assetts/images/envbg/bedroom (2).png",
-        "assetts/images/envbg/bedroom.png",
-        "assetts/images/envbg/class.png",
-        "assetts/images/envbg/closet.png",
-        "assetts/images/envbg/club (2).png",
-        "assetts/images/envbg/club.png",
-        "assetts/images/envbg/corridor.png",
-        "assetts/images/envbg/house.png",
-        "assetts/images/envbg/kitchen.png",
-        "assetts/images/envbg/parkdayandnightbg/day.png",
-        "assetts/images/envbg/parkdayandnightbg/night.png",
-        "assetts/images/envbg/roomdayandnightbg/day.png",
-        "assetts/images/envbg/roomdayandnightbg/night.png",
-        "assetts/images/envbg/schooldayandnightbg/day.png",
         "assetts/images/olddark-bg-pattern.png",
         "assetts/images/oldsakuralogo.png",
         "assetts/images/sakuralogo.png"
@@ -50,6 +36,5 @@
     "audio": {},
     "video": [
         "assetts/video/bgvideo.mp4"
-    ],
-    "misc": []
+    ]
 }

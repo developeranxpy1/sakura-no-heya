@@ -40,8 +40,13 @@ const Common = {
   },
 
   loadState: (filename) => {
-    const item = localStorage.getItem(STORAGE_PREFIX + filename);
-    return item ? JSON.parse(item) : null;
+    try {
+      const item = localStorage.getItem(STORAGE_PREFIX + filename);
+      return item ? JSON.parse(item) : null;
+    } catch (e) {
+      console.warn(`Corrupt state file: ${filename}. Resetting.`);
+      return null;
+    }
   },
 
   // Initialize default files if missing
