@@ -2055,15 +2055,10 @@
 
                 const bubbleClass = (role === 'user') ? 'msg-user' : 'msg-sakura';
                 
-                // Avatar for Sakura
+                // Avatar for Sakura - REMOVED per user request
                 let avatarHtml = "";
-                if(role !== 'user') {
-                    // Safe Access: First Character -> Neutral -> First Image
-                    const firstCharKey = (scannedAssets.characters && Object.keys(scannedAssets.characters).length > 0) ? Object.keys(scannedAssets.characters)[0] : null;
-                    const avatarSrc = firstCharKey ? scannedAssets.characters[firstCharKey]?.neutral?.[0] : 'assetts/images/sakura_avatar_placeholder.png';
-                    
-                    avatarHtml = `<img src="${avatarSrc}" class="msg-avatar" onerror="this.style.display='none'">`;
-                }
+                // if(role !== 'user') { ... } 
+
 
                 return `<div style="display:flex; width:100%; margin-bottom: 12px; ${role==='user'?'justify-content:flex-end':''}">
                            ${avatarHtml}
