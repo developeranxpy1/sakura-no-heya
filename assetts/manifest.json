@@ -46,5 +46,10 @@
                 "assetts/images/character/school-dress/sad/shy2.png"
             ]
         }
-    }
+    },
+    "audio": {},
+    "video": [
+        "assetts/video/bgvideo.mp4"
+    ],
+    "misc": []
 }
