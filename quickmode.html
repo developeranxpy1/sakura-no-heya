@@ -540,6 +540,11 @@
                 transform: none;
                 border-radius: 25px; /* Round container */
             }
+            /* Character Layer Mobile Fix */
+            .character-layer {
+                max-height: 85vh !important; 
+                bottom: -5vh !important;
+            }
             .dialogue-box {
                 padding: 15px 15px 60px 15px; 
                 border-radius: 25px !important; /* Fully Rounded */
@@ -2487,54 +2492,6 @@ Dynamic: You rarely change locations. You focus on the conversation.`;
         }
         
     </script>
-    <!-- Mobile & Fixes -->
-    <style>
-        /* Mobile Updates */
-        @media (max-width: 600px) {
-            .dialogue-box { 
-                width: 95% !important; 
-                bottom: 70px !important; 
-                padding: 15px !important; 
-                left: 50% !important; 
-                transform: translateX(-50%) !important;
-                margin-left: 0 !important;
-            }
-            .character-layer { max-height: 85vh !important; bottom: -5vh !important; }
-            #userInput { font-size: 16px !important; } 
-            .vn-controls { bottom: 10px !important; }
-        }
-        
-        /* Collapse Button Style */
-        .collapse-btn {
-            display: none;
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 20px;
-            color: white;
-            padding: 5px 12px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            z-index: 20;
-            backdrop-filter: blur(4px);
-        }
-        .dialogue-box.expanded .collapse-btn {
-            display: block;
-        }
 
-        
-        /* Desktop Reset (Fix Chopped Head) */
-        @media (min-width: 601px) {
-            .character-layer {
-                max-height: 100vh !important; /* Allow full height */
-                bottom: -14vh !important; /* Restore original desktop anchor */
-            }
-        }
-
-        /* Fix Ghost Text */
-        .character-layer { color: transparent !important; }
-    </style>
 </body>
 </html>
