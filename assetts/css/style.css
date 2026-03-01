@@ -233,8 +233,8 @@ textarea:focus {
     border: none !important;
     outline: none;
     background: transparent !important;
-    color: #333 !important; /* Dark Text for Light Glass */
-    caret-color: #ff9ebd !important; /* Pink Cursor */
+    color: #ffffff !important; /* White Text for Dark Glass */
+    caret-color: #ffffff !important; /* Bright White Cursor for visibility */
     font-size: 14px; /* Smaller font for thinner box */
     font-family: 'Comic Sans MS', 'Comic Sans', cursive;
     border-radius: 0;  
