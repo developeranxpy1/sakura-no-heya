@@ -323,126 +323,89 @@
         }
 
         /* Input Area - Integrated */
+        /* Input Area */
         .input-bar {
             width: 100%;
             display: flex;
             gap: 15px;
             align-items: center;
-            margin-top: auto; 
-            padding-top: 0;
-            border: none;
-            margin-bottom: 30px; /* Increased gap to 10% feel (Desktop) */
+            margin-top: auto;
+            margin-bottom: 30px;
         }
 
-        /* Integrated Input Wrapper - Matching Snippet */
         .integrated-input {
-            flex: 1; 
-            height: 30px; /* Increased by 10% (27px -> 30px) */
-            background: rgba(255,255,255,0.35); 
-            border-radius: 999px; 
+            flex: 1;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 999px;
             display: flex;
             align-items: center;
-            padding-left: 15px; 
+            padding: 0 4px 0 15px;
             box-sizing: border-box;
-            position: relative;
-            border: none; 
-            overflow: hidden; /* Prevent Button Overflow */
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
-        .integrated-input:focus-within {
-           /* Optional: keeping focus ring or removing if pure snippet is desired. 
-              Snippet has no focus style, so I'll keep it subtle or remove border change. */
-           box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
-        }
-        
-        /* Send Button - Exact Snippet Style */
+
         #sendBtn {
-            /* Always Expanded */
-            width: 80px; 
-            height: 28px;
-            margin-right: 2px;
-            border-radius: 14px;   
-            /* 3D Pink Effect */
-            background: linear-gradient(to bottom, #ff9ebd, #e91e63); 
-            color: white; 
-            border: 1px solid rgba(255,255,255,0.4);
-            box-shadow: 0 2px 0 #ad1457; /* Reduced 3D depth for better centering */
+            width: 80px;
+            height: 32px;
+            border-radius: 999px;
+            background: #e91e63;
+            color: white;
+            border: none;
             display: flex;
             align-items: center;
-            justify-content: center; /* Always center */
+            justify-content: center;
             cursor: pointer;
-            transition: border-radius 0.6s ease; /* No width transition needed */
-            margin-left: auto; 
+            margin-left: auto;
             flex-shrink: 0;
-            font-size: 0.9rem; 
+            font-size: 0.85rem;
             padding: 0;
-            line-height: 1;
-            overflow: hidden; 
-            white-space: nowrap;
-            position: relative;
         }
 
         #sendBtn:disabled {
-            opacity: 0.5;
+            opacity: 0.4;
             cursor: not-allowed;
-            filter: grayscale(0.8);
-            box-shadow: none; /* Flatten disabled button */
-            transform: none; /* Don't shift - keep vertically centered */
         }
-        
+
         #sendBtn:hover:not(:disabled) {
-            box-shadow: 0 4px 0 #ad1457, 0 6px 8px rgba(0,0,0,0.3); /* Slightly lifted */
+            background: #f06292;
         }
-        
+
         #sendBtn:active:not(:disabled) {
-            transform: translateY(3px); /* Press Down */
-            box-shadow: 0 1px 0 #ad1457, 0 2px 2px rgba(0,0,0,0.2); /* Reduced Shadow */
+            background: #c2185b;
         }
-        
+
         .btn-text {
-            display: inline-block;
-            opacity: 1; /* Always Visible */
-            max-width: none; 
-            margin-left: 6px; /* Always Gapped */
+            margin-left: 5px;
             font-size: 0.8rem;
             font-weight: bold;
-            font-family: 'Comic Sans MS', 'Comic Sans', cursive;
-            transition: all 0.6s ease; /* Match button speed */
-            color: #fff; /* White Text */
-            overflow: hidden;
+            color: #fff;
         }
-        
 
-
-        /* Input Field - Snippet Style */
         .chat-input {
             flex: 1;
-            height: 24px !important; /* Taller for better cursor visibility */
-            line-height: 24px !important; 
+            height: 100%;
             padding: 0 !important;
             margin: 0 !important;
             border: none !important;
             outline: none;
             background: transparent !important;
-            color: #ffffff !important; /* White Text for Dark Glass */
-            caret-color: #ffffff !important; /* Bright White Cursor for visibility */
-            font-size: 16px !important; /* Larger font for readability */
-            font-family: 'Comic Sans MS', 'Comic Sans', cursive;
-            border-radius: 0;  
-            box-shadow: none !important; 
-            text-align: left; 
-            min-width: 0; /* Allow Flex Shrink */
+            color: #ffffff !important;
+            caret-color: #ffffff !important;
+            font-size: 15px;
+            font-family: sans-serif;
+            box-shadow: none !important;
+            min-width: 0;
         }
-        
+
         .chat-input::placeholder {
-            color: #ddd !important;
-            opacity: 0.8;
+            color: rgba(255, 255, 255, 0.5);
         }
-        
+
         .chat-input:focus {
-             /* Resetting focus styles to match snippet (none) */
-             background: transparent !important;
-             box-shadow: none !important;
+            background: transparent !important;
+            box-shadow: none !important;
+        }
         }
 
         /* --- Button Styling (Pretty & Functional) --- */
