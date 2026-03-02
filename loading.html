@@ -323,18 +323,6 @@
             );
         }
 
-        /* ===== BOTTOM TIP TEXT ===== */
-        .tip-text {
-            position: fixed;
-            bottom: 20px;
-            font-family: 'Comic Sans MS', 'Comic Sans', cursive, sans-serif;
-            font-size: 0.7rem;
-            color: var(--text-color);
-            opacity: 0.3;
-            z-index: 10;
-            text-align: center;
-            letter-spacing: 1px;
-        }
 
         /* ===== DDLC-STYLE FULL SCREEN GLITCH ===== */
         .full-glitch {
@@ -419,8 +407,6 @@
         </div>
     </div>
 
-    <!-- Bottom tip -->
-    <div class="tip-text" id="tipText">Every day, I imagine a future where I can be with you.</div>
 
     <script src="assetts/js/common.js"></script>
     <script>
@@ -613,7 +599,6 @@
         const screenTear = document.getElementById('screenTear');
         const fullGlitch = document.getElementById('fullGlitch');
         const logoImg = document.getElementById('logoImg');
-        const tipText = document.getElementById('tipText');
 
         // ===== ANIMATED DOTS (Ren'Py style) =====
         let dotCount = 0;
@@ -703,21 +688,11 @@
             "Initializing the literature club..."
         ];
 
-        const ddlcTips = [
-            "Every day, I imagine a future where I can be with you.",
-            "Will you write the way into her heart?",
-            "The poems are the key to everything.",
-            "Just Sakura.",
-            "A file has been modified. Is something wrong?",
-            "I hope you like the surprise I have for you~"
-        ];
-
         // ===== PROGRESS SIMULATION =====
         let progress = 0;
         let currentMsgIdx = 0;
 
         statusText.textContent = msgs[0];
-        tipText.textContent = ddlcTips[Math.floor(Math.random() * ddlcTips.length)];
 
         const interval = setInterval(() => {
             progress += Math.random() * 4 + 0.5;
