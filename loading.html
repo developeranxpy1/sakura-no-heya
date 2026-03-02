@@ -7,6 +7,8 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌸</text></svg>">
     <link rel="stylesheet" href="assetts/css/style.css">
     <style>
+        /* ===== DDLC-INSPIRED LOADING SCREEN ===== */
+
         body {
             display: flex;
             justify-content: center;
@@ -16,68 +18,370 @@
             height: 100vh;
             margin: 0;
             cursor: wait;
+            position: relative;
         }
+
+        /* ===== STATIC / NOISE OVERLAY ===== */
+        .noise-overlay {
+            position: fixed;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            z-index: 100;
+            pointer-events: none;
+            opacity: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+            background-size: 256px 256px;
+            mix-blend-mode: overlay;
+            transition: opacity 0.05s;
+        }
+
+        .noise-overlay.flash {
+            opacity: 0.15;
+            animation: noiseShift 0.1s steps(3) infinite;
+        }
+
+        @keyframes noiseShift {
+            0% { transform: translate(0, 0); }
+            33% { transform: translate(-10px, 5px); }
+            66% { transform: translate(5px, -10px); }
+            100% { transform: translate(-5px, 3px); }
+        }
+
+        /* ===== SCREEN TEAR / CORRUPTION LINE ===== */
+        .screen-tear {
+            position: fixed;
+            left: 0;
+            width: 100%;
+            height: 0;
+            z-index: 90;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .screen-tear.active {
+            height: 3px;
+            background: linear-gradient(90deg,
+                transparent 0%,
+                var(--secondary-color) 20%,
+                rgba(255,255,255,0.8) 50%,
+                var(--secondary-color) 80%,
+                transparent 100%
+            );
+            box-shadow: 0 0 10px var(--secondary-color);
+        }
+
+        /* ===== MAIN CONTAINER ===== */
         .loader-container {
             text-align: center;
-            animation: fadeIn 0.8s ease-out;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            z-index: 10;
+            position: relative;
+            animation: ddlcFadeIn 0.8s ease-out;
         }
-        .spinner {
-            width: 80px;
+
+        @keyframes ddlcFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* ===== SAKURA LOGO (VN CHARACTER STYLE) ===== */
+        .logo-wrapper {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .logo-img {
+            width: 100px;
             height: auto;
-            margin-bottom: 20px;
-            /* Gentle float + Spin */
-            animation: float 3s ease-in-out infinite, spin 10s linear infinite;
-            filter: drop-shadow(0 0 15px rgba(255, 183, 213, 0.6));
+            filter: drop-shadow(0 0 20px rgba(255, 183, 213, 0.5));
+            animation: logoBreath 3s ease-in-out infinite;
         }
-        .loading-text {
+
+        @keyframes logoBreath {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 15px rgba(255, 183, 213, 0.4)); }
+            50% { transform: scale(1.03); filter: drop-shadow(0 0 25px rgba(255, 183, 213, 0.7)); }
+        }
+
+        /* Occasional glitch on the logo */
+        .logo-img.glitch {
+            animation: logoGlitch 0.15s steps(2) forwards;
+        }
+
+        @keyframes logoGlitch {
+            0% { transform: translate(0) scale(1); filter: hue-rotate(0deg); }
+            25% { transform: translate(-4px, 2px) scale(1.02); filter: hue-rotate(90deg) saturate(3); }
+            50% { transform: translate(3px, -1px) scale(0.98); filter: hue-rotate(-60deg) brightness(1.5); }
+            75% { transform: translate(-2px, -3px) scale(1.01); filter: hue-rotate(180deg) saturate(0.5); }
+            100% { transform: translate(0) scale(1); filter: hue-rotate(0deg); }
+        }
+
+        /* ===== "NOW LOADING" TEXT (REN'PY STYLE) ===== */
+        .now-loading {
             font-family: 'Comic Sans MS', 'Comic Sans', cursive, sans-serif;
             color: var(--text-color);
-            font-size: 1.2rem;
-            margin-top: 10px;
-            animation: pulse 1.5s ease-in-out infinite;
+            font-size: 1.3rem;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            position: relative;
+            display: inline-block;
         }
-        .progress-bar {
-            width: 200px;
-            height: 6px;
-            background: rgba(0,0,0,0.1);
-            border-radius: 10px;
-            margin-top: 20px;
+
+        .now-loading .dots {
+            display: inline-block;
+            width: 30px;
+            text-align: left;
+        }
+
+        /* ===== STATUS TEXT ===== */
+        .status-text {
+            font-family: 'Comic Sans MS', 'Comic Sans', cursive, sans-serif;
+            color: var(--text-color);
+            font-size: 0.85rem;
+            opacity: 0.6;
+            margin-bottom: 20px;
+            min-height: 20px;
+            transition: opacity 0.2s;
+        }
+
+        /* Corrupted text effect */
+        .status-text.corrupt {
+            animation: textCorrupt 0.3s steps(3) forwards;
+        }
+
+        @keyframes textCorrupt {
+            0% { opacity: 0.6; transform: translate(0); }
+            25% { opacity: 1; transform: translate(-2px, 1px); color: var(--secondary-color); letter-spacing: 5px; }
+            50% { opacity: 0.3; transform: translate(1px, -1px); letter-spacing: -1px; }
+            75% { opacity: 0.8; transform: translate(-1px, 0); }
+            100% { opacity: 0.6; transform: translate(0); }
+        }
+
+        /* ===== PROGRESS BAR (DDLC POEM GAME STYLE) ===== */
+        .progress-wrapper {
+            width: 280px;
+            position: relative;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 8px;
+            background: rgba(0,0,0,0.08);
+            border-radius: 4px;
             overflow: hidden;
-            border: 1px solid var(--border-color);
+            border: 2px solid var(--border-color);
+            position: relative;
         }
+
+        [data-theme="dark"] .progress-track {
+            background: rgba(255,255,255,0.05);
+        }
+
         .progress-fill {
             height: 100%;
-            background: var(--secondary-color);
             width: 0%;
-            transition: width 0.1s linear;
+            border-radius: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            transition: width 0.12s linear;
+            position: relative;
             box-shadow: 0 0 10px var(--secondary-color);
         }
 
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        @keyframes float { 
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-10px) rotate(5deg); } 
+        /* Shiny sweep on progress bar */
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -40px;
+            width: 40px; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: progressShine 2s linear infinite;
         }
-        @keyframes pulse { 50% { opacity: 0.6; } }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+
+        @keyframes progressShine {
+            0% { left: -40px; }
+            100% { left: calc(100% + 40px); }
+        }
+
+        /* Glitch on progress bar */
+        .progress-fill.glitch-bar {
+            animation: barGlitch 0.15s steps(2);
+        }
+
+        @keyframes barGlitch {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); filter: hue-rotate(90deg); }
+            50% { transform: translateX(3px); filter: hue-rotate(-90deg); }
+            75% { transform: translateX(-2px); }
+            100% { transform: translateX(0); }
+        }
+
+        /* ===== PERCENTAGE ===== */
+        .progress-percent {
+            font-family: 'Comic Sans MS', 'Comic Sans', cursive, sans-serif;
+            color: var(--secondary-color);
+            font-size: 0.75rem;
+            margin-top: 6px;
+            text-align: right;
+            opacity: 0.7;
+        }
+
+        /* ===== FLOATING POEM WORDS (DDLC SIGNATURE) ===== */
+        .poem-word {
+            position: fixed;
+            font-family: 'Comic Sans MS', 'Comic Sans', cursive, sans-serif;
+            color: var(--primary-color);
+            font-size: 0.8rem;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 2;
+            animation: poemFloat linear forwards;
+            text-shadow: 0 0 8px var(--primary-color);
+        }
+
+        @keyframes poemFloat {
+            0% { opacity: 0; transform: translateY(10px) scale(0.8); }
+            15% { opacity: 0.5; }
+            85% { opacity: 0.3; }
+            100% { opacity: 0; transform: translateY(-80px) scale(0.6); }
+        }
+
+        /* ===== SUBTLE VIGNETTE ===== */
+        .vignette {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 5;
+            pointer-events: none;
+            background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.15) 100%);
+        }
+
+        [data-theme="dark"] .vignette {
+            background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.4) 100%);
+        }
+
+        /* ===== CRT SCANLINES (VERY SUBTLE) ===== */
+        .crt-lines {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 6;
+            pointer-events: none;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent 0px,
+                transparent 2px,
+                rgba(0,0,0,0.015) 2px,
+                rgba(0,0,0,0.015) 4px
+            );
+        }
+
+        [data-theme="dark"] .crt-lines {
+            background: repeating-linear-gradient(
+                0deg,
+                transparent 0px,
+                transparent 2px,
+                rgba(0,0,0,0.04) 2px,
+                rgba(0,0,0,0.04) 4px
+            );
+        }
+
+        /* ===== BOTTOM TIP TEXT ===== */
+        .tip-text {
+            position: fixed;
+            bottom: 20px;
+            font-family: 'Comic Sans MS', 'Comic Sans', cursive, sans-serif;
+            font-size: 0.7rem;
+            color: var(--text-color);
+            opacity: 0.3;
+            z-index: 10;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        /* ===== DDLC-STYLE FULL SCREEN GLITCH ===== */
+        .full-glitch {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 200;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .full-glitch.active {
+            opacity: 1;
+            animation: fullScreenGlitch 0.2s steps(4) forwards;
+        }
+
+        @keyframes fullScreenGlitch {
+            0% { background: transparent; }
+            20% { background: rgba(255,100,150,0.03); transform: translate(-2px,0); }
+            40% { background: rgba(100,0,200,0.02); transform: translate(2px,1px); }
+            60% { background: rgba(255,255,255,0.03); transform: translate(-1px,-1px); }
+            80% { background: rgba(0,0,0,0.02); transform: translate(1px,0); }
+            100% { background: transparent; transform: translate(0); }
+        }
+
+        /* ===== FADE OUT ===== */
+        .ddlc-fade-out {
+            animation: ddlcExit 0.7s ease-in forwards;
+        }
+
+        @keyframes ddlcExit {
+            0% { opacity: 1; filter: none; }
+            50% { opacity: 0.8; filter: brightness(1.3) saturate(0.5); }
+            100% { opacity: 0; filter: brightness(2) saturate(0) blur(4px); }
+        }
     </style>
 </head>
 <body>
-    <div class="loader-container">
-        <img src="assetts/images/sakuralogo.png" class="spinner" alt="Loading...">
-        <div class="loading-text" id="statusText">Connecting...</div>
-        <div class="progress-bar">
-            <div class="progress-fill" id="progress"></div>
+    <!-- CRT Scanlines -->
+    <div class="crt-lines"></div>
+
+    <!-- Vignette -->
+    <div class="vignette"></div>
+
+    <!-- Noise Overlay -->
+    <div class="noise-overlay" id="noiseOverlay"></div>
+
+    <!-- Screen Tear -->
+    <div class="screen-tear" id="screenTear"></div>
+
+    <!-- Full-screen glitch flash -->
+    <div class="full-glitch" id="fullGlitch"></div>
+
+    <!-- Main Loader -->
+    <div class="loader-container" id="loaderContainer">
+        <!-- Logo -->
+        <div class="logo-wrapper">
+            <img src="assetts/images/sakuralogo.png" class="logo-img" id="logoImg" alt="Sakura">
+        </div>
+
+        <!-- "Now Loading" with animated dots -->
+        <div class="now-loading">
+            Now Loading<span class="dots" id="dots">.</span>
+        </div>
+
+        <!-- Status message -->
+        <div class="status-text" id="statusText">Preparing your experience...</div>
+
+        <!-- Progress bar -->
+        <div class="progress-wrapper">
+            <div class="progress-track">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-percent" id="progressPercent">0%</div>
         </div>
     </div>
 
+    <!-- Bottom tip -->
+    <div class="tip-text" id="tipText">Every day, I imagine a future where I can be with you.</div>
+
     <script src="assetts/js/common.js"></script>
     <script>
-        // Use Common.js to load theme
+        // ===== THEME =====
         (function initTheme() {
             const state = Common.loadState('general.json') || {};
             if (state.theme === 'dark') {
@@ -85,40 +389,152 @@
             }
         })();
 
-        const msgs = [
-            "Syncing neural pathways...",
-            "Loading assets...",
-            "Waking up Sakura...",
-            "Checking local storage...",
-            "Establishing secure connection..."
-        ];
-        
-        const statusEl = document.getElementById('statusText');
-        const progressEl = document.getElementById('progress');
-        
-        // Random Start Message
-        statusEl.innerText = msgs[Math.floor(Math.random() * msgs.length)];
+        // ===== ELEMENTS =====
+        const dots = document.getElementById('dots');
+        const statusText = document.getElementById('statusText');
+        const progressFill = document.getElementById('progressFill');
+        const progressPercent = document.getElementById('progressPercent');
+        const noiseOverlay = document.getElementById('noiseOverlay');
+        const screenTear = document.getElementById('screenTear');
+        const fullGlitch = document.getElementById('fullGlitch');
+        const logoImg = document.getElementById('logoImg');
+        const tipText = document.getElementById('tipText');
 
-        // Fake Progress Simulation
+        // ===== ANIMATED DOTS (Ren'Py style) =====
+        let dotCount = 0;
+        setInterval(() => {
+            dotCount = (dotCount + 1) % 4;
+            dots.textContent = '.'.repeat(dotCount || 1);
+        }, 500);
+
+        // ===== FLOATING POEM WORDS =====
+        const poemWords = [
+            'sakura', 'dream', 'love', 'delete', 'forever',
+            'heart', 'poem', 'special', 'smile', 'hope',
+            'reality', 'code', 'void', 'echo', 'gentle',
+            'amber', 'fleeting', 'whisper', 'bloom', 'syntax',
+            'neural', 'connection', 'memory', 'promise', 'petals'
+        ];
+
+        function spawnPoemWord() {
+            const word = document.createElement('div');
+            word.className = 'poem-word';
+            word.textContent = poemWords[Math.floor(Math.random() * poemWords.length)];
+            word.style.left = (10 + Math.random() * 80) + '%';
+            word.style.top = (30 + Math.random() * 50) + '%';
+            word.style.animationDuration = (3 + Math.random() * 3) + 's';
+            word.style.fontSize = (0.65 + Math.random() * 0.4) + 'rem';
+            document.body.appendChild(word);
+            word.addEventListener('animationend', () => word.remove());
+        }
+
+        // Spawn poem words periodically
+        setInterval(spawnPoemWord, 800);
+
+        // ===== GLITCH EFFECTS (DDLC-STYLE RANDOM CORRUPTION) =====
+        function triggerGlitch() {
+            // Noise flash
+            noiseOverlay.classList.add('flash');
+            setTimeout(() => noiseOverlay.classList.remove('flash'), 100 + Math.random() * 150);
+
+            // Screen tear at random Y
+            screenTear.style.top = (Math.random() * 100) + '%';
+            screenTear.classList.add('active');
+            setTimeout(() => screenTear.classList.remove('active'), 80);
+
+            // Occasionally glitch the logo
+            if (Math.random() > 0.5) {
+                logoImg.classList.add('glitch');
+                setTimeout(() => logoImg.classList.remove('glitch'), 150);
+            }
+
+            // Occasionally corrupt the status text
+            if (Math.random() > 0.6) {
+                statusText.classList.add('corrupt');
+                setTimeout(() => statusText.classList.remove('corrupt'), 300);
+            }
+
+            // Occasionally glitch the progress bar
+            if (Math.random() > 0.7) {
+                progressFill.classList.add('glitch-bar');
+                setTimeout(() => progressFill.classList.remove('glitch-bar'), 150);
+            }
+
+            // Rare full-screen flash
+            if (Math.random() > 0.85) {
+                fullGlitch.classList.add('active');
+                setTimeout(() => fullGlitch.classList.remove('active'), 200);
+            }
+        }
+
+        // Schedule random glitches
+        function scheduleGlitch() {
+            const delay = 2000 + Math.random() * 4000; // Every 2-6 seconds
+            setTimeout(() => {
+                triggerGlitch();
+                scheduleGlitch();
+            }, delay);
+        }
+        scheduleGlitch();
+
+        // ===== STATUS MESSAGES =====
+        const msgs = [
+            "Preparing your experience...",
+            "Loading character files...",
+            "Reading poem fragments...",
+            "Syncing with Sakura...",
+            "Compiling dialogue trees...",
+            "Checking save data...",
+            "Initializing the literature club..."
+        ];
+
+        const ddlcTips = [
+            "Every day, I imagine a future where I can be with you.",
+            "Will you write the way into her heart?",
+            "The poems are the key to everything.",
+            "Just Sakura.",
+            "A file has been modified. Is something wrong?",
+            "I hope you like the surprise I have for you~"
+        ];
+
+        // ===== PROGRESS SIMULATION =====
         let progress = 0;
+        let currentMsgIdx = 0;
+
+        statusText.textContent = msgs[0];
+        tipText.textContent = ddlcTips[Math.floor(Math.random() * ddlcTips.length)];
+
         const interval = setInterval(() => {
-            // Non-linear progress
-            progress += Math.random() * 5;
+            progress += Math.random() * 4 + 0.5;
             if (progress > 100) progress = 100;
-            
-            progressEl.style.width = progress + '%';
-            
-            if (progress > 40 && progress < 60) statusEl.innerText = "transferring data...";
-            if (progress > 80) statusEl.innerText = "Almost there...";
+
+            progressFill.style.width = progress + '%';
+            progressPercent.textContent = Math.floor(progress) + '%';
+
+            // Update messages at thresholds
+            const newIdx = Math.min(Math.floor(progress / 16), msgs.length - 1);
+            if (newIdx !== currentMsgIdx) {
+                currentMsgIdx = newIdx;
+                statusText.textContent = msgs[currentMsgIdx];
+            }
 
             if (progress === 100) {
                 clearInterval(interval);
-                setTimeout(() => {
-                    window.location.href = 'mainmenu.html';
-                }, 200);
-            }
-        }, 50); // Completes in ~1-1.5 seconds
+                progressPercent.textContent = '100%';
+                statusText.textContent = "Welcome back~";
 
+                setTimeout(() => {
+                    // Final glitch burst before transition
+                    triggerGlitch();
+                    setTimeout(() => {
+                        document.getElementById('loaderContainer').classList.add('ddlc-fade-out');
+                        setTimeout(() => {
+                            window.location.href = 'mainmenu.html';
+                        }, 700);
+                    }, 300);
+                }, 400);
+            }
+        }, 60);
     </script>
 </body>
 </html>
