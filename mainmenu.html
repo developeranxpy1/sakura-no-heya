@@ -473,46 +473,7 @@ You never mention being AI. You control the background/Visual Novel elements.`;
         }
 
         async function startQuickMode() {
-            // Show Loading Overlay
-            const overlay = document.getElementById('loadingOverlay');
-            if(overlay) overlay.style.display = 'flex';
-            
-            // PRELOAD ASSETS (Blocking)
-            try {
-                const res = await fetch('assetts/manifest.json');
-                const assets = await res.json();
-                
-                const urls = [];
-                function traverse(obj) {
-                    if (!obj) return;
-                    if (typeof obj === 'string' && obj.match(/\.(png|jpe?g|webp|gif)$/i)) urls.push(obj);
-                    else if (typeof obj === 'object') for (const key in obj) traverse(obj[key]);
-                }
-                traverse(assets);
-                
-                if(urls.length > 0) {
-                     // Check if ANY are cached by just waiting a bit?
-                     // We force load.
-                     const promises = urls.map(url => new Promise(resolve => {
-                        const img = new Image();
-                        img.onload = resolve;
-                        img.onerror = resolve; 
-                        img.src = url;
-                    }));
-                    
-                    // Race: 3 seconds max vs All Loaded
-                    await Promise.race([
-                        Promise.all(promises),
-                        new Promise(r => setTimeout(r, 3000)) // Max 3s wait
-                    ]);
-                }
-                
-            } catch(e) {
-                console.error("Preload failed", e);
-            }
-
-            // Navigate
-            window.location.href = 'quickmode.html';
+            window.location.href = 'loading.html?target=quickmode';
         }
 
         /* --- IMPORT / EXPORT LOGIC --- */
@@ -593,11 +554,5 @@ You never mention being AI. You control the background/Visual Novel elements.`;
         }
     </script>
     
-    <!-- Loading Overlay -->
-    <div id="loadingOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 10000; display: none; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
-        <img src="assetts/images/sakuralogo.png" style="width: 150px; margin-bottom: 20px; animation: bounce 2s infinite;">
-        <div style="font-size: 1.5rem; font-weight: bold; color: var(--text-color);">Loading...</div>
-        <style>@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }</style>
-    </div>
 </body>
 </html>
