@@ -1078,7 +1078,29 @@
             margin: 16px 0 0;
         }
 
+        #fileList {
+            display: grid;
+            gap: 12px;
+        }
+
+        #fileList > strong {
+            color: rgba(89, 74, 78, 0.72);
+            font-family: "Courier New", Courier, monospace;
+            font-size: 0.74rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        [data-theme="dark"] #fileList > strong {
+            color: rgba(224, 224, 224, 0.62);
+        }
+
         #fileList li {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
             margin-bottom: 10px;
             background: rgba(255, 255, 255, 0.42);
             padding: 10px 12px;
@@ -1086,9 +1108,31 @@
             border: 1px solid rgba(255, 255, 255, 0.42);
         }
 
+        #fileList li > div {
+            min-width: 0;
+            display: grid;
+            gap: 4px;
+        }
+
+        #fileList li strong {
+            color: var(--text-color);
+            font-size: 0.95rem;
+            line-height: 1.2;
+        }
+
+        #fileList li small {
+            color: rgba(89, 74, 78, 0.7);
+            font-size: 0.76rem;
+            line-height: 1.4;
+        }
+
         [data-theme="dark"] #fileList li {
             background: rgba(255, 255, 255, 0.06);
             border-color: rgba(255, 255, 255, 0.12);
+        }
+
+        [data-theme="dark"] #fileList li small {
+            color: rgba(224, 224, 224, 0.68);
         }
 
         #fileList button {
