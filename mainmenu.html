@@ -53,6 +53,46 @@
             pointer-events: auto;
         }
 
+        .settings-modal {
+            align-items: stretch;
+            gap: 12px;
+        }
+
+        .settings-modal h2 {
+            width: 100%;
+            text-align: center;
+        }
+
+        .setting-row {
+            width: 100%;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 16px;
+            padding: 12px 16px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.24);
+            border: 2px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .setting-row span {
+            min-width: 0;
+            text-align: left;
+            font-size: 1.05rem;
+            font-weight: bold;
+            line-height: 1.3;
+            color: var(--text-color);
+        }
+
+        [data-theme="dark"] .setting-row {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .setting-row .switch {
+            flex-shrink: 0;
+        }
+
         #fileList ul {
             list-style: none;
             padding: 0;
@@ -113,6 +153,15 @@
 
             .btn-menu {
                 font-size: 1rem;
+            }
+
+            .setting-row {
+                padding: 10px 12px;
+                gap: 12px;
+            }
+
+            .setting-row span {
+                font-size: 0.95rem;
             }
         }
     </style>
