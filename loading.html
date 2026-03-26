@@ -4,778 +4,122 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loading...</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌸</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='12' fill='%23ff85b3'/%3E%3Ccircle cx='20' cy='24' r='8' fill='%23ffd5e8'/%3E%3Ccircle cx='44' cy='24' r='8' fill='%23ffd5e8'/%3E%3Ccircle cx='24' cy='42' r='8' fill='%23ffd5e8'/%3E%3Ccircle cx='40' cy='42' r='8' fill='%23ffd5e8'/%3E%3C/svg%3E">
     <link rel="stylesheet" href="assetts/css/style.css">
-    <style>
-        /* ===== DDLC-INSPIRED LOADING SCREEN ===== */
-
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            overflow: hidden;
-            height: 100vh;
-            margin: 0;
-            cursor: wait;
-            position: relative;
-            /* Override base theme bg for space effect */
-            background: #050510 !important;
-            background-image: none !important;
-        }
-
-        /* ===== SPACE CANVAS ===== */
-        #spaceCanvas {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        /* ===== SHOOTING STARS (CSS) ===== */
-        .shooting-star {
-            position: fixed;
-            width: 120px;
-            height: 2px;
-            background: linear-gradient(90deg, rgba(255,255,255,0.9), transparent);
-            border-radius: 2px;
-            z-index: 1;
-            pointer-events: none;
-            opacity: 0;
-            filter: blur(0.3px);
-            box-shadow: 0 0 6px 1px rgba(200,180,255,0.4);
-        }
-
-        .shooting-star.active {
-            animation: shootStar 0.8s linear forwards;
-        }
-
-        @keyframes shootStar {
-            0% { opacity: 1; transform: translateX(0) translateY(0) scaleX(0.3); }
-            30% { opacity: 1; transform: translateX(80px) translateY(40px) scaleX(1); }
-            100% { opacity: 0; transform: translateX(300px) translateY(150px) scaleX(0.5); }
-        }
-
-        /* ===== STATIC / NOISE OVERLAY ===== */
-        .noise-overlay {
-            position: fixed;
-            top: -50%; left: -50%;
-            width: 200%; height: 200%;
-            z-index: 100;
-            pointer-events: none;
-            opacity: 0;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
-            background-size: 256px 256px;
-            mix-blend-mode: overlay;
-            transition: opacity 0.05s;
-        }
-
-        .noise-overlay.flash {
-            opacity: 0.15;
-            animation: noiseShift 0.1s steps(3) infinite;
-        }
-
-        @keyframes noiseShift {
-            0% { transform: translate(0, 0); }
-            33% { transform: translate(-10px, 5px); }
-            66% { transform: translate(5px, -10px); }
-            100% { transform: translate(-5px, 3px); }
-        }
-
-        /* ===== SCREEN TEAR / CORRUPTION LINE ===== */
-        .screen-tear {
-            position: fixed;
-            left: 0;
-            width: 100%;
-            height: 0;
-            z-index: 90;
-            pointer-events: none;
-            overflow: hidden;
-        }
-
-        .screen-tear.active {
-            height: 3px;
-            background: linear-gradient(90deg,
-                transparent 0%,
-                var(--secondary-color) 20%,
-                rgba(255,255,255,0.8) 50%,
-                var(--secondary-color) 80%,
-                transparent 100%
-            );
-            box-shadow: 0 0 10px var(--secondary-color);
-        }
-
-        /* ===== MAIN CONTAINER ===== */
-        .loader-container {
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
-            position: relative;
-            animation: ddlcFadeIn 0.8s ease-out;
-        }
-
-        @keyframes ddlcFadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        /* ===== SAKURA LOGO (VN CHARACTER STYLE) ===== */
-        .logo-wrapper {
-            position: relative;
-            margin-bottom: 30px;
-        }
-
-        .logo-img {
-            width: 100px;
-            height: auto;
-            filter: drop-shadow(0 0 20px rgba(255, 183, 213, 0.5));
-            animation: logoBreath 3s ease-in-out infinite;
-        }
-
-        @keyframes logoBreath {
-            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 15px rgba(255, 183, 213, 0.4)); }
-            50% { transform: scale(1.03); filter: drop-shadow(0 0 25px rgba(255, 183, 213, 0.7)); }
-        }
-
-        /* Occasional glitch on the logo */
-        .logo-img.glitch {
-            animation: logoGlitch 0.15s steps(2) forwards;
-        }
-
-        @keyframes logoGlitch {
-            0% { transform: translate(0) scale(1); filter: hue-rotate(0deg); }
-            25% { transform: translate(-4px, 2px) scale(1.02); filter: hue-rotate(90deg) saturate(3); }
-            50% { transform: translate(3px, -1px) scale(0.98); filter: hue-rotate(-60deg) brightness(1.5); }
-            75% { transform: translate(-2px, -3px) scale(1.01); filter: hue-rotate(180deg) saturate(0.5); }
-            100% { transform: translate(0) scale(1); filter: hue-rotate(0deg); }
-        }
-
-        /* ===== "NOW LOADING" TEXT (REN'PY STYLE) ===== */
-        .now-loading {
-            font-family: 'Comic Sans MS', 'Comic Sans', cursive, sans-serif;
-            color: var(--text-color);
-            font-size: 1.3rem;
-            letter-spacing: 2px;
-            margin-bottom: 8px;
-            position: relative;
-            display: inline-block;
-        }
-
-        .now-loading .dots {
-            display: inline-block;
-            width: 30px;
-            text-align: left;
-        }
-
-        /* ===== STATUS TEXT ===== */
-        .status-text {
-            font-family: 'Comic Sans MS', 'Comic Sans', cursive, sans-serif;
-            color: var(--text-color);
-            font-size: 0.85rem;
-            opacity: 0.6;
-            margin-bottom: 20px;
-            min-height: 20px;
-            transition: opacity 0.2s;
-        }
-
-        /* Corrupted text effect */
-        .status-text.corrupt {
-            animation: textCorrupt 0.3s steps(3) forwards;
-        }
-
-        @keyframes textCorrupt {
-            0% { opacity: 0.6; transform: translate(0); }
-            25% { opacity: 1; transform: translate(-2px, 1px); color: var(--secondary-color); letter-spacing: 5px; }
-            50% { opacity: 0.3; transform: translate(1px, -1px); letter-spacing: -1px; }
-            75% { opacity: 0.8; transform: translate(-1px, 0); }
-            100% { opacity: 0.6; transform: translate(0); }
-        }
-
-        /* ===== PROGRESS BAR (DDLC POEM GAME STYLE) ===== */
-        .progress-wrapper {
-            width: 280px;
-            position: relative;
-        }
-
-        .progress-track {
-            width: 100%;
-            height: 8px;
-            background: rgba(0,0,0,0.08);
-            border-radius: 4px;
-            overflow: hidden;
-            border: 2px solid var(--border-color);
-            position: relative;
-        }
-
-        [data-theme="dark"] .progress-track {
-            background: rgba(255,255,255,0.05);
-        }
-
-        .progress-fill {
-            height: 100%;
-            width: 0%;
-            border-radius: 4px;
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-            transition: width 0.12s linear;
-            position: relative;
-            box-shadow: 0 0 10px var(--secondary-color);
-        }
-
-        /* Shiny sweep on progress bar */
-        .progress-fill::after {
-            content: '';
-            position: absolute;
-            top: 0; left: -40px;
-            width: 40px; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-            animation: progressShine 2s linear infinite;
-        }
-
-        @keyframes progressShine {
-            0% { left: -40px; }
-            100% { left: calc(100% + 40px); }
-        }
-
-        /* Glitch on progress bar */
-        .progress-fill.glitch-bar {
-            animation: barGlitch 0.15s steps(2);
-        }
-
-        @keyframes barGlitch {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(-5px); filter: hue-rotate(90deg); }
-            50% { transform: translateX(3px); filter: hue-rotate(-90deg); }
-            75% { transform: translateX(-2px); }
-            100% { transform: translateX(0); }
-        }
-
-        /* ===== PERCENTAGE ===== */
-        .progress-percent {
-            font-family: 'Comic Sans MS', 'Comic Sans', cursive, sans-serif;
-            color: var(--secondary-color);
-            font-size: 0.75rem;
-            margin-top: 6px;
-            text-align: right;
-            opacity: 0.7;
-        }
-
-        /* ===== FLOATING POEM WORDS (DDLC SIGNATURE) ===== */
-        .poem-word {
-            position: fixed;
-            font-family: 'Comic Sans MS', 'Comic Sans', cursive, sans-serif;
-            color: var(--primary-color);
-            font-size: 0.8rem;
-            opacity: 0;
-            pointer-events: none;
-            z-index: 2;
-            animation: poemFloat linear forwards;
-            text-shadow: 0 0 8px var(--primary-color);
-        }
-
-        @keyframes poemFloat {
-            0% { opacity: 0; transform: translateY(10px) scale(0.8); }
-            15% { opacity: 0.5; }
-            85% { opacity: 0.3; }
-            100% { opacity: 0; transform: translateY(-80px) scale(0.6); }
-        }
-
-        /* ===== SUBTLE VIGNETTE ===== */
-        .vignette {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 5;
-            pointer-events: none;
-            background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.15) 100%);
-        }
-
-        [data-theme="dark"] .vignette {
-            background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.4) 100%);
-        }
-
-        /* ===== CRT SCANLINES (VERY SUBTLE) ===== */
-        .crt-lines {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 6;
-            pointer-events: none;
-            background: repeating-linear-gradient(
-                0deg,
-                transparent 0px,
-                transparent 2px,
-                rgba(0,0,0,0.015) 2px,
-                rgba(0,0,0,0.015) 4px
-            );
-        }
-
-        [data-theme="dark"] .crt-lines {
-            background: repeating-linear-gradient(
-                0deg,
-                transparent 0px,
-                transparent 2px,
-                rgba(0,0,0,0.04) 2px,
-                rgba(0,0,0,0.04) 4px
-            );
-        }
-
-
-        /* ===== DDLC-STYLE FULL SCREEN GLITCH ===== */
-        .full-glitch {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 200;
-            pointer-events: none;
-            opacity: 0;
-        }
-
-        .full-glitch.active {
-            opacity: 1;
-            animation: fullScreenGlitch 0.2s steps(4) forwards;
-        }
-
-        @keyframes fullScreenGlitch {
-            0% { background: transparent; }
-            20% { background: rgba(255,100,150,0.03); transform: translate(-2px,0); }
-            40% { background: rgba(100,0,200,0.02); transform: translate(2px,1px); }
-            60% { background: rgba(255,255,255,0.03); transform: translate(-1px,-1px); }
-            80% { background: rgba(0,0,0,0.02); transform: translate(1px,0); }
-            100% { background: transparent; transform: translate(0); }
-        }
-
-        /* ===== FADE OUT ===== */
-        .ddlc-fade-out {
-            animation: ddlcExit 0.7s ease-in forwards;
-        }
-
-        @keyframes ddlcExit {
-            0% { opacity: 1; filter: none; }
-            50% { opacity: 0.8; filter: brightness(1.3) saturate(0.5); }
-            100% { opacity: 0; filter: brightness(2) saturate(0) blur(4px); }
-        }
-
-        /* ===== SAFETY FALLBACK LINK ===== */
-        .safety-link {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: rgba(255, 255, 255, 0.3);
-            text-decoration: none;
-            font-size: 0.8rem;
-            font-family: 'Comic Sans MS', cursive;
-            z-index: 1000;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 2s;
-        }
-        .safety-link.visible {
-            opacity: 1;
-            pointer-events: auto;
-        }
-        .safety-link:hover {
-            color: var(--secondary-color);
-            text-decoration: underline;
-        }
-    </style>
+    <link rel="stylesheet" href="assetts/css/loading.css">
 </head>
 <body>
-    <!-- Space Background -->
-    <canvas id="spaceCanvas"></canvas>
+    <div class="loading-scene">
+        <div class="ambient-shape one" aria-hidden="true"></div>
+        <div class="ambient-shape two" aria-hidden="true"></div>
+        <div class="ambient-shape three" aria-hidden="true"></div>
+        <div class="grid-veil" aria-hidden="true"></div>
+        <div class="petal-field" id="petalField" aria-hidden="true"></div>
+        <div class="grain-veil" aria-hidden="true"></div>
 
-    <!-- Shooting Star Elements -->
-    <div class="shooting-star" id="shootingStar1"></div>
-    <div class="shooting-star" id="shootingStar2"></div>
+        <main class="loading-shell" id="loadingShell">
+            <section class="loading-panel glass-panel">
+                <div class="hero-side">
+                    <div>
+                        <div class="eyebrow" id="loaderEyebrow">Sakura startup sequence</div>
+                        <h1 class="hero-title" id="heroTitle">Setting the room for <span id="displayName">you</span></h1>
+                        <p class="hero-copy" id="heroCopy">
+                            Preparing the next screen and waiting for the assets it actually needs.
+                        </p>
+                    </div>
 
-    <!-- CRT Scanlines -->
-    <div class="crt-lines"></div>
+                    <div class="hero-visual">
+                        <div class="logo-orbit" aria-hidden="true">
+                            <div class="orbit-ring ring-a"></div>
+                            <div class="orbit-ring ring-b"></div>
+                            <div class="orbit-ring ring-c"></div>
+                            <div class="orbit-node node-a"></div>
+                            <div class="orbit-node node-b"></div>
+                            <div class="orbit-node node-c"></div>
+                            <div class="logo-core">
+                                <img src="assetts/images/sakuralogo.png" alt="Sakura">
+                            </div>
+                        </div>
 
-    <!-- Vignette -->
-    <div class="vignette"></div>
+                        <div class="signal-stack">
+                            <div class="signal-card">
+                                <span class="signal-label">Theme</span>
+                                <strong id="themeLabel">Petal Bloom</strong>
+                            </div>
+                            <div class="signal-card">
+                                <span class="signal-label">Destination</span>
+                                <strong id="destinationLabel">Main menu</strong>
+                            </div>
+                            <div class="signal-card">
+                                <span class="signal-label">Required assets</span>
+                                <strong id="assetCountLabel">0 items</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-    <!-- Noise Overlay -->
-    <div class="noise-overlay" id="noiseOverlay"></div>
+                <div class="status-side">
+                    <div class="status-header">
+                        <div class="status-chip" id="phaseChip">Preparing</div>
+                        <div class="timer-chip" id="elapsedTime">00:00</div>
+                    </div>
 
-    <!-- Screen Tear -->
-    <div class="screen-tear" id="screenTear"></div>
+                    <div class="progress-hero">
+                        <div class="progress-copy">
+                            <p class="status-kicker">Current task</p>
+                            <h2 class="status-title" id="statusText" aria-live="polite">Inspecting startup requirements...</h2>
+                        </div>
+                        <div class="percent-wrap" id="progressPercent">0%</div>
+                    </div>
 
-    <!-- Full-screen glitch flash -->
-    <div class="full-glitch" id="fullGlitch"></div>
+                    <div class="progress-track" aria-hidden="true">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
 
-    <!-- Main Loader -->
-    <div class="loader-container" id="loaderContainer">
-        <!-- Logo -->
-        <div class="logo-wrapper">
-            <img src="assetts/images/sakuralogo.png" class="logo-img" id="logoImg" alt="Sakura">
-        </div>
+                    <p class="status-note" id="statusNote">The loader will stay here until the next screen is actually ready.</p>
 
-        <!-- "Now Loading" with animated dots -->
-        <div class="now-loading">
-            Now Loading<span class="dots" id="dots">.</span>
-        </div>
+                    <div class="milestones" id="milestones">
+                        <div class="milestone active">
+                            <div class="milestone-index">01</div>
+                            <div class="milestone-copy">
+                                <strong>Read target</strong>
+                                <small>Check the next screen and determine what has to load.</small>
+                            </div>
+                            <div class="milestone-state">Active</div>
+                        </div>
+                        <div class="milestone">
+                            <div class="milestone-index">02</div>
+                            <div class="milestone-copy">
+                                <strong>Warm shared files</strong>
+                                <small>Load styles, scripts, and persistent shell resources.</small>
+                            </div>
+                            <div class="milestone-state">Queued</div>
+                        </div>
+                        <div class="milestone">
+                            <div class="milestone-index">03</div>
+                            <div class="milestone-copy">
+                                <strong>Load visuals</strong>
+                                <small>Bring in the images and media needed for the target screen.</small>
+                            </div>
+                            <div class="milestone-state">Queued</div>
+                        </div>
+                        <div class="milestone">
+                            <div class="milestone-index">04</div>
+                            <div class="milestone-copy">
+                                <strong>Hand off</strong>
+                                <small>Only leave after every required item has finished loading.</small>
+                            </div>
+                            <div class="milestone-state">Queued</div>
+                        </div>
+                    </div>
 
-        <!-- Status message -->
-        <div class="status-text" id="statusText">Preparing your experience...</div>
-
-        <!-- Progress bar -->
-        <div class="progress-wrapper">
-            <div class="progress-track">
-                <div class="progress-fill" id="progressFill"></div>
-            </div>
-            <div class="progress-percent" id="progressPercent">0%</div>
-        </div>
+                    <a href="mainmenu.html" class="manual-link" id="safetyLink">Continue anyway</a>
+                </div>
+            </section>
+        </main>
     </div>
 
-    <!-- Safety Fallback Link -->
-    <a href="mainmenu.html" class="safety-link" id="safetyLink">Stuck? Click here to continue manually.</a>
-
-
     <script src="assetts/js/common.js"></script>
-    <script>
-        // ===== THEME =====
-        (function initTheme() {
-            const state = Common.loadState('general.json') || {};
-            if (state.theme === 'dark') {
-                document.documentElement.setAttribute('data-theme', 'dark');
-            }
-        })();
-
-        // ===== SPACE BACKGROUND =====
-        (function initSpace() {
-            const canvas = document.getElementById('spaceCanvas');
-            const ctx = canvas.getContext('2d');
-            let W, H;
-
-            function resize() {
-                W = canvas.width = window.innerWidth;
-                H = canvas.height = window.innerHeight;
-            }
-            resize();
-            window.addEventListener('resize', resize);
-
-            // --- Stars (multiple layers for parallax depth) ---
-            const starLayers = [
-                { count: 200, maxSize: 1.0, speed: 0.02, stars: [] },   // distant
-                { count: 80,  maxSize: 1.8, speed: 0.05, stars: [] },   // mid
-                { count: 30,  maxSize: 2.8, speed: 0.1,  stars: [] },   // close
-            ];
-
-            const starColors = [
-                [255, 220, 255],  // pink-white
-                [200, 200, 255],  // blue-white
-                [255, 240, 200],  // warm white
-                [180, 160, 255],  // lavender
-                [255, 180, 220],  // sakura pink
-                [255, 255, 255],  // pure white
-            ];
-
-            starLayers.forEach(layer => {
-                for (let i = 0; i < layer.count; i++) {
-                    const color = starColors[Math.floor(Math.random() * starColors.length)];
-                    layer.stars.push({
-                        x: Math.random() * W,
-                        y: Math.random() * H,
-                        size: Math.random() * layer.maxSize + 0.3,
-                        twinkleSpeed: 0.005 + Math.random() * 0.02,
-                        twinklePhase: Math.random() * Math.PI * 2,
-                        baseOpacity: 0.3 + Math.random() * 0.7,
-                        color: color,
-                    });
-                }
-            });
-
-            // --- Nebula clouds (soft gradient blobs) ---
-            const nebulae = [];
-            const nebulaColors = [
-                { r: 120, g: 40, b: 160, a: 0.04 },   // purple
-                { r: 200, g: 60, b: 120, a: 0.03 },   // pink
-                { r: 40, g: 50, b: 140, a: 0.035 },    // deep blue
-                { r: 180, g: 100, b: 200, a: 0.025 },  // lavender
-                { r: 255, g: 120, b: 180, a: 0.02 },   // sakura glow
-            ];
-
-            for (let i = 0; i < 6; i++) {
-                const nc = nebulaColors[i % nebulaColors.length];
-                nebulae.push({
-                    x: Math.random() * W,
-                    y: Math.random() * H,
-                    radius: 150 + Math.random() * 250,
-                    color: nc,
-                    driftX: (Math.random() - 0.5) * 0.15,
-                    driftY: (Math.random() - 0.5) * 0.1,
-                    pulsePhase: Math.random() * Math.PI * 2,
-                    pulseSpeed: 0.003 + Math.random() * 0.005,
-                });
-            }
-
-            function drawNebulae() {
-                nebulae.forEach(n => {
-                    n.x += n.driftX;
-                    n.y += n.driftY;
-                    n.pulsePhase += n.pulseSpeed;
-
-                    // Wrap around
-                    if (n.x < -n.radius) n.x = W + n.radius;
-                    if (n.x > W + n.radius) n.x = -n.radius;
-                    if (n.y < -n.radius) n.y = H + n.radius;
-                    if (n.y > H + n.radius) n.y = -n.radius;
-
-                    const pulse = 0.7 + Math.sin(n.pulsePhase) * 0.3;
-                    const r = n.radius * pulse;
-                    const grad = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, r);
-                    grad.addColorStop(0, `rgba(${n.color.r},${n.color.g},${n.color.b},${n.color.a * pulse})`);
-                    grad.addColorStop(0.5, `rgba(${n.color.r},${n.color.g},${n.color.b},${n.color.a * 0.4 * pulse})`);
-                    grad.addColorStop(1, 'rgba(0,0,0,0)');
-                    ctx.fillStyle = grad;
-                    ctx.fillRect(n.x - r, n.y - r, r * 2, r * 2);
-                });
-            }
-
-            function drawStars() {
-                starLayers.forEach(layer => {
-                    layer.stars.forEach(s => {
-                        s.twinklePhase += s.twinkleSpeed;
-                        const twinkle = 0.4 + Math.sin(s.twinklePhase) * 0.6;
-                        const opacity = s.baseOpacity * twinkle;
-                        const [cr, cg, cb] = s.color;
-
-                        // Glow
-                        if (s.size > 1.5) {
-                            const glow = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.size * 4);
-                            glow.addColorStop(0, `rgba(${cr},${cg},${cb},${opacity * 0.3})`);
-                            glow.addColorStop(1, 'rgba(0,0,0,0)');
-                            ctx.fillStyle = glow;
-                            ctx.fillRect(s.x - s.size * 4, s.y - s.size * 4, s.size * 8, s.size * 8);
-                        }
-
-                        // Star dot
-                        ctx.beginPath();
-                        ctx.arc(s.x, s.y, s.size * twinkle, 0, Math.PI * 2);
-                        ctx.fillStyle = `rgba(${cr},${cg},${cb},${opacity})`;
-                        ctx.fill();
-
-                        // Cross sparkle for bright stars
-                        if (s.size > 2 && twinkle > 0.8) {
-                            ctx.strokeStyle = `rgba(${cr},${cg},${cb},${opacity * 0.4})`;
-                            ctx.lineWidth = 0.5;
-                            const len = s.size * 3 * twinkle;
-                            ctx.beginPath();
-                            ctx.moveTo(s.x - len, s.y);
-                            ctx.lineTo(s.x + len, s.y);
-                            ctx.moveTo(s.x, s.y - len);
-                            ctx.lineTo(s.x, s.y + len);
-                            ctx.stroke();
-                        }
-
-                        // Slow drift
-                        s.y += layer.speed;
-                        if (s.y > H + 5) { s.y = -5; s.x = Math.random() * W; }
-                    });
-                });
-            }
-
-            function animateSpace() {
-                ctx.clearRect(0, 0, W, H);
-                drawNebulae();
-                drawStars();
-                requestAnimationFrame(animateSpace);
-            }
-            animateSpace();
-
-            // --- Shooting Stars (CSS-based, triggered periodically) ---
-            const shootEls = [document.getElementById('shootingStar1'), document.getElementById('shootingStar2')];
-            let shootIdx = 0;
-
-            function launchShootingStar() {
-                const el = shootEls[shootIdx % shootEls.length];
-                shootIdx++;
-                el.classList.remove('active');
-                // Random position in upper half
-                el.style.left = (Math.random() * 60) + '%';
-                el.style.top = (Math.random() * 40) + '%';
-                el.style.transform = `rotate(${25 + Math.random() * 20}deg)`;
-                el.style.width = (80 + Math.random() * 100) + 'px';
-                // Force reflow
-                void el.offsetWidth;
-                el.classList.add('active');
-                el.addEventListener('animationend', () => el.classList.remove('active'), { once: true });
-            }
-
-            // Launch a shooting star every 2-5 seconds
-            function scheduleShoot() {
-                setTimeout(() => {
-                    launchShootingStar();
-                    scheduleShoot();
-                }, 2000 + Math.random() * 3000);
-            }
-            // First one after a short delay
-            setTimeout(scheduleShoot, 800);
-        })();
-
-        // ===== ELEMENTS =====
-        const dots = document.getElementById('dots');
-        const statusText = document.getElementById('statusText');
-        const progressFill = document.getElementById('progressFill');
-        const progressPercent = document.getElementById('progressPercent');
-        const noiseOverlay = document.getElementById('noiseOverlay');
-        const screenTear = document.getElementById('screenTear');
-        const fullGlitch = document.getElementById('fullGlitch');
-        const logoImg = document.getElementById('logoImg');
-
-        // ===== ANIMATED DOTS (Ren'Py style) =====
-        let dotCount = 0;
-        setInterval(() => {
-            dotCount = (dotCount + 1) % 4;
-            dots.textContent = '.'.repeat(dotCount || 1);
-        }, 500);
-
-        // ===== FLOATING POEM WORDS =====
-        const poemWords = [
-            'sakura', 'dream', 'love', 'delete', 'forever',
-            'heart', 'poem', 'special', 'smile', 'hope',
-            'reality', 'code', 'void', 'echo', 'gentle',
-            'amber', 'fleeting', 'whisper', 'bloom', 'syntax',
-            'neural', 'connection', 'memory', 'promise', 'petals'
-        ];
-
-        function spawnPoemWord() {
-            const word = document.createElement('div');
-            word.className = 'poem-word';
-            word.textContent = poemWords[Math.floor(Math.random() * poemWords.length)];
-            word.style.left = (10 + Math.random() * 80) + '%';
-            word.style.top = (30 + Math.random() * 50) + '%';
-            word.style.animationDuration = (3 + Math.random() * 3) + 's';
-            word.style.fontSize = (0.65 + Math.random() * 0.4) + 'rem';
-            document.body.appendChild(word);
-            word.addEventListener('animationend', () => word.remove());
-        }
-
-        // Spawn poem words periodically
-        setInterval(spawnPoemWord, 800);
-
-        // ===== GLITCH EFFECTS (DDLC-STYLE RANDOM CORRUPTION) =====
-        function triggerGlitch() {
-            // Noise flash
-            noiseOverlay.classList.add('flash');
-            setTimeout(() => noiseOverlay.classList.remove('flash'), 100 + Math.random() * 150);
-
-            // Screen tear at random Y
-            screenTear.style.top = (Math.random() * 100) + '%';
-            screenTear.classList.add('active');
-            setTimeout(() => screenTear.classList.remove('active'), 80);
-
-            // Occasionally glitch the logo
-            if (Math.random() > 0.5) {
-                logoImg.classList.add('glitch');
-                setTimeout(() => logoImg.classList.remove('glitch'), 150);
-            }
-
-            // Occasionally corrupt the status text
-            if (Math.random() > 0.6) {
-                statusText.classList.add('corrupt');
-                setTimeout(() => statusText.classList.remove('corrupt'), 300);
-            }
-
-            // Occasionally glitch the progress bar
-            if (Math.random() > 0.7) {
-                progressFill.classList.add('glitch-bar');
-                setTimeout(() => progressFill.classList.remove('glitch-bar'), 150);
-            }
-
-            // Rare full-screen flash
-            if (Math.random() > 0.85) {
-                fullGlitch.classList.add('active');
-                setTimeout(() => fullGlitch.classList.remove('active'), 200);
-            }
-        }
-
-        // Schedule random glitches
-        function scheduleGlitch() {
-            const delay = 2000 + Math.random() * 4000; // Every 2-6 seconds
-            setTimeout(() => {
-                triggerGlitch();
-                scheduleGlitch();
-            }, delay);
-        }
-        scheduleGlitch();
-
-        // ===== STATUS MESSAGES =====
-        const msgs = [
-            "Preparing your experience...",
-            "Loading character files...",
-            "Reading poem fragments...",
-            "Syncing with Sakura...",
-            "Compiling dialogue trees...",
-            "Checking save data...",
-            "Initializing the literature club..."
-        ];
-
-        // ===== PROGRESS SIMULATION =====
-        let progress = 0;
-        let currentMsgIdx = 0;
-
-        const safetyLink = document.getElementById('safetyLink');
-
-        // Show safety link after 10 seconds of being "stuck"
-        setTimeout(() => {
-            if (window.location.href.includes('loading.html')) {
-                safetyLink.classList.add('visible');
-            }
-        }, 10000);
-
-        // Safety redirect after 20 seconds total
-        setTimeout(() => {
-            if (window.location.href.includes('loading.html')) {
-                console.warn("Safety redirect triggered.");
-                window.location.href = 'mainmenu.html';
-            }
-        }, 20000);
-
-        const interval = setInterval(() => {
-            progress += Math.random() * 4 + 0.5;
-            if (progress >= 100) progress = 100;
-
-            progressFill.style.width = progress + '%';
-            progressPercent.textContent = Math.floor(progress) + '%';
-
-            // Update messages at thresholds
-            const newIdx = Math.min(Math.floor(progress / 16), msgs.length - 1);
-            if (newIdx !== currentMsgIdx) {
-                currentMsgIdx = newIdx;
-                statusText.textContent = msgs[currentMsgIdx];
-            }
-
-            if (progress === 100) {
-                clearInterval(interval);
-                progressPercent.textContent = '100%';
-                statusText.textContent = "Welcome back~";
-
-                // Robust transition with try-catch
-                try {
-                    setTimeout(() => {
-                        // Final glitch burst before transition
-                        if (typeof triggerGlitch === 'function') triggerGlitch();
-                        
-                        setTimeout(() => {
-                            const loaderCont = document.getElementById('loaderContainer');
-                            if (loaderCont) loaderCont.classList.add('ddlc-fade-out');
-                            
-                            setTimeout(() => {
-                                window.location.href = 'mainmenu.html';
-                            }, 700);
-                        }, 300);
-                    }, 400);
-                } catch (e) {
-                    console.error("Transition error:", e);
-                    window.location.href = 'mainmenu.html'; // Direct redirect on error
-                }
-            }
-        }, 60);
-    </script>
+    <script src="assetts/js/loading.js"></script>
 </body>
 </html>
