@@ -1286,6 +1286,14 @@
         const boxContainer = document.querySelector('.vn-box-container');
         const nameLabel = document.querySelector('.char-name-label') || { innerText: "" }; // Null safety proxy
         const historyContainer = document.getElementById('history-container');
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const overlayText = document.getElementById('overlay-text');
+        const overlayProgress = document.getElementById('overlay-progress');
+
+        function setStartupOverlay(message, percent) {
+            if (overlayText) overlayText.innerText = message;
+            if (overlayProgress) overlayProgress.style.width = Math.max(0, Math.min(percent, 100)) + '%';
+        }
 
         // Prevent Mobile Scroll (Rubber-banding) - Aggressive
         document.addEventListener('touchmove', function(e) { 
