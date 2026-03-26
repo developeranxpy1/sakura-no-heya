@@ -154,7 +154,7 @@
     <div class="menu-container">
         <!-- Main Card -->
         <div class="glass-panel menu-card" style="overflow: hidden;"> <!-- Ensure video clips to corners -->
-            <video autoplay loop muted playsinline 
+            <video autoplay loop muted playsinline onerror="this.remove()"
                 style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; filter: blur(8px); opacity: 0.8; transform: scale(1.1);"> <!-- Scale to prevent blur edges -->
                 <source src="assetts/video/bgvideo.mp4" type="video/mp4">
             </video>
