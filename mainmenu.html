@@ -48,6 +48,28 @@
             margin-bottom: 0;
         }
 
+        .menu-buttons .btn-menu:disabled {
+            background: #f3f0f3;
+            border-color: #d8cfd7;
+            color: #9b9098;
+            cursor: not-allowed;
+            box-shadow: none;
+            opacity: 0.72;
+        }
+
+        .menu-buttons .btn-menu:disabled:hover,
+        .menu-buttons .btn-menu:disabled:active {
+            transform: none;
+            filter: none;
+            box-shadow: none;
+        }
+
+        [data-theme="dark"] .menu-buttons .btn-menu:disabled {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.12);
+            color: rgba(224, 224, 224, 0.48);
+        }
+
         .settings-modal.active {
             opacity: 1;
             pointer-events: auto;
@@ -179,7 +201,7 @@
 
             <div class="menu-buttons card-content">
                 <button class="btn-menu" onclick="startQuickMode()">Quick Start</button>
-                <button id="storyBtn" class="btn-menu" disabled>Story Mode</button>
+                <button id="storyBtn" class="btn-menu" disabled title="Enable Developer Mode to unlock Story Mode.">Story Mode</button>
                 <button class="btn-menu" onclick="toggleSettings()">Settings</button>
                 <button class="btn-menu btn-danger" onclick="clearData()">Delete userdata</button>
                 <button class="btn-menu" onclick="logout()">Logout</button>
@@ -403,6 +425,8 @@
             const btn = document.getElementById('storyBtn');
             btn.disabled = !isEnabled;
             btn.onclick = isEnabled ? function() { window.location.href = 'desktopui.html'; } : null;
+            btn.title = isEnabled ? "Open Story Mode" : "Enable Developer Mode to unlock Story Mode.";
+            btn.setAttribute('aria-disabled', String(!isEnabled));
         }
 
         function toggleTheme(isDark) {
