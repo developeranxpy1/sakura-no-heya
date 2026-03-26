@@ -1373,16 +1373,15 @@
 
         function updateFileList() {
             const list = document.getElementById('fileList');
-            let content = "<strong>Persistence Files:</strong><ul style='list-style:none; padding:0; margin-top:5px;'>";
             const prefix = 'delta_os_';
-            let found = false;
+            const files = [];
 
             for (let i = 0; i < localStorage.length; i++) {
                 const key = localStorage.key(i);
                 if (key.startsWith(prefix)) {
-                    found = true;
                     const filename = key.replace(prefix, '');
                     let meta = "Unknown Date";
+                    let sortOrder = 0;
                     try {
                         const data = JSON.parse(localStorage.getItem(key));
                         if (data && data.createdAt) {
