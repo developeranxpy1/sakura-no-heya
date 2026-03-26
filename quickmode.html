@@ -2553,35 +2553,37 @@ Dynamic: You rarely change locations. You focus on the conversation.`;
         // but for dynamic updates in processResponse.
         
         // --- INITIAL CONTINUITY ---
-        setTimeout(() => {
-            const hour = new Date().getHours();
-            const timeOfDay = hour < 12 ? "morning" : (hour < 18 ? "afternoon" : "evening");
-            const isNight = hour >= 18 || hour < 6;
-            const location = isNight ? "Your Room (Night)" : "School Classroom (Day)";
-    
-            if (chatHistory.length > 0) {
-                 // CONTINUATION GREETING
-                 const lastMsg = chatHistory[chatHistory.length - 1];
-                 const minutesSince = (Date.now() - (lastMsg.timestamp || 0)) / 1000 / 60;
-                 
-                 // Only if it's been at least 5 minutes
-                 if(minutesSince > 5) {
-                     if (lastMsg.role === 'assistant') {
-                          // She spoke last
-                          const continuityPrompt = `[SYSTEM EVENT: The user has returned. It is ${timeOfDay} (${location}). Recap of last topic: "${lastMsg.content.substring(0, 100)}...". Welcome them back based on this.]`;
-                          sendToAI(continuityPrompt, false, true); 
-                     } else {
-                          // User spoke last
-                          const continuityPrompt = `[SYSTEM EVENT: The user has returned. It is ${timeOfDay} (${location}). They last said: "${lastMsg.content.substring(0, 100)}". Reply to this and welcome them back.]`;
-                          sendToAI(continuityPrompt, false, true);
+        startupReady.then(() => {
+            setTimeout(() => {
+                const hour = new Date().getHours();
+                const timeOfDay = hour < 12 ? "morning" : (hour < 18 ? "afternoon" : "evening");
+                const isNight = hour >= 18 || hour < 6;
+                const location = isNight ? "Your Room (Night)" : "School Classroom (Day)";
+        
+                if (chatHistory.length > 0) {
+                     // CONTINUATION GREETING
+                     const lastMsg = chatHistory[chatHistory.length - 1];
+                     const minutesSince = (Date.now() - (lastMsg.timestamp || 0)) / 1000 / 60;
+                     
+                     // Only if it's been at least 5 minutes
+                     if(minutesSince > 5) {
+                         if (lastMsg.role === 'assistant') {
+                              // She spoke last
+                              const continuityPrompt = `[SYSTEM EVENT: The user has returned. It is ${timeOfDay} (${location}). Recap of last topic: "${lastMsg.content.substring(0, 100)}...". Welcome them back based on this.]`;
+                              sendToAI(continuityPrompt, false, true); 
+                         } else {
+                              // User spoke last
+                              const continuityPrompt = `[SYSTEM EVENT: The user has returned. It is ${timeOfDay} (${location}). They last said: "${lastMsg.content.substring(0, 100)}". Reply to this and welcome them back.]`;
+                              sendToAI(continuityPrompt, false, true);
+                         }
                      }
-                 }
-            } else {
-                // FRESH START
-                const startPrompt = `[SYSTEM EVENT: The user has just arrived. It is ${timeOfDay}. You are in: ${location}. Notice the user and greet them based on the time and location.]`;
-                sendToAI(startPrompt, false, true);
-            }
-        }, 1500); // Delay to ensure assets loaded
+                } else {
+                    // FRESH START
+                    const startPrompt = `[SYSTEM EVENT: The user has just arrived. It is ${timeOfDay}. You are in: ${location}. Notice the user and greet them based on the time and location.]`;
+                    sendToAI(startPrompt, false, true);
+                }
+            }, 320);
+        });
         // --- VISUAL VIEWPORT FIX (Mobile Keyboard) ---
         if (window.visualViewport) {
             window.visualViewport.addEventListener('resize', () => {
