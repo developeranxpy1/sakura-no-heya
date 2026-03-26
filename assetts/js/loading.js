@@ -65,18 +65,18 @@ const petalField = document.getElementById("petalField");
 
 let redirecting = false;
 
-displayName.textContent = username;
-heroLead.textContent = selectedTarget.hero.replace("{name}", "").trim();
-loaderEyebrow.textContent = selectedTarget.eyebrow;
-heroCopy.textContent = selectedTarget.copy;
-destinationLabel.textContent = selectedTarget.destination;
-themeLabel.textContent = document.documentElement.getAttribute("data-theme") === "dark" ? "Moonlight" : "Petal Bloom";
-safetyLink.href = selectedTarget.page;
+if (displayName) displayName.textContent = username;
+if (heroLead) heroLead.textContent = selectedTarget.hero.replace("{name}", "").trim();
+if (loaderEyebrow) loaderEyebrow.textContent = selectedTarget.eyebrow;
+if (heroCopy) heroCopy.textContent = selectedTarget.copy;
+if (destinationLabel) destinationLabel.textContent = selectedTarget.destination;
+if (themeLabel) themeLabel.textContent = document.documentElement.getAttribute("data-theme") === "dark" ? "Moonlight" : "Petal Bloom";
+if (safetyLink) safetyLink.href = selectedTarget.page;
 
 function setProgress(percent) {
     const clamped = Math.max(0, Math.min(100, percent));
-    progressFill.style.width = clamped + "%";
-    progressPercent.textContent = Math.round(clamped) + "%";
+    if (progressFill) progressFill.style.width = clamped + "%";
+    if (progressPercent) progressPercent.textContent = Math.round(clamped) + "%";
 
     let activeIndex = 0;
     if (clamped >= 100) {
@@ -93,19 +93,19 @@ function setProgress(percent) {
 
         if (clamped >= 100 || index < activeIndex) {
             milestone.classList.add("done");
-            stateEl.textContent = "Done";
+            if (stateEl) stateEl.textContent = "Done";
         } else if (index === activeIndex) {
             milestone.classList.add("active");
-            stateEl.textContent = "Active";
+            if (stateEl) stateEl.textContent = "Active";
         } else {
-            stateEl.textContent = "Queued";
+            if (stateEl) stateEl.textContent = "Queued";
         }
     });
 }
 
 function setPhase(text, note) {
-    statusText.textContent = text;
-    statusNote.textContent = note;
+    if (statusText) statusText.textContent = text;
+    if (statusNote) statusNote.textContent = note;
 }
 
 async function loadText(url) {
@@ -166,7 +166,7 @@ async function loadResource(resource) {
 
 async function runLoader() {
     const resources = selectedTarget.resources.slice();
-    assetCountLabel.textContent = resources.length + (resources.length === 1 ? " item" : " items");
+    if (assetCountLabel) assetCountLabel.textContent = resources.length + (resources.length === 1 ? " item" : " items");
 
     let completed = 0;
     const requiredFailures = [];
@@ -174,7 +174,7 @@ async function runLoader() {
     for (const resource of resources) {
         const percentBase = resources.length === 0 ? 0 : (completed / resources.length) * 100;
         setProgress(percentBase);
-        phaseChip.textContent = completed === 0 ? "Preparing" : "Loading";
+        if (phaseChip) phaseChip.textContent = completed === 0 ? "Preparing" : "Loading";
         setPhase(resource.label, "Waiting for " + resource.label.toLowerCase() + " to finish loading.");
 
         try {
@@ -191,15 +191,17 @@ async function runLoader() {
     }
 
     if (requiredFailures.length > 0) {
-        phaseChip.textContent = "Blocked";
+        if (phaseChip) phaseChip.textContent = "Blocked";
         setPhase("Required assets failed", "The loader stopped at " + requiredFailures[0].resource.label.toLowerCase() + ".");
-        safetyLink.classList.add("visible");
+        if (safetyLink) safetyLink.classList.add("visible");
         return;
     }
 
     redirecting = true;
-    phaseChip.textContent = "Ready";
-    phaseChip.classList.add("ready");
+    if (phaseChip) {
+        phaseChip.textContent = "Ready";
+        phaseChip.classList.add("ready");
+    }
     setProgress(100);
     setPhase("Destination ready", "All required assets finished loading. Redirecting now.");
     sessionStorage.setItem("sakura_loader_target", JSON.stringify({
@@ -208,7 +210,7 @@ async function runLoader() {
     }));
 
     window.setTimeout(() => {
-        loadingShell.classList.add("exit");
+        if (loadingShell) loadingShell.classList.add("exit");
     }, 280);
 
     window.setTimeout(() => {
@@ -245,7 +247,7 @@ const elapsedInterval = window.setInterval(() => {
     const seconds = Math.floor((Date.now() - startedAt) / 1000);
     const minutesText = String(Math.floor(seconds / 60)).padStart(2, "0");
     const secondsText = String(seconds % 60).padStart(2, "0");
-    elapsedTime.textContent = minutesText + ":" + secondsText;
+    if (elapsedTime) elapsedTime.textContent = minutesText + ":" + secondsText;
 
     if (redirecting) {
         window.clearInterval(elapsedInterval);
@@ -253,14 +255,14 @@ const elapsedInterval = window.setInterval(() => {
 }, 1000);
 
 window.setTimeout(() => {
-    if (!redirecting) {
+    if (!redirecting && safetyLink) {
         safetyLink.classList.add("visible");
     }
 }, 10000);
 
 runLoader().catch((error) => {
     console.error("Loader failed", error);
-    phaseChip.textContent = "Blocked";
+    if (phaseChip) phaseChip.textContent = "Blocked";
     setPhase("Loader error", "The loading sequence failed before the target screen was ready.");
-    safetyLink.classList.add("visible");
+    if (safetyLink) safetyLink.classList.add("visible");
 });
