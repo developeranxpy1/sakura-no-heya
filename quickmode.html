@@ -1307,57 +1307,195 @@
         // --- ASSETS ---
         let scannedAssets = { environments: {}, characters: {} };
 
-        // Initialize State after Assets Load
-        // Fail-Safe: Retry logic for manifest
-        async function loadManifestWithRetry(retries = 3) {
-            for (let i = 0; i < retries; i++) {
-                try {
-                    const res = await fetch('assetts/manifest.json');
-                    if (!res.ok) throw new Error("Manifest 404");
-                    const data = await res.json();
-                    
-                    // Validation
-                    if (!data.environments || !data.characters) throw new Error("Invalid Manifest Structure");
-                    
-                    scannedAssets = data;
-                    console.log("Assets Loaded Successfully:", scannedAssets);
-                    restoreState(); 
-                    preloadAllAssets(scannedAssets);
+        function normalizeManifest(data) {
+            const manifest = { ...data };
+
+            if (Array.isArray(manifest.environments)) {
+                const environmentList = manifest.environments.slice();
+                const matchPath = (...needles) => environmentList.find((assetPath) => {
+                    const normalizedPath = String(assetPath).toLowerCase().replace(/\\/g, '/');
+                    return needles.some((needle) => normalizedPath.includes(needle));
+                });
+
+                manifest.environmentList = environmentList;
+                manifest.environments = {
+                    room: {
+                        day: matchPath('roomdayandnightbg/day', '/bedroom.png'),
+                        night: matchPath('roomdayandnightbg/night', '/bedroom (2).png')
+                    },
+                    school: {
+                        day: matchPath('schooldayandnightbg/day', '/class.png'),
+                        night: matchPath('schooldayandnightbg/night')
+                    },
+                    classroom: {
+                        sunset: matchPath('/class.png', '/classroom')
+                    }
+                };
+            }
+
+            return manifest;
+        }
+
+        function preloadUrl(url) {
+            return new Promise((resolve) => {
+                if (!url || typeof url !== 'string') {
+                    resolve(false);
                     return;
-                } catch (err) {
-                    console.warn(`Manifest Load Attempt ${i+1} Failed:`, err);
-                    await new Promise(r => setTimeout(r, 1000)); // Wait 1s
+                }
+
+                if (/\.(png|jpe?g|webp|gif)$/i.test(url)) {
+                    const img = new Image();
+                    img.onload = () => resolve(true);
+                    img.onerror = () => resolve(false);
+                    img.src = url;
+                    return;
+                }
+
+                if (/\.(mp4|webm|mov)$/i.test(url)) {
+                    const video = document.createElement('video');
+                    const cleanup = () => {
+                        video.removeAttribute('src');
+                        video.load();
+                    };
+
+                    video.preload = 'auto';
+                    video.muted = true;
+                    video.playsInline = true;
+                    video.onloadeddata = () => {
+                        cleanup();
+                        resolve(true);
+                    };
+                    video.onerror = () => {
+                        cleanup();
+                        resolve(false);
+                    };
+                    video.src = url;
+                    video.load();
+                    return;
+                }
+
+                fetch(url, { cache: 'default' })
+                    .then((response) => resolve(response.ok))
+                    .catch(() => resolve(false));
+            });
+        }
+
+        async function preloadAssetList(urls, onProgress) {
+            const uniqueUrls = Array.from(new Set(urls.filter(Boolean)));
+            let loaded = 0;
+
+            for (const url of uniqueUrls) {
+                await preloadUrl(url);
+                loaded += 1;
+                if (onProgress) {
+                    onProgress(loaded, uniqueUrls.length, url);
                 }
             }
-            console.error("All Manifest attempts failed. Using fallback.");
-            UI.alert("Warning: Asset Manifest failed to load. Using visual fallbacks.");
-            restoreState(); // Run anyway with defaults
+
+            return uniqueUrls.length;
         }
-        
-        loadManifestWithRetry();
+
+        function collectStartupAssets() {
+            const urls = [];
+            const now = new Date();
+            const hour = now.getHours();
+            const day = now.getDay();
+            const isNight = hour >= 18 || hour < 6;
+            const isSunday = day === 0;
+            const generalData = Common.loadState('general.json') || {};
+            const createdAt = generalData.createdAt || 0;
+            const isNewUser = (Date.now() - createdAt) < 8000;
+            const logState = Common.loadState('log1.json') || {};
+
+            let backgroundUrl = logState.last_bg;
+            if (!backgroundUrl) {
+                backgroundUrl = isNight ? scannedAssets.environments?.room?.night : scannedAssets.environments?.school?.day;
+                if (isSunday && !isNight) backgroundUrl = scannedAssets.environments?.room?.day || backgroundUrl;
+                if (isNewUser && scannedAssets.environments?.classroom?.sunset) {
+                    backgroundUrl = scannedAssets.environments.classroom.sunset;
+                }
+            }
+
+            const fallbackBackground = scannedAssets.environments?.room?.night || 'assetts/images/envbg/roomdayandnightbg/night.png';
+            const neutralCharacter = scannedAssets.characters?.['school-dress']?.neutral?.[0];
+            const characterUrl = logState.last_char || neutralCharacter;
+
+            urls.push(backgroundUrl, fallbackBackground, characterUrl, neutralCharacter);
+            return urls.filter(Boolean);
+        }
 
         // --- PRELOADER ---
         function preloadAllAssets(assets) {
             const urls = new Set();
-            // Recursive extractor
+
             function traverse(obj) {
                 if (!obj) return;
                 if (typeof obj === 'string') {
-                    if (obj.match(/\.(png|jpe?g|webp|gif)$/i)) urls.add(obj);
+                    if (obj.match(/\.(png|jpe?g|webp|gif|mp4|webm|mov)$/i)) {
+                        urls.add(obj);
+                    }
                 } else if (typeof obj === 'object') {
                     for (const key in obj) traverse(obj[key]);
                 }
             }
+
             traverse(assets);
-            
-            console.log(`Background Preloading ${urls.size} assets...`);
-            let loaded = 0;
-            urls.forEach(url => {
-                const img = new Image();
-                img.src = url;
-                img.onload = () => { loaded++; if(loaded === urls.size) console.log("All Assets Preloaded!"); };
+            console.log(`Background preloading ${urls.size} assets...`);
+            return preloadAssetList(Array.from(urls)).then(() => {
+                console.log("Background preload complete.");
             });
         }
+
+        // Initialize State after Assets Load
+        async function loadManifestWithRetry(retries = 3) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    setStartupOverlay('Reading scene manifest...', 14 + (i * 4));
+                    const res = await fetch('assetts/manifest.json', { cache: 'default' });
+                    if (!res.ok) throw new Error("Manifest 404");
+                    const data = await res.json();
+                    if (!data.environments || !data.characters) throw new Error("Invalid manifest structure");
+
+                    scannedAssets = normalizeManifest(data);
+                    setStartupOverlay('Preparing opening scene...', 34);
+
+                    const startupAssets = collectStartupAssets();
+                    await preloadAssetList(startupAssets, (loaded, total) => {
+                        const progress = total === 0 ? 82 : 34 + Math.round((loaded / total) * 48);
+                        setStartupOverlay('Preparing opening scene...', progress);
+                    });
+
+                    restoreState();
+                    setStartupOverlay('Warming the rest of the room...', 88);
+                    preloadAllAssets(scannedAssets).catch((error) => {
+                        console.warn('Background preload failed:', error);
+                    });
+                    setStartupOverlay('Scene ready', 100);
+                    console.log("Assets loaded successfully:", scannedAssets);
+                    return scannedAssets;
+                } catch (err) {
+                    console.warn(`Manifest load attempt ${i + 1} failed:`, err);
+                    setStartupOverlay('Retrying manifest...', 20);
+                    await new Promise(r => setTimeout(r, 1000));
+                }
+            }
+
+            console.error("All manifest attempts failed. Using fallback visuals.");
+            UI.alert("Warning: Asset manifest failed to load. Using visual fallbacks.");
+            restoreState();
+            setStartupOverlay('Fallback scene ready', 100);
+            return null;
+        }
+
+        if (loadingOverlay) {
+            loadingOverlay.classList.add('active');
+        }
+
+        const startupReady = loadManifestWithRetry().finally(() => {
+            setTimeout(() => {
+                if (loadingOverlay) loadingOverlay.classList.remove('active');
+            }, 180);
+        });
 
         // --- PERSISTENCE HELPERS ---
         function saveChatHistory() {
