@@ -1153,12 +1153,12 @@
 
     <div class="menu-container">
         <!-- Main Card -->
-        <div class="glass-panel menu-card" style="overflow: hidden;"> <!-- Ensure video clips to corners -->
+        <div class="glass-panel menu-card" data-access="Quick route ready" style="overflow: hidden;"> <!-- Ensure video clips to corners -->
             <video autoplay loop muted playsinline onerror="this.remove()"
                 style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; filter: blur(8px); opacity: 0.8; transform: scale(1.1);"> <!-- Scale to prevent blur edges -->
                 <source src="assetts/video/bgvideo.mp4" type="video/mp4">
             </video>
-            <div class="card-header-logo">
+            <div class="card-header-logo" data-userline="Signed in. Quick Start is ready now; enable Developer Mode in Settings to unlock Story Mode.">
                 <img src="assetts/images/sakuralogo.png" class="menu-logo" alt="Sakura">
             </div>
             
@@ -1168,7 +1168,7 @@
                     <span>🚀</span> Quick Start
                 </button>
                 
-                <button id="storyBtn" class="btn-menu" disabled style="opacity: 0.6; cursor: not-allowed; background: #f9f9f9; border-color: #ddd; color: #aaa;">
+                <button id="storyBtn" class="btn-menu" data-storyhint="Locked behind Developer Mode so the live route stays stable for regular play." disabled style="opacity: 0.6; cursor: not-allowed; background: #f9f9f9; border-color: #ddd; color: #aaa;">
                     <span>📖</span> Story Mode
                 </button>
                 
