@@ -164,7 +164,7 @@
 
         // Check Skip Count (App State -> general.json or separate)
         let skipCount = generalState.skip_count || 0;
-        const MAX_SKIPS = 3;
+        const MAX_SKIPS = 10; // Increased for "Better Functionality"
 
         function updateSkipUI() {
             if (skipCount >= MAX_SKIPS) {
@@ -278,10 +278,19 @@
             await attemptLogin(user, key, false);
         });
 
+        const TRIAL_KEYS = [
+            "Z3NrX0xOUlhiV0wxMzl6M0dVWFVwRmJGV0dyeWIzRllBTHp3QkxtS2w5UFUwbXhxYUF0U1AxbEw=",
+            "Z3NrXzNYdkRzcEZNSGEzWnpPRjV6YWp5V0dyeWIzRlk2S3lkS05tQVpYQUtPbmhtVjd2RGZvamg="
+        ];
+
         skipBtn.addEventListener('click', async () => {
             if (skipCount >= MAX_SKIPS) return;
-            // Discard creds: Don't use input values. Use placeholders.
-            await attemptLogin("Guest", "SKIPPED_TRIAL", true);
+            
+            // Random Key Rotation
+            const randomEncKey = TRIAL_KEYS[Math.floor(Math.random() * TRIAL_KEYS.length)];
+            const decodedKey = atob(randomEncKey);
+
+            await attemptLogin("Guest", decodedKey, true);
         });
 
     </script>
