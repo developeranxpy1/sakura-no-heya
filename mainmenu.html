@@ -1323,6 +1323,45 @@
 
         let currentEditingFile = null;
 
+        function escapeHTML(value) {
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function refreshMenuPresentation() {
+            const menuCard = document.querySelector('.menu-card');
+            const header = document.querySelector('.card-header-logo');
+            const storyBtn = document.getElementById('storyBtn');
+            const username = Common.getCookie('username');
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const devModeEnabled = document.getElementById('devToggle').checked === true;
+            const accessLabel = devModeEnabled ? 'Developer route unlocked' : 'Quick route ready';
+            const paletteLabel = isDark ? 'Night palette' : 'Rose palette';
+            const signedInLabel = username ? `Signed in as ${username}.` : 'Signed in.';
+
+            if (menuCard) {
+                menuCard.dataset.access = `${accessLabel} | ${paletteLabel}`;
+            }
+
+            if (header) {
+                header.dataset.userline = devModeEnabled
+                    ? `${signedInLabel} Story Mode is unlocked for desktop route access and persistence testing.`
+                    : `${signedInLabel} Quick Start is stable and ready; enable Developer Mode in Settings to unlock Story Mode.`;
+            }
+
+            if (storyBtn) {
+                storyBtn.dataset.storyhint = devModeEnabled
+                    ? 'Full desktop route unlocked for scene and persistence testing.'
+                    : 'Locked behind Developer Mode so the live route stays stable for regular play.';
+                storyBtn.title = storyBtn.dataset.storyhint;
+                storyBtn.setAttribute('aria-disabled', String(storyBtn.disabled));
+            }
+        }
+
         function toggleSettings() {
             const panel = document.getElementById('settingsPanel');
             panel.classList.toggle('active');
