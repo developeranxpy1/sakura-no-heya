@@ -1456,8 +1456,14 @@
                         document.getElementById('themeToggle').checked = isDark;
                         toggleTheme(isDark);
                     }
+                    if (parsed.devMode !== undefined) {
+                        const isEnabled = parsed.devMode === true;
+                        document.getElementById('devToggle').checked = isEnabled;
+                        applyDevMode(isEnabled);
+                    }
                     // Apply theme globally (backup)
                     Common.initTheme();
+                    refreshMenuPresentation();
                 }
 
             } catch (e) {
