@@ -1400,13 +1400,22 @@
                     */
                 }
             }
-            content += "</ul>";
-            
-            if (found) {
-                list.innerHTML = content;
-            } else {
-                list.innerHTML = "No persistent files found.";
+            if (files.length === 0) {
+                list.textContent = "No persistent files found.";
+                return;
             }
+
+            files.sort((a, b) => b.sortOrder - a.sortOrder || a.filename.localeCompare(b.filename));
+
+            list.innerHTML = `<strong>Persistence Files</strong><ul>${files.map((file) => `
+                <li>
+                    <div>
+                        <strong>${escapeHTML(file.filename)}</strong>
+                        <small>${escapeHTML(file.meta)}</small>
+                    </div>
+                    <button type="button" data-file="${encodeURIComponent(file.filename)}" onclick="editFile(decodeURIComponent(this.dataset.file))">Edit</button>
+                </li>
+            `).join('')}</ul>`;
         }
 
         function editFile(filename) {
