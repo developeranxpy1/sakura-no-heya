@@ -763,6 +763,388 @@
             }
         }
 
+        /* Existing markup VN override */
+        html, body {
+            min-height: 100%;
+            height: auto !important;
+            overflow: auto !important;
+        }
+
+        body {
+            position: relative;
+            background:
+                radial-gradient(circle at top left, rgba(255, 255, 255, 0.74), transparent 24%),
+                linear-gradient(135deg, #fff1f8 0%, #ffd8ea 48%, #fff7d8 100%) !important;
+            background-image:
+                radial-gradient(circle at top left, rgba(255, 255, 255, 0.74), transparent 24%),
+                linear-gradient(135deg, #fff1f8 0%, #ffd8ea 48%, #fff7d8 100%) !important;
+        }
+
+        [data-theme="dark"] body {
+            background:
+                radial-gradient(circle at top left, rgba(255, 255, 255, 0.08), transparent 24%),
+                linear-gradient(135deg, #080a15 0%, #151124 48%, #251c39 100%) !important;
+            background-image:
+                radial-gradient(circle at top left, rgba(255, 255, 255, 0.08), transparent 24%),
+                linear-gradient(135deg, #080a15 0%, #151124 48%, #251c39 100%) !important;
+        }
+
+        body::before,
+        body::after {
+            content: "";
+            position: fixed;
+            border-radius: 999px;
+            filter: blur(28px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::before {
+            width: min(44vw, 520px);
+            height: min(44vw, 520px);
+            top: -12%;
+            left: -10%;
+            background: radial-gradient(circle, rgba(255, 168, 205, 0.94), rgba(255, 168, 205, 0));
+        }
+
+        body::after {
+            width: min(36vw, 440px);
+            height: min(36vw, 440px);
+            right: -4%;
+            bottom: -14%;
+            background: radial-gradient(circle, rgba(200, 182, 255, 0.84), rgba(200, 182, 255, 0));
+        }
+
+        .menu-container {
+            position: relative;
+            z-index: 1;
+            min-height: 100dvh;
+            width: 100%;
+            padding: clamp(16px, 3vw, 28px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+        }
+
+        .menu-card {
+            width: min(680px, 100%);
+            min-height: auto;
+            overflow: hidden !important;
+            border-width: 1px !important;
+            border-color: rgba(255, 255, 255, 0.38) !important;
+            border-radius: 38px !important;
+            box-shadow: 0 34px 90px rgba(120, 54, 86, 0.22) !important;
+            background: rgba(255, 248, 252, 0.72) !important;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+
+        [data-theme="dark"] .menu-card {
+            background: rgba(18, 22, 40, 0.78) !important;
+            box-shadow: 0 34px 90px rgba(0, 0, 0, 0.38) !important;
+            border-color: rgba(255, 255, 255, 0.12) !important;
+        }
+
+        .menu-card::before {
+            content: attr(data-access);
+            position: absolute;
+            top: 18px;
+            right: 18px;
+            z-index: 3;
+            min-height: 38px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.44);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            color: var(--text-color);
+            font-family: "Courier New", Courier, monospace;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        [data-theme="dark"] .menu-card::before {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.14);
+        }
+
+        .menu-card > video {
+            position: absolute !important;
+            inset: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            z-index: -1 !important;
+            opacity: 0.34 !important;
+            filter: blur(10px) saturate(1.12) !important;
+            transform: scale(1.12) !important;
+        }
+
+        .card-header-logo {
+            align-items: flex-start !important;
+            text-align: left;
+            padding: 58px 28px 18px 28px !important;
+            gap: 10px;
+        }
+
+        .card-header-logo::before {
+            content: "Visual novel start screen";
+            display: inline-flex;
+            align-items: center;
+            min-height: 36px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.42);
+            border: 1px solid rgba(255, 255, 255, 0.48);
+            color: var(--text-color);
+            font-family: "Courier New", Courier, monospace;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .card-header-logo::after {
+            content: attr(data-userline);
+            display: block;
+            max-width: 36ch;
+            color: rgba(89, 74, 78, 0.84);
+            line-height: 1.6;
+        }
+
+        [data-theme="dark"] .card-header-logo::after {
+            color: rgba(224, 224, 224, 0.78);
+        }
+
+        .menu-logo {
+            width: min(320px, 80%) !important;
+            max-width: 320px !important;
+            margin: 0 !important;
+            filter: drop-shadow(0 16px 24px rgba(0, 0, 0, 0.16)) !important;
+        }
+
+        .menu-buttons {
+            display: grid !important;
+            gap: 12px !important;
+            padding: 0 28px 28px !important;
+        }
+
+        .menu-buttons::before {
+            content: "Choose where to continue";
+            margin-bottom: 2px;
+            color: rgba(89, 74, 78, 0.64);
+            font-family: "Courier New", Courier, monospace;
+            font-size: 0.74rem;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+
+        [data-theme="dark"] .menu-buttons::before {
+            color: rgba(224, 224, 224, 0.56);
+        }
+
+        .menu-buttons .btn-menu > span {
+            display: none;
+        }
+
+        .menu-buttons .btn-menu {
+            width: 100%;
+            min-height: 78px;
+            padding: 18px 20px !important;
+            border-radius: 24px !important;
+            border: 1px solid rgba(255, 255, 255, 0.14) !important;
+            background: rgba(121, 55, 93, 0.9) !important;
+            color: #ffffff !important;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+            text-align: left;
+            font-size: 1.18rem !important;
+            font-weight: 800 !important;
+            line-height: 1.2;
+            display: grid;
+            gap: 6px;
+        }
+
+        .menu-buttons .btn-menu:hover:not(:disabled) {
+            transform: translateY(-3px);
+            background: rgba(121, 55, 93, 0.96) !important;
+            border-color: rgba(255, 255, 255, 0.28) !important;
+            box-shadow: 0 18px 28px rgba(0, 0, 0, 0.16) !important;
+        }
+
+        .menu-buttons .btn-menu::after {
+            font-size: 0.78rem;
+            font-weight: 500;
+            line-height: 1.45;
+            color: rgba(255, 255, 255, 0.74);
+        }
+
+        .menu-buttons .btn-menu:nth-of-type(1) {
+            background: linear-gradient(135deg, rgba(255, 216, 111, 0.28), rgba(255, 110, 169, 0.2)), rgba(121, 55, 93, 0.94) !important;
+            border-color: rgba(255, 216, 111, 0.34) !important;
+            color: #fff4bd !important;
+        }
+
+        .menu-buttons .btn-menu:nth-of-type(1)::after {
+            content: "Fastest way into the chat room through the stable loader.";
+        }
+
+        #storyBtn {
+            opacity: 1 !important;
+            background: rgba(89, 76, 112, 0.9) !important;
+        }
+
+        #storyBtn::after {
+            content: attr(data-storyhint);
+        }
+
+        #storyBtn:disabled {
+            opacity: 0.64 !important;
+            cursor: not-allowed !important;
+        }
+
+        .menu-buttons .btn-menu:nth-of-type(3)::after {
+            content: "Theme, audio, personality, and persistence management.";
+        }
+
+        .menu-buttons .btn-menu:nth-of-type(n+4) {
+            min-height: 60px;
+            text-align: center;
+            place-items: center;
+            background: rgba(255, 255, 255, 0.18) !important;
+            color: var(--text-color) !important;
+        }
+
+        [data-theme="dark"] .menu-buttons .btn-menu:nth-of-type(n+4) {
+            color: var(--text-color) !important;
+            background: rgba(255, 255, 255, 0.08) !important;
+        }
+
+        .menu-buttons .btn-menu:nth-of-type(n+4)::after {
+            content: "";
+            display: none;
+        }
+
+        .menu-separator {
+            height: 1px;
+            margin: 4px 0;
+            background: linear-gradient(90deg, transparent, rgba(89, 74, 78, 0.28), transparent);
+        }
+
+        [data-theme="dark"] .menu-separator {
+            background: linear-gradient(90deg, transparent, rgba(224, 224, 224, 0.16), transparent);
+        }
+
+        .settings-modal {
+            padding: 28px;
+            border-radius: inherit;
+            overflow-y: auto;
+        }
+
+        .settings-modal > h2 {
+            margin: 0 0 18px !important;
+            font-size: 2rem !important;
+            line-height: 1;
+        }
+
+        .settings-modal > h2::before {
+            content: "Control room";
+            display: block;
+            margin-bottom: 10px;
+            color: rgba(89, 74, 78, 0.64);
+            font-family: "Courier New", Courier, monospace;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+
+        [data-theme="dark"] .settings-modal > h2::before {
+            color: rgba(224, 224, 224, 0.56);
+        }
+
+        .settings-modal > hr {
+            display: none;
+        }
+
+        #fileList ul {
+            list-style: none;
+            padding: 0;
+            margin: 16px 0 0;
+        }
+
+        #fileList li {
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.42);
+            padding: 10px 12px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.42);
+        }
+
+        [data-theme="dark"] #fileList li {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+
+        #fileList button {
+            border-radius: 10px !important;
+            padding: 8px 12px !important;
+            font-size: 0.85rem !important;
+        }
+
+        #jsonEditor > div {
+            width: min(760px, 100%) !important;
+            max-width: min(760px, 100%) !important;
+            padding: 24px !important;
+            display: grid !important;
+            gap: 16px;
+            background: var(--glass-bg) !important;
+        }
+
+        #jsonEditor textarea {
+            width: 100% !important;
+            height: 360px !important;
+            margin: 0 !important;
+            font-family: Consolas, "Courier New", monospace !important;
+        }
+
+        @media (max-height: 820px) {
+            .menu-container {
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .menu-container {
+                padding: 16px;
+            }
+
+            .menu-card::before {
+                position: static;
+                margin: 16px 16px 0 auto;
+            }
+
+            .card-header-logo,
+            .menu-buttons,
+            .settings-modal {
+                padding-left: 20px !important;
+                padding-right: 20px !important;
+            }
+
+            .card-header-logo {
+                padding-top: 24px !important;
+            }
+
+            .menu-buttons .btn-menu {
+                min-height: 72px;
+            }
+        }
+
     </style>
 </head>
 <body>
