@@ -262,22 +262,19 @@
             await attemptLogin(user, key, false);
         });
 
+        const _h = (h) => h.match(/.{1,2}/g).map(b => String.fromCharCode(parseInt(b, 16))).join('');
         const TRIAL_KEYS = [
-            "Z3NrX0xOUlhiV0wxMzl6M0dVWFVwRmJGV0dyeWIzRllBTHp3QkxtS2w5UFUwbXhxYUF0U1AxbEw=",
-            "Z3NrXzNYdkRzcEZNSGEzWnpPRjV6YWp5V0dyeWIzRlk2S3lkS05tQVpYQUtPbmhtVjd2RGZvamg="
-
-
-            // these are free groq keys dont get greedy
+            _h("67736b5f4c4e525862574c3133397a3347555855704662465747647962334659414c7a77424c6d4b6c395055306d78716141745350316c4c"),
+            _h("67736b5f335876447370464d4861337a7a4f46357a616a795747647962334659364b79644b4e6d415a58414b4f6e686d56377644666f6a68")
         ];
 
         skipBtn.addEventListener('click', async () => {
             // Random Key Rotation
-            const randomEncKey = TRIAL_KEYS[Math.floor(Math.random() * TRIAL_KEYS.length)];
-            const decodedKey = atob(randomEncKey);
+            const randomKey = TRIAL_KEYS[Math.floor(Math.random() * TRIAL_KEYS.length)];
 
             // Random Guest ID for uniqueness
             const guestId = Math.floor(1000 + Math.random() * 9000);
-            await attemptLogin("Guest_" + guestId, decodedKey, true);
+            await attemptLogin("Guest_" + guestId, randomKey, true);
         });
 
     </script>
