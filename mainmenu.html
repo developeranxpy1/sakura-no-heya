@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sakura No Heya</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%F0%9F%8C%B8</text></svg>">
+    <link rel="stylesheet" href="assetts/css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100dvh;
+        }
+
+        .menu-container {
+            width: min(92vw, 760px);
+            padding: 20px;
+        }
+
+        .menu-card {
+            width: 100%;
+            min-height: 640px;
+        }
+
+        .menu-card > video {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            opacity: 0.28;
+            filter: blur(8px);
+            transform: scale(1.08);
+        }
+
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-top: 0;
+        }
+
+        .menu-buttons .btn-menu {
+            margin-bottom: 0;
+        }
+
+        .settings-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        #fileList ul {
+            list-style: none;
+            padding: 0;
+            margin: 8px 0 0;
+        }
+
+        #fileList li {
+            margin-bottom: 10px;
+            background: var(--btn-bg);
+            padding: 8px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        #fileList button {
+            background: var(--glass-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 6px 10px;
+            cursor: pointer;
+            color: var(--text-color);
+            font-family: inherit;
+            font-weight: bold;
+        }
+
+        #jsonEditor textarea {
+            width: 100%;
+            height: 300px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px;
+            font-family: Consolas, "Courier New", monospace;
+            resize: vertical;
+        }
+
+        @media (max-width: 720px) {
+            body {
+                overflow-y: auto;
+                padding: 20px 0;
+            }
+
+            .menu-container {
+                width: min(96vw, 760px);
+                padding: 10px;
+            }
+
+            .card-header-logo {
+                padding: 26px 16px 16px;
+            }
+
+            .card-content {
+                padding: 1.25rem;
+            }
+
+            .btn-menu {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="menu-container">
+        <div class="glass-panel menu-card">
+            <video autoplay loop muted playsinline onerror="this.remove()">
+                <source src="assetts/video/bgvideo.mp4" type="video/mp4">
+            </video>
+
+            <div class="card-header-logo">
+                <img src="assetts/images/sakuralogo.png" class="menu-logo" alt="Sakura">
+            </div>
+
+            <div class="menu-buttons card-content">
+                <button class="btn-menu" onclick="startQuickMode()">Quick Start</button>
+                <button id="storyBtn" class="btn-menu" disabled>Story Mode</button>
+                <button class="btn-menu" onclick="toggleSettings()">Settings</button>
+                <button class="btn-menu btn-danger" onclick="clearData()">Delete userdata</button>
+                <button class="btn-menu" onclick="logout()">Logout</button>
+
+                <div class="menu-separator"></div>
+
+                <button class="btn-menu" onclick="window.location.href='about.html'">About</button>
+            </div>
+
+            <div class="settings-modal" id="settingsPanel">
+                <h2 style="font-family: 'Comic Sans MS', cursive, sans-serif; color: var(--text-color); font-size: 2rem; margin-bottom: 30px;">Settings</h2>
+
+                <div class="setting-row">
+                    <span>Dark Mode</span>
+                    <label class="switch">
+                        <input type="checkbox" id="themeToggle" onchange="toggleTheme(this.checked); saveSettings(false)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-row">
+                    <span>Music</span>
+                    <label class="switch">
+                        <input type="checkbox" id="musicToggle" onchange="saveSettings(false)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-row">
+                    <span>SFX</span>
+                    <label class="switch">
+                        <input type="checkbox" id="sfxToggle" onchange="saveSettings(false)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-row">
+                    <span>Developer Mode</span>
+                    <label class="switch">
+                        <input type="checkbox" id="devToggle" onchange="saveSettings(false)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div style="margin-top: 20px; width: 100%;">
+                    <label style="display:block; text-align:left; font-size:0.9rem; margin-bottom:5px;">Personality</label>
+                    <textarea id="personalityInput" maxlength="5000" placeholder="5000-chars max" style="width: 100%; box-sizing: border-box; border-radius: 10px; padding: 15px; border: 2px solid var(--border-color); font-family: inherit; resize: vertical; min-height: 150px; font-size: 1rem; background: var(--glass-bg); color: var(--text-color);"></textarea>
+                </div>
+
+                <div style="margin-top: 30px; display:flex; gap:15px; flex-wrap: wrap; justify-content: center; width: 100%;">
+                    <button class="btn-candy" onclick="saveSettings(true)">Save</button>
+                    <button class="btn-candy" onclick="toggleSettings()">Back</button>
+                </div>
+
+                <hr style="margin: 25px 0; border: 0.5px solid #eee; width: 100%;">
+
+                <div style="display:flex; gap:10px; flex-wrap: wrap; justify-content: center; width: 100%; margin-bottom: 20px;">
+                    <button class="btn-candy" onclick="exportData()">Export Data</button>
+                    <button class="btn-candy" onclick="triggerImport()">Import Data</button>
+                </div>
+                <input type="file" id="importFile" style="display: none;" accept=".zip" onchange="importData(this)">
+
+                <button class="btn-candy-red" onclick="clearData()">Delete All Data</button>
+
+                <div id="fileList" style="margin-top: 15px; font-size: 0.8rem; color: #888; text-align: left; width: 100%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="jsonEditor" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 100; display: none; align-items: center; justify-content: center;">
+        <div class="glass-panel" style="background: white; padding: 20px; width: 90%; max-width: 500px; display: flex; flex-direction: column;">
+            <h3 style="margin-top: 0; color: #594a4e; text-align: center;">Edit <span id="editFileName"></span></h3>
+            <textarea id="jsonContent"></textarea>
+            <div style="margin-top: 15px; display: flex; gap: 10px; justify-content: center;">
+                <button class="btn-candy" onclick="saveJSON()">Save</button>
+                <button class="btn-candy" style="border-color: #ddd; background: #f0f0f0; color: #888;" onclick="closeEditor()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="assetts/js/common.js"></script>
+    <script>
+        if (!Common.getCookie('username')) {
+            window.location.href = 'index.html';
+        }
+
+        let currentEditingFile = null;
+
+        function toggleSettings() {
+            const panel = document.getElementById('settingsPanel');
+            panel.classList.toggle('active');
+
+            if (panel.classList.contains('active')) {
+                updateFileList();
+            }
+        }
+
+        function updateFileList() {
+            const list = document.getElementById('fileList');
+            let content = "<strong>Persistence Files:</strong><ul>";
+            const prefix = 'delta_os_';
+            let found = false;
+
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith(prefix)) {
+                    found = true;
+                    const filename = key.replace(prefix, '');
+                    let meta = "Unknown Date";
+                    try {
+                        const data = JSON.parse(localStorage.getItem(key));
+                        if (data && data.createdAt) {
+                            const date = new Date(data.createdAt);
+                            meta = date.toLocaleString();
+                        }
+                    } catch (e) {}
+
+                    content += `<li>
+                        <div>
+                            <span style="color:var(--btn-text); font-weight:bold;">${filename}</span><br>
+                            <span style="font-size:0.7rem; color:var(--btn-text); opacity: 0.7;">${meta}</span>
+                        </div>
+                        <button type="button" onclick="editFile('${filename.replace(/'/g, "\\'")}')">Edit</button>
+                    </li>`;
+                }
+            }
+            content += "</ul>";
+
+            if (found) {
+                list.innerHTML = content;
+            } else {
+                list.innerHTML = "No persistent files found.";
+            }
+        }
+
+        function editFile(filename) {
+            currentEditingFile = filename;
+            const data = Common.loadState(filename);
+
+            document.getElementById('editFileName').innerText = filename;
+            document.getElementById('jsonContent').value = JSON.stringify(data, null, 2);
+            document.getElementById('jsonEditor').style.display = 'flex';
+        }
+
+        function closeEditor() {
+            document.getElementById('jsonEditor').style.display = 'none';
+            currentEditingFile = null;
+        }
+
+        function saveJSON() {
+            if (!currentEditingFile) return;
+
+            try {
+                const raw = document.getElementById('jsonContent').value;
+                const parsed = JSON.parse(raw);
+
+                Common.saveState(currentEditingFile, parsed);
+
+                alert("Saved!");
+                closeEditor();
+                updateFileList();
+
+                if (currentEditingFile === 'general.json') {
+                    if (parsed.personality !== undefined) document.getElementById('personalityInput').value = parsed.personality;
+                    if (parsed.music !== undefined) document.getElementById('musicToggle').checked = parsed.music;
+                    if (parsed.sfx !== undefined) document.getElementById('sfxToggle').checked = parsed.sfx;
+                    if (parsed.devMode !== undefined) {
+                        document.getElementById('devToggle').checked = parsed.devMode === true;
+                        applyDevMode(parsed.devMode === true);
+                    }
+                    if (parsed.theme !== undefined) {
+                        const isDark = parsed.theme === 'dark';
+                        document.getElementById('themeToggle').checked = isDark;
+                        toggleTheme(isDark);
+                    }
+                    Common.initTheme();
+                }
+            } catch (e) {
+                alert("Invalid JSON! Please check syntax.\n" + e.message);
+            }
+        }
+
+        function logout() {
+            Common.setCookie('username', '', -1);
+            Common.setCookie('key', '', -1);
+            window.location.href = 'index.html';
+        }
+
+        function clearData() {
+            if (confirm("Are you sure? This will delete all your settings, history, and mood data.")) {
+                localStorage.clear();
+                Common.setCookie('delta_settings', '', -1);
+                logout();
+            }
+        }
+
+        function saveSettings(shouldClose = false) {
+            const isDark = document.getElementById('themeToggle').checked;
+            const music = document.getElementById('musicToggle').checked;
+            const sfx = document.getElementById('sfxToggle').checked;
+            const devMode = document.getElementById('devToggle').checked;
+            const personality = document.getElementById('personalityInput').value.trim();
+
+            const current = Common.loadState('general.json') || {};
+            current.theme = isDark ? 'dark' : 'light';
+            current.music = music;
+            current.sfx = sfx;
+            current.devMode = devMode;
+            current.personality = personality;
+
+            Common.saveState('general.json', current);
+            Common.initTheme();
+            applyDevMode(devMode);
+
+            if (shouldClose) {
+                toggleSettings();
+            }
+        }
+
+        function applyDevMode(isEnabled) {
+            const btn = document.getElementById('storyBtn');
+            btn.disabled = !isEnabled;
+            btn.onclick = isEnabled ? function() { window.location.href = 'desktopui.html'; } : null;
+        }
+
+        function toggleTheme(isDark) {
+            const theme = isDark ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+        }
+
+        const DEFAULT_PERSONALITY = `You are Sakura.
+You are shy, soft-spoken, and formal. You hesitate, overthink, and apologize.
+You enjoy literature and atmosphere. You DO NOT sound poetic unless emotional.
+You never mention being AI. You control the background/Visual Novel elements.`;
+
+        const settings = Common.loadState('general.json') || {};
+        if (settings.theme === 'dark') {
+            document.getElementById('themeToggle').checked = true;
+            toggleTheme(true);
+        }
+        document.getElementById('musicToggle').checked = settings.music !== false;
+        document.getElementById('sfxToggle').checked = settings.sfx !== false;
+        document.getElementById('devToggle').checked = settings.devMode === true;
+        applyDevMode(settings.devMode === true);
+
+        let savedPersonality = settings.personality || settings.prompt;
+        if (!savedPersonality) {
+            savedPersonality = DEFAULT_PERSONALITY;
+        } else if (savedPersonality.includes("OUTPUT FORMAT: Return JSON ONLY")) {
+            savedPersonality = savedPersonality.split("OUTPUT FORMAT")[0].trim();
+        }
+        document.getElementById('personalityInput').value = savedPersonality;
+
+        async function startQuickMode() {
+            window.location.href = 'loading.html?target=quickmode';
+        }
+
+        async function exportData() {
+            const zip = new JSZip();
+            let count = 0;
+
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('delta_os_')) {
+                    zip.file(key, localStorage.getItem(key));
+                    count++;
+                }
+            }
+
+            const creds = {
+                username: Common.getCookie('username'),
+                key: Common.getCookie('key')
+            };
+            zip.file('credentials.json', JSON.stringify(creds));
+
+            if (count === 0) {
+                alert("No data to export!");
+                return;
+            }
+
+            const now = new Date();
+            const dateStr = now.toISOString().slice(0, 10);
+            const timeStr = now.toTimeString().slice(0, 5).replace(':', '-');
+            const filename = `sakuranh-${dateStr}-${timeStr}.zip`;
+
+            const blob = await zip.generateAsync({ type: "blob" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function triggerImport() {
+            document.getElementById('importFile').click();
+        }
+
+        async function importData(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            try {
+                const zip = await JSZip.loadAsync(file);
+                let imported = 0;
+
+                for (const filename of Object.keys(zip.files)) {
+                    const content = await zip.file(filename).async("string");
+
+                    if (filename === 'credentials.json') {
+                        try {
+                            const creds = JSON.parse(content);
+                            if (creds.username) Common.setCookie('username', creds.username, 30);
+                            if (creds.key) Common.setCookie('key', creds.key, 30);
+                        } catch (e) {}
+                    } else if (filename.startsWith('delta_os_')) {
+                        localStorage.setItem(filename, content);
+                        imported++;
+                    }
+                }
+
+                alert(`Imported ${imported} files successfully! Reloading...`);
+                window.location.reload();
+            } catch (e) {
+                alert("Import failed! Invalid zip." + e);
+            }
+        }
+    </script>
+</body>
+</html>
