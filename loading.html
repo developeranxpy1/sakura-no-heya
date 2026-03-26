@@ -10,37 +10,31 @@
 </head>
 <body>
     <div class="loading-scene">
-        <div class="ambient-shape one" aria-hidden="true"></div>
-        <div class="ambient-shape two" aria-hidden="true"></div>
-        <div class="ambient-shape three" aria-hidden="true"></div>
-        <div class="grid-veil" aria-hidden="true"></div>
+        <div class="scene-bloom bloom-a" aria-hidden="true"></div>
+        <div class="scene-bloom bloom-b" aria-hidden="true"></div>
+        <div class="scene-bloom bloom-c" aria-hidden="true"></div>
+        <div class="scene-grid" aria-hidden="true"></div>
+        <div class="scene-word" aria-hidden="true">SAKURA</div>
         <div class="petal-field" id="petalField" aria-hidden="true"></div>
-        <div class="grain-veil" aria-hidden="true"></div>
+        <div class="scene-grain" aria-hidden="true"></div>
 
         <main class="loading-shell" id="loadingShell">
-            <section class="loading-panel glass-panel">
+            <section class="loading-panel">
                 <div class="hero-side">
-                    <div>
+                    <div class="hero-topline">
                         <div class="eyebrow" id="loaderEyebrow">Sakura startup sequence</div>
-                        <h1 class="hero-title" id="heroTitle"><span id="heroLead">Setting the room for</span> <span id="displayName">you</span></h1>
+                        <div class="hero-stamp">Stable asset gate</div>
+                    </div>
+
+                    <div class="hero-copy-block">
+                        <p class="hero-kicker">Startup handoff</p>
+                        <h1 class="hero-title" id="heroTitle">
+                            <span id="heroLead">Setting the room for</span>
+                            <span id="displayName">you</span>
+                        </h1>
                         <p class="hero-copy" id="heroCopy">
                             Preparing the next screen and waiting for the assets it actually needs.
                         </p>
-                    </div>
-
-                    <div class="hero-visual">
-                        <div class="logo-orbit" aria-hidden="true">
-                            <div class="orbit-ring ring-a"></div>
-                            <div class="orbit-ring ring-b"></div>
-                            <div class="orbit-ring ring-c"></div>
-                            <div class="orbit-node node-a"></div>
-                            <div class="orbit-node node-b"></div>
-                            <div class="orbit-node node-c"></div>
-                            <div class="logo-core">
-                                <img src="assetts/images/sakuralogo.png" alt="Sakura">
-                            </div>
-                        </div>
-
                         <div class="signal-stack">
                             <div class="signal-card">
                                 <span class="signal-label">Theme</span>
@@ -56,6 +50,28 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="hero-visual">
+                        <div class="visual-caption">
+                            <span class="visual-label">Live sequence</span>
+                            <strong>Every required file must resolve before handoff.</strong>
+                        </div>
+
+                        <div class="logo-stage" aria-hidden="true">
+                            <div class="logo-stage-glow"></div>
+                            <div class="logo-orbit orbit-outer"></div>
+                            <div class="logo-orbit orbit-middle"></div>
+                            <div class="logo-orbit orbit-inner"></div>
+                            <div class="orbit-mark mark-a"></div>
+                            <div class="orbit-mark mark-b"></div>
+                            <div class="orbit-mark mark-c"></div>
+                            <div class="logo-plinth">
+                                <div class="logo-core">
+                                    <img src="assetts/images/sakuralogo.png" alt="Sakura">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="status-side">
@@ -64,19 +80,26 @@
                         <div class="timer-chip" id="elapsedTime">00:00</div>
                     </div>
 
-                    <div class="progress-hero">
-                        <div class="progress-copy">
-                            <p class="status-kicker">Current task</p>
-                            <h2 class="status-title" id="statusText" aria-live="polite">Inspecting startup requirements...</h2>
+                    <div class="status-copy">
+                        <div class="progress-hero">
+                            <div class="progress-copy">
+                                <p class="status-kicker">Current task</p>
+                                <h2 class="status-title" id="statusText" aria-live="polite">Inspecting startup requirements...</h2>
+                            </div>
+                            <div class="percent-wrap" id="progressPercent">0%</div>
                         </div>
-                        <div class="percent-wrap" id="progressPercent">0%</div>
+                        <p class="status-note" id="statusNote">The loader will stay here until the next screen is actually ready.</p>
                     </div>
 
-                    <div class="progress-track" aria-hidden="true">
-                        <div class="progress-fill" id="progressFill"></div>
+                    <div class="progress-panel">
+                        <div class="progress-track" aria-hidden="true">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <div class="progress-legend">
+                            <span>Resolve resources</span>
+                            <span>Enter destination</span>
+                        </div>
                     </div>
-
-                    <p class="status-note" id="statusNote">The loader will stay here until the next screen is actually ready.</p>
 
                     <div class="milestones" id="milestones">
                         <div class="milestone active">
