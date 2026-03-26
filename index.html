@@ -92,7 +92,7 @@
             </div>
 
             <button class="btn btn-secondary" id="skipBtn" style="margin-top: 25px; width: 100%; border:none; opacity: 0.9;">Skip Key (Trial)</button>
-            <div id="skipInfo" class="skip-count"></div>
+            <div id="skipInfo" class="skip-count" style="display: none;"></div>
 
             <p class="info-text">
                 By entering, you accept cookies for credentials and persistent memory for app state.
@@ -162,22 +162,10 @@
              keyInput.value = generalState.key;
         }
 
-        // Check Skip Count (App State -> general.json or separate)
-        let skipCount = generalState.skip_count || 0;
-        const MAX_SKIPS = 10; // Increased for "Better Functionality"
-
+        // Removed Skip Count Logic as per User Request ("always enable")
         function updateSkipUI() {
-            if (skipCount >= MAX_SKIPS) {
-                // skipBtn.disabled = true; // User asked to "discard creds" - arguably if expired we might still want to disable or handle differently. 
-                // Keeping disabled logic for Expired Trial as strict requirement mentions limit.
-                skipBtn.disabled = true;
-                skipBtn.innerText = "Trial Expired";
-                skipInfo.innerText = "Please enter a valid API Key to continue.";
-            } else {
-                skipInfo.innerText = `Trial Uses: ${skipCount}/${MAX_SKIPS}`;
-            }
+            // Logic removed
         }
-        updateSkipUI();
 
         // Strict Validation Regex
         const keyRegex = /^gsk_[a-zA-Z0-9]{20,}$/;
@@ -234,10 +222,6 @@
             // 3. Sync to general.json
             generalState.username = user;
             generalState.key = key;
-            if (isSkip) {
-                skipCount++;
-                generalState.skip_count = skipCount;
-            }
             Common.saveState('general.json', generalState);
             
             // 4. Init other files if missing
@@ -284,13 +268,13 @@
         ];
 
         skipBtn.addEventListener('click', async () => {
-            if (skipCount >= MAX_SKIPS) return;
-            
             // Random Key Rotation
             const randomEncKey = TRIAL_KEYS[Math.floor(Math.random() * TRIAL_KEYS.length)];
             const decodedKey = atob(randomEncKey);
 
-            await attemptLogin("Guest", decodedKey, true);
+            // Random Guest ID for uniqueness
+            const guestId = Math.floor(1000 + Math.random() * 9000);
+            await attemptLogin("Guest_" + guestId, decodedKey, true);
         });
 
     </script>
