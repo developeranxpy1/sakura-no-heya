@@ -225,7 +225,7 @@ body {
     letter-spacing: -0.05em;
 }
 
-.hero-title span,
+.hero-title #displayName,
 .percent-wrap,
 .milestone.active .milestone-state,
 .milestone-index {

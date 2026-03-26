@@ -47,8 +47,8 @@ const username = Common.getCookie("username") || generalState.username || "you";
 
 const loadingShell = document.getElementById("loadingShell");
 const displayName = document.getElementById("displayName");
+const heroLead = document.getElementById("heroLead");
 const loaderEyebrow = document.getElementById("loaderEyebrow");
-const heroTitle = document.getElementById("heroTitle");
 const heroCopy = document.getElementById("heroCopy");
 const themeLabel = document.getElementById("themeLabel");
 const destinationLabel = document.getElementById("destinationLabel");
@@ -66,8 +66,8 @@ const petalField = document.getElementById("petalField");
 let redirecting = false;
 
 displayName.textContent = username;
+heroLead.textContent = selectedTarget.hero.replace("{name}", "").trim();
 loaderEyebrow.textContent = selectedTarget.eyebrow;
-heroTitle.innerHTML = selectedTarget.hero.replace("{name}", `<span>${username}</span>`);
 heroCopy.textContent = selectedTarget.copy;
 destinationLabel.textContent = selectedTarget.destination;
 themeLabel.textContent = document.documentElement.getAttribute("data-theme") === "dark" ? "Moonlight" : "Petal Bloom";
